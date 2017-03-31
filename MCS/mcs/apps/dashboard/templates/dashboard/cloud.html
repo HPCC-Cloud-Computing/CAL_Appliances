@@ -1,0 +1,35 @@
+{% extend 'dashboard/base.html' %}
+{% block brand %}
+<a class="navbar-brand" href="#">Cloud Servers Monitoring</a>
+{% endblock %}
+{% block main %}
+<div class="col-md-12">
+    <div class="card">
+        <div class="header">
+            <h4 class="title">Cloud Servers</h4>
+        </div>
+        <div class="content table-responsive table-full-width">
+            <table class="table table-striped">
+                <thead>
+                    <th>ID</th>
+                    <th>IP ADDRESS</th>
+                    <th>TYPE</th>
+                    <th>CAPACITY</th>
+                    <th>STATUS</th>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.ipaddress }}</td>
+                        <td>{{ item.type }}</td>
+                        <td>{{ item.capacity }}</td>
+                        <td>{{ item.status }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
