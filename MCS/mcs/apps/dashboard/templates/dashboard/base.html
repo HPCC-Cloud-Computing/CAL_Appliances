@@ -29,7 +29,7 @@
 
 
     <!--  Fonts and icons     -->
-    <link href="{% static 'assets/css/font-awesome.min.css' %}'" rel="stylesheet">
+    <link href="{% static 'assets/css/font-awesome.min.css' %}" rel="stylesheet"/>
     <link href='https://fonts.googleapis.com/css?family=Muli:400,300' rel='stylesheet' type='text/css'>
     <link href="{% static 'assets/css/themify-icons.css' %}" rel="stylesheet">
 
@@ -37,6 +37,7 @@
 <body>
 
 <div class="wrapper">
+
     <div class="sidebar" data-background-color="black" data-active-color="danger">
 
     <!--
@@ -48,37 +49,41 @@
             <div class="logo">
                 <a href="{% url 'home'  %}" class="simple-text">
                     Multi Cloud Storage
-                    <hr>
-                    <img src="{% static 'assets/img/logo.png' %}" style="width: 100px; height: 100px;margin: 20px 20px 20px 20px"/>
+                    <img src="{% static 'assets/img/logo.png' %}" style="width: 90px; height: 90px;margin: 20px 20px 20px 20px"/>
                 </a>
             </div>
 
             <ul class="nav">
-                <liv class="{% if  request.endpoint == 'home' %}active{% endif %}">
+                <li class="{% if  '/home' in request.path %}active{% endif %}">
                     <a href="{% url 'home'  %}">
                         <i class="ti-home"></i>
-                        <p>Home</p>
+                        <p>HOME</p>
                     </a>
-                <li>
-                <li class="{% if  request.endpoint == 'home' %}active{% endif %}">
+                </li>
+                <li class="{% if  '/user' in request.path %}active{% endif %}">
                     <a href="{% url 'user' %}">
                         <i class="ti-user"></i>
                         <p>User Profile</p>
                     </a>
                 </li>
-                <li class="{% if  request.endpoint == 'home' %}active{% endif %}">
-                    <a href="{% url 'file' %}">
+                <li class="{% if  '/files' in request.path %}active{% endif %}">
+                    <a href="{% url 'files' %}">
                         <i class="ti-folder"></i>
                         <p>File Management</p>
                     </a>
                 </li>
-                <li class="{% if  request.endpoint == 'home' %}active{% endif %}">
-                    <a href="{% url 'cloud' %}">
-                        <i class="ti-cloud-up"></i>
+                <li class="{% if  '/clouds' in request.path %}active{% endif %}">
+                    <a href="{% url 'clouds' %}">
+                        <i class="ti-cloud"></i>
                         <p>Cloud Management</p>
                     </a>
                 </li>
-
+                <li class="{% if  '/settings' in request.path %}active{% endif %}">
+                    <a href="{% url 'settings' %}">
+                        <i class="ti-settings"></i>
+                        <p>Settings</p>
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
@@ -119,7 +124,7 @@
                               </ul>
                         </li>
                         <li>
-                            <a href="#">
+                            <a href="{% url 'settings' %}">
                                 <i class="ti-settings"></i>
                                 <p>Settings</p>
                             </a>
@@ -133,9 +138,7 @@
 
         <div class="content">
             <div class="container-fluid">
-                <div class="row">
-                    {% block main %}{% endblock %}
-                </div>
+                {% block main %}{% endblock %}
             </div>
         </div>
 
@@ -166,30 +169,9 @@
     <!--  Notifications Plugin    -->
     <script src="{% static 'assets/js/bootstrap-notify.js' %}"></script>
 
-    <!--  Google Maps Plugin    -->
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js"></script>
-
     <!-- Paper Dashboard Core javascript and methods for Demo purpose -->
     <script src="{% static 'assets/js/paper-dashboard.js' %}"></script>
 
-    <!-- Paper Dashboard DEMO methods, don't include it in your project! -->
-    <!-- <script src="{% static 'assets/js/demo.js' %}"></script> -->
-
-    <script type="text/javascript">
-        $(document).ready(function(){
-
-            demo.initChartist();
-
-            $.notify({
-                icon: 'ti-gift',
-                message: "Welcome to <b>Paper Dashboard</b> - a beautiful Bootstrap freebie for your next project."
-
-            },{
-                type: 'success',
-                timer: 4000
-            });
-
-        });
-    </script>
-
+    <!-- Custom JS -->
+    <script src="{% static 'assets/js/custom.js' %}"></script>
 </html>

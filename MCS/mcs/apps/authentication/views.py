@@ -10,7 +10,7 @@ class LoginView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         if request.user.id:
-            return redirect('/')
+            return redirect('/home')
         return self.render_to_response({})
 
     def post(self, request, *args, **kwargs):
@@ -18,7 +18,7 @@ class LoginView(TemplateView):
                             password=request.POST['password'])
         if user is not None:
             login(request, user)
-            return redirect('/')
+            return redirect('/home')
         else:
             return redirect('/auth/login')
 
@@ -60,4 +60,4 @@ def user_exists(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('/')
+    return redirect('/home')
