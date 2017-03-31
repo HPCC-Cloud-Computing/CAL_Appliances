@@ -91,3 +91,68 @@ Vấn đề trong hướng này: Chứng minh rằng cách sử dụng Chord Pro
 - Thầy muốn sử dụng Chord Ring với các Node trên Ring là Các Data Item, và các DataItem sẽ trỏ tới vị trí các DataItem Node khác trên Ring.
 
 - Góc nhìn của thầy đối với hệ thống, đó là tập các Cloud Server của User là thành phần có tính tương đối cố định, tức là các sự kiện Gắn thêm 1 Cloud Server/ Loại bỏ 1 Cloud Server là rất ít khi xảy ra. Các Node trên Chord Ring là Các Data Item, và các thành phần thường xuyên gia nhập và rời khỏi hệ thống là các DataItem chứ không phải là các Cloud Server.
+
+## 24/3/2017
+
+Thầy yêu cầu mô tả 3 mô hình dưới đây. Sau đó, phân tích và chứng minh mô hình Reference Node là mô hình hiệu quả nhất (theo lý thuyết):
+
+3 Mô hình được đưa ra phân tích là: mô hình VM Ring with Virtual Machine Node, mô hình Cloud Ring with Reference Node và mô hình Mapping (CloudID,ObjectID) by SQL Table.
+
+Các bước mô tả, phân tích và chứng minh cụ thể như sau:
+
+Phần 1: Giới thiệu và triển khai các mô hình khả thi để giải quyết cơ chế Lookup và tương tác với Data Object.
+
+Phần 2: Phân tích, so sánh các mô hình với nhau trên các tiêu chí cụ thể. Sau đó, nêu ra các ưu điểm, nhược điểm của từng mô hình.
+
+Kết luận phần 2: Mô hình được lựa chọn mô hình nào, lý do lựa chọn mô hình đó ?
+
+Phần 3: Phân tích kỹ hơn về mô hình đã lựa chọn
+
+## 25/3/2017
+
+Ý kiến của anh Hiếu:
+
+- Triển khai đầy đủ 3 mô hình thầy đề xuất thành 3 bài viết riêng biệt. Viết chi tiết về các vấn đề mà 3 mô hình phải giải quyết (lookup, update, move data, fault tolerance, replicate, load balance...)
+- Về đọc lại xem làm sao để khi người dùng muốn truy cập vào nội dung một data Object, thì hệ thống check được container chứa object đó nằm trong account của người dùng, và object người dùng muốn truy cập nằm trong container trên mà không truy cập vào device chứa nội dung container và account. (Tìm hiểu Swift auditor service)
+- Xây dựng mô hình multi-ring, 1 Ring chứa thông tin về các Account - Ring này do hệ thống MCS quản lý, và mỗi 1 account chứa 1 Cloud Server Ring độc lập với nhau.
+
+## 26/03/2017
+
+### Vấn đề 1
+
+Việc chúng ta thiết kế và sử dụng hệ thống hiện tại đang xây dựng để quản lý một loạt các loại đám mây khác nhau của nhiều Cloud Server hạ tầng bên dưới (Các Cloud Server như Swift, Amazon S3) cũng tương tự như việc hệ điều hành Linux thiết kế và xây dựng hệ thống VFS ( Virtual File System) để quản lý một loạt các File System khác nhau của hàng loạt các Device bên dưới
+
+Loại đám mây - Loại File System:  Swift, S3, Google Cloud - NTFS, FAT32, ext3, ext4
+
+Khi sử dụng hệ thống của chúng ta, trên thực tế khi người dùng truy cập vào một Data Object lưu trữ trên hệ thống, hệ thống phải đi qua một lớp Abstraction Layer trước khi truy cập tới Cloud Server thực chứa Data Object mà người dùng muốn truy cập => hiệu năng giảm so với cách truy cập trực tiếp tới Cloud Server.
+
+Mục tiêu về hiệu năng : Thiết kế hệ thống của chúng ta - chính là lớp Abstraction Layer, sao cho thời gian được hệ thống dùng để đi qua lớp abstraction Layer là nhỏ nhất có thể.
+
+Kết luận: Mô hình hiện tại của hệ thống của chúng ta có rất nhiều đặc điểm giống với Linux VFS
+
+### Vấn đề 2
+
+Nếu xét về khía cạnh một đồ án tốt nghiệp đơn giản, thì hệ thống của chúng ta không cần thiết phải xây dựng các cơ chế liên quan tới hiệu năng, cân bằng tải, sao lưu, chống lỗi,... Có quá nhiều tối ưu đã đặt vào hệ thống.
+
+Phạm vi của một đò án tốt nghiệp, theo em nghĩ nếu nhìn theo quan điểm góc nhìn phân tích hệ thống Linux VFS:
+
+Cho phép người dùng tương tác vào các Data Object lưu trên các loại Cloud Server khác nhau theo một phương thức đồng nhất:
+
+- Cho phép người dùng chọn Cloud Server sẽ lưu Data Object, lưa chọn có sao lưu Data Object đó vào một Cloud Server khác hay không ?
+- Cho phép người dùng truy cập vào các Data Object lưu trên các loại Cloud Server khác nhau theo một phương thức đồng nhất.
+- Cho phép người dùng quản lý trạng thái của Data Object.
+- Cho phép người dùng sao lưu - backup Data Object Sang một Cloud Server khác.
+- ...
+
+Tất cả mọi dữ liệu quản lý Data Object có thể sử dụng cơ sở dữ liệu để lưu trữ.
+Đồ án tốt nghiệp của một kỹ sư chỉ cần phân tích thiết kế, sau đó xây dựng được một hệ thống như trên mà không cần phải tính đến các cơ chế hiệu năng, sao lưu, cân bằng tải, phân tán thì cũng là rất ổn rồi. Chúng ta đang xây dựng quá nhiều các tính năng ở phía bên trên => Quy mô của đồ án là lớn hơn nhiều mức cần thiết.
+
+Đề xuất quá trình trình bày đồ án:
+
+Trình bày về tầng 1: Các con Cloud Server, và các hạn chế hiện tại của các Cloud Server
+
+Trình bày về tầng 2:  Trình bày quy trình xây dựng thư viện Abstraction, các cơ chế CRUD cho Data Object khi hệ thống tích hợp nhiều Cloud Server thuộc nhiều loại Cloud khác nhau - và trình bày mô hình một hệ thống sử dụng thư viện này để tạo ra một ứng dụng cho phép tích hợp nhiều Cloud Server với nhau - Trình bày về CAL và một hệ quản lý nhiều Cloud Server sử dụng CAL.
+
+Trình bày về tầng 3: Các cơ chế tối ưu hóa hệ thống, các tính năng nâng cao như phân tán tải - load balance giữa các cloud Server, cơ chế sao lưu replicate, cơ chế tối ưu hóa hiệu năng, cơ chế sử dụng Message Queue để time-coupling, cơ chế đồng bộ hóa cho các bản sao, cơ chế chống lỗi, cơ chế phục hồi - recovery, .....
+
+Đề xuất của em: Chuyển đồ án sang đặt nặng hướng nghiên cứu hơn ==> Tập trung vào thiết kế của hệ thống, còn sản phẩm minh họa chỉ cần thực hiện được một số tính năng là được.

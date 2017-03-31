@@ -146,14 +146,14 @@ Một vấn đề xảy ra ở đây, đó là có thể xảy ra trường hợ
 
 Từ vấn đề ở trên, chúng ta sẽ đề xuất 1 cơ chế kiểm tra trong quá trình lưu trữ **x**: Trước khi lưu trữ một replica lên một CloudNode, chúng ta cần kiểm tra tình trạng của Cloud Node. Nếu Cloud Node đã
 
-**Cần thảo luận thêm với thầy**
+_**Cần thảo luận thêm với thầy**_
 
 Tuy nhiên, có một vấn đề phát sinh ở đây, đó là chúng ta không hoàn toàn đảm bảo rằng, **k** key được sinh ra sẽ luôn luôn nằm trên **k** Cloud khác nhau, do chúng ta không thể nào điều khiển được replicaID nhận được sau khi hashing replica_name sẽ rơi vào node nào trên ring ?
 Đặt ID cho Node/Replica, sau đó lưu lại lastID used trong Node ?
 
 Thứ hai, là có luôn cần đảm bảo **k** bản sao phải nằm trên **k** node khác nhau (một cách tuyệt đối ?) Nếu không cần thì ta tiếp tục sử dụng cách cũ.
 
-**Cần thảo luận thêm với thầy**
+_**Cần thảo luận thêm với thầy**_
 
 #### 3.5.2 Lookup Data Object Process
 
@@ -167,7 +167,7 @@ Quá trình lookup **cơ bản** sẽ diễn ra như sau:
 
 Khi nhận được lookup request, MCS sẽ lấy ra thông tin **Object\_Name** từ request, và tìm trong cơ sở dữ liệu **Object Metadata** nào tương ứng với **Object\_Name** này. Sau đó MCS sẽ lấy ra một **replicaID** trong số các **replicaID** của Object đó, và dựa vào thuật toán Lookup của Chord Protocol để tìm xem Cloud Node nào đang chứa replica tương ứng với replicaID này (replicaID's successor Node). Bước cuối cùng, MCS Server trả về cho User các thông tin cần thiết như: replicaID và thông tin định danh của Cloud  để User có thể kết nối trực tiếp tới Cloud Server để lấy nội dung của Data Object **x** về. Cơ chế tương tác trực tiếp giữa User và Cloud Server cho phép dữ liệu không cần phải đi qua hệ thống trung gian là MCS, qua đó giảm tải cho hệ thống MCS cũng như tăng hiệu năng truy cập, vì cách User truy cập trực tiếp tới Cloud Server sẽ nhanh hơn việc chúng ta phải lấy nội dung Object từ Cloud Server về MCS, sau đó lại từ MCS trả nội dung Object về User.
 
-**(Vấn đề- Hybrid Cloud ? - Cloud có thêm thuộc tính là private hay public, nếu public thì cho phép người dùng connect trực tiếp, còn nếu private thì cho đi qua MCS rồi MCS trả về ?)**
+_**(Vấn đề- Hybrid Cloud ? - Cloud có thêm thuộc tính là private hay public, nếu public thì cho phép người dùng connect trực tiếp, còn nếu private thì cho đi qua MCS rồi MCS trả về ?)**_
 
 Như vậy, chúng ta đã xây dựng quy trình xử lý cơ bản cho thao tác Lookup Data Object. Tuy nhiên, như chúng ta đã nói ở phần đầu, các thao tác trên Data Object phải đảm bảo về các tính chất của hệ thống phân tán như tính High-available, cân bằng tải và tính nhất quán của dữ liệu - data consistency. Trong thao tác Lookup Data Object, các tính chất trên biểu hiện cụ thể thông qua các kịch bản sau:
 
@@ -418,7 +418,6 @@ Vấn đề: Các list:
 Vấn đề: Dung lượng lưu trữ trên các Cloud Node:
 
 Chúng ta có phải dự trù dung lượng dư thừa trên các Node hay không? trong trường hợp Successsor của một
-
 
 công việc sáng nay:
 
