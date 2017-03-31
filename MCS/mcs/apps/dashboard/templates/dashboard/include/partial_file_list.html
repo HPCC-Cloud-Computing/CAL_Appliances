@@ -1,0 +1,34 @@
+{% for file in folder.children.all %}
+{% if file.is_folder is True %}
+<tr>
+    <td>
+        <div class="checkbox">
+          <input type="checkbox" name="checked_file" value="{{ file.id }}">
+        </div>
+    </td>
+    <td>
+      <a href="{% url 'files' %}?folder_id={{ file.id }}">
+         <i class="ti-folder"> {{ file.name }}</i>
+      </a>
+    </td>
+    <td><p>---</p></td>
+    <td><p>---</p></td>
+</tr>
+{% endif %}
+{% endfor %}
+{% for file in folder.children.all %}
+{% if file.is_folder is False %}
+<tr>
+    <td>
+        <div class="checkbox"><input type="checkbox" name="checked_file" value="{{ file.id }}"></div>
+    </td>
+    <td>
+        <a href="#">
+          <i class="ti-file"> {{ file.name }}</i>
+        </a>
+    </td>
+    <td><p>---</p></td>
+    <td><p>---</p></td>
+</tr>
+{% endif %}
+{% endfor %}

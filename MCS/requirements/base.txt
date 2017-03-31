@@ -8,6 +8,6 @@ django-model-utils
 
 mysql-python
 
-# django-allauth
+django-rq
 
 # calplus
