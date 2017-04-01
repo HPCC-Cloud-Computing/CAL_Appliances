@@ -1,5 +1,7 @@
 from django.conf.urls import url
 from django.views.generic import TemplateView
+from django.conf.urls.static import static
+from django.conf import settings
 
 from mcs.apps.dashboard.views import files, user
 
@@ -30,4 +32,4 @@ urlpatterns = [
         name='settings'),
     url(r'^user/$',
         user.update_user, name='user')
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

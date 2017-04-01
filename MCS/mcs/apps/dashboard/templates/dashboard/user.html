@@ -3,15 +3,16 @@
 <a class="navbar-brand" href="#">User Profile</a>
 {% endblock %}
 {% block main %}
-<div class="row">
-    <form id="user-update-form" action="{% url 'user' %}" method="POST">
+<div class="row">   
+    {% load static %}
+    <form id="user-update-form" action="{% url 'user' %}" method="POST" enctype="multipart/form-data">
         <div class="col-lg-4 col-md-7">
             <div class="card card-user">
                 <div class="image"></div>
                     <div class="content">
                         <div class="author">
-                          <img class="avatar border-white" src="{{ user.profile.image }}" alt="..."/>
-                          <div class="avatar-upload text-center" style="position: relative">
+                          <img class="avatar border-white" src="{{ MEDIA_ROOT }}{{ user.profile.image.url }}" alt="..."/>
+                          <div class="avatar-upload text-center form-group" style="position: relative">
                               <label class="btn btn-warning btn-fill">Upload new profile picture</label>
                               <input type="file" name="image" style="position: absolute; opacity: 0; top: 0; left: 0; right: 0; bottom: 0">
                           </div>
@@ -50,7 +51,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Email</label>
-                                <input type="text" class="form-control border-input" placeholder="Your email" value="{{ user.email }}" name="email">
+                                <input type="email" class="form-control border-input" placeholder="Your email" value="{{ user.email }}" name="email">
                             </div>
                         </div>
                          <div class="col-md-6">
@@ -90,5 +91,11 @@
             </div>
         </div>
     </form>
+ <!--    <form action="{% url 'user' %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+        {{ user_form.as_p }}
+        {{ profile_form.as_p }}
+        <button type="submit">Submit</button>
+    </form> -->
 </div>
 {% endblock %}
