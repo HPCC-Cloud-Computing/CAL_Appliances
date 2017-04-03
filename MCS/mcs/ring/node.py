@@ -1,68 +1,46 @@
 import hashlib
 
+from finger import Finger
+from ring import RING_SIZE, FINGER_TABLE_SIZE
+
+
+def in_interval(val, left, right, equal_left, equal_right):
+    if (equal_left and val == left):
+        return True
+
+    if (equal_right and val == right):
+        return True
+
+    if (right > left):
+        if (val > left and val < right):
+            return True
+        else:
+            return False
+
+    if (right < left):
+        if (val < left):
+            left = left - RING_SIZE
+        else:
+            if (val > left):
+                right = right + RING_SIZE
+
+        if (val > left and val < right):
+            return True
+        else:
+            return False
+    return True
+
 
 class Node(object):
-    class Successor(object):
-        """
-        List manager for successor references.
-        It is responsible that entries in the successor list and first finger are consistent.
-        """
-
-        def __init__(self, finger_table):
-            self.list = []
-            self._backup = None
-            self.max_entries = 3
-            self._finger_table = finger_table
-
-        def set(self, new_successor, replace_old=True):
-            if len(self.list) == 0:
-                self.list = [new_successor]
-            else:
-                self.list[0] = new_successor
-            self._correct_finger_table(new_successor, replace_old=replace_old)
-
-        def get(self):
-            return self.list[0]
-
-        def update_others(self, successors, ignore_keys=-1):
-            if successors:
-                self._backup = self.list
-                self.list = [self.get()] + [x for x in successors if x['node_id'] != ignore_keys]
-                del self.list[self.max_entries:]
-
-        def delete_first(self):
-            del self.list[0]
-            self._correct_finger_table(self.get(), replace_old=True)
-
-        def count_occurrence(self, successor):
-            return self.list.count(successor)
-
-        def _correct_finger_table(self, new_successor, replace_old=False, offset=0):
-            old_peer = self._finger_table[offset].get("successor")
-            self._finger_table[offset]["successor"] = new_successor
-
-            if old_peer is None or not replace_old:
-                return
-
-            for entry in self._finger_table[offset + 1]:
-                if entry and entry["successor"].get("node_id") == old_peer["node_id"]:
-                    entry["successor"] = new_successor
-                else:
-                    break
-
     def __init__(self, username, clouds):
         self.ring = hashlib.sha256(username).hexdigest()
         self.username = username
         self.clouds = clouds
-        self.successors = []
         self.finger_table = []
         self.generate_id()
 
     def create(self):
-        if len(self.successors) == 0:
-            self.successors = [self.id]
-        else:
-            self.successors[0] = self.id
+        self.successor = self
         self.predecessor = None
 
     def generate_id(self):
@@ -70,10 +48,17 @@ class Node(object):
         ip_addresses = self.username
         for cloud in self.clouds:
             ip_addresses += cloud.address
-        self.id = int(hashlib.sha256(ip_addresses).hexdigest(), 16)
+        self.id = int(hashlib.sha256(ip_addresses).hexdigest(), 16) % RING_SIZE
 
-    def init_finger_table(self):
-        pass
+    def init_finger_table(self, init_node):
+        for i in range(0, FINGER_TABLE_SIZE):
+            _finger = Finger(self.id, i)
+            self.finger_table.append(_finger)
+        self.finger_table[0].successor = init_node.find_successor(self.finger_table[0].start)
+        self.successor = self.finger_table[0].successor
+        self.predecessor = self.successor.predecessor
+        self.successor.predecessor = self
+        self.predecessor.successor = self
 
     def update_finger_table(self):
         pass
@@ -87,8 +72,16 @@ class Node(object):
     def check_predecessor(self):
         pass
 
-    def find_successor(self):
+    def find_successor(self, node_id):
         pass
+
+    def find_predecessor(self, node_id):
+        if node_id == self.id:
+            return self.predecessor
+        node = self
+        while not in_interval(node_id, node.id, node.successor.id):
+            node = node.closest_preceding_node(node_id)
+        return node
 
     def as_dict(self):
         pass
@@ -96,7 +89,12 @@ class Node(object):
     def join(self):
         pass
 
-    def closest_preceding_node(self, node_id, key_id):
+    def closest_preceding_node(self, node_id):
+        # for i in range(FINGER_TABLE_SIZE-1, -1, -1):
+        #     finger = self.finger_table[i]
+        #     if in_interval(finger.successor, self.id, node_id):
+        #         return finger
+        # return self
         pass
 
     def stabilize(self):
