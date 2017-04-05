@@ -4,11 +4,13 @@ class Cloud(object):
         self.address = address
         self.config = config
         self.status = 'OK'
+        self.get_quota()
+        self.get_usage()
 
-    def get_quotas(self):
+    def get_quota(self):
         """Return quota (Unit: GiB)"""
         # TODO:
-        # self.quotas = connect.head_account()
+        # self.quota = connect.head_account()
         #
         pass
 
