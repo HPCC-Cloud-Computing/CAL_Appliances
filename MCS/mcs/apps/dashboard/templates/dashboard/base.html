@@ -54,31 +54,31 @@
             </div>
 
             <ul class="nav">
-                <li class="{% if  request.path == '/home/' %}active{% endif %}">
+                <li class="{% if  '/home' in request.path %}active{% endif %}">
                     <a href="{% url 'home'  %}">
                         <i class="ti-home"></i>
                         <p>HOME</p>
                     </a>
                 </li>
-                <li class="{% if  request.path == '/user/' %}active{% endif %}">
+                <li class="{% if  '/user' in request.path %}active{% endif %}">
                     <a href="{% url 'user' %}">
                         <i class="ti-user"></i>
                         <p>User Profile</p>
                     </a>
                 </li>
-                <li class="{% if  request.path == '/files/' %}active{% endif %}">
+                <li class="{% if  '/files' in request.path %}active{% endif %}">
                     <a href="{% url 'files' %}">
                         <i class="ti-folder"></i>
                         <p>File Management</p>
                     </a>
                 </li>
-                <li class="{% if  request.path == '/clouds/' %}active{% endif %}">
+                <li class="{% if  '/clouds' in request.path %}active{% endif %}">
                     <a href="{% url 'clouds' %}">
                         <i class="ti-cloud"></i>
                         <p>Cloud Management</p>
                     </a>
                 </li>
-                <li class="{% if  request.path == '/settings/' %}active{% endif %}">
+                <li class="{% if  '/settings' in request.path %}active{% endif %}">
                     <a href="{% url 'settings' %}">
                         <i class="ti-settings"></i>
                         <p>Settings</p>

@@ -17,13 +17,13 @@
                 <h4 class="title">File MANAGEMENT</h4>
             </div>
             <div class="content">
-            	<button type="button" class="btn btn-default js-file-upload" data-url="{{ url_upload }}">
+            	<button type="button" id="upload_btn" class="btn btn-default js-file-upload" data-url="{{ url_upload }}">
             		<i class="ti-upload"></i>
             	</button>
-                <button type="button" class="btn btn-primary js-folder-create" data-url="{{ url_create }}">
+                <button type="button" id="create_btn" class="btn btn-primary js-folder-create" data-url="{{ url_create }}">
                     <i class="ti-plus"></i>
                 </button>
-                <button type="submit" class="btn btn-danger js-files-delete" form="delete-form" onclick="return confirm('Are you sure?');return false;">
+                <button type="submit" id="delete_btn" class="btn btn-danger js-files-delete" form="delete-form" onclick="return confirm('Are you sure?');return false;">
                     <i class="ti-trash"></i>
                 </button>
             </div>
@@ -43,6 +43,7 @@
                             <th>Name</th>
                             <th>Modified</th>
                             <th>Size</th>
+                            <th>Action</th>
                         </thead>
                         <tbody>
                             {% include 'dashboard/include/partial_file_list.html' %}

@@ -1,11 +1,13 @@
-from django.core.urlresolvers import reverse
-from django.http import JsonResponse, HttpResponseRedirect
-from django.shortcuts import render
-from django.template.loader import render_to_string
+import hashlib
 
+from dashboard import utils
 from dashboard.forms import CreateFolderForm, UploadFileForm
 from dashboard.models import File
-from dashboard import utils
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
+from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
+from django.shortcuts import render
+from django.template.loader import render_to_string
 
 
 def _get_folder(request, folder_id=None, urls={}):
@@ -48,6 +50,7 @@ def _get_folder(request, folder_id=None, urls={}):
             #                              is_folder=True
             #                              owner=<current_user>)
             folder = File.objects.create(name='root',
+                                         owner=request.user,
                                          is_root=True,
                                          is_folder=True,
                                          path='/rfolder/')
@@ -55,8 +58,8 @@ def _get_folder(request, folder_id=None, urls={}):
     return (folder, url)
 
 
+@login_required(login_url='/auth/login/')
 def list_files(request, folder_id=None):
-
     folder, url_create = _get_folder(request, folder_id=folder_id,
                                      urls={
                                          'rfolder': 'create_root_folder',
@@ -97,6 +100,7 @@ def create_folder(request, folder_id=None):
                 # new_folder.owner = request.user
                 # '/' at the end because it is folder.
                 new_folder.path = folder.path + str(new_folder.name) + '/'
+                new_folder.owner = request.user
                 new_folder.save()
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
         else:
@@ -145,9 +149,9 @@ def upload_file(request, folder_id=None):
                 new_file.path = folder.path + str(new_file.name)
                 new_file.size = request.FILES['content'].size
                 new_file.is_folder = False
+                new_file.owner = request.user
                 new_file.save()
-                # Save file by hashed id
-                # tasks.upload_file(request.FILES['content'], new_file.path)
+                # Save file by hashed id - temporary
                 utils.handle_uploaded_file(request.FILES['content'],
                                            new_file.path)
                 return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -164,9 +168,11 @@ def upload_file(request, folder_id=None):
 
 
 def download_file(request):
-    # TODO: In the case, user doesn't choose anything
-    #       Throw alert.
-    files = File.objects.filter(
-        id__in=request.POST.getlist('checked_file'))
-    # TODO: Get object from CloudNode
-    #       then send back to download.
+    # Temporary download_file
+    from django.utils.encoding import smart_str
+
+    file = File.objects.get(id=request.POST.get('download_file'))
+    file_content = open('/tmp/' + hashlib.sha256(file.path).hexdigest(), 'r')
+    response = HttpResponse(file_content, content_type='application/octet-stream')
+    response['Content-Disposition'] = 'attachment; filename=%s' % smart_str(file.name)
+    return response

@@ -10,4 +10,6 @@ mysql-python
 
 django-rq
 
+Pillow
+
 # calplus

@@ -13,6 +13,7 @@
     </td>
     <td><p>---</p></td>
     <td><p>---</p></td>
+    <td><p></p></td>
 </tr>
 {% endif %}
 {% endfor %}
@@ -23,12 +24,19 @@
         <div class="checkbox"><input type="checkbox" name="checked_file" value="{{ file.id }}"></div>
     </td>
     <td>
-        <a href="#">
-          <i class="ti-file"> {{ file.name }}</i>
-        </a>
+        <a><i class="ti-file"> {{ file.name }}</i></a>
     </td>
-    <td><p>---</p></td>
-    <td><p>---</p></td>
+    <td><p>{{ file.last_modified }}</p></td>
+    <td><p>{{ file.size }}</p></td>
+    <td>
+        <div class="text-center" style="width: 50%">
+            <form id="download-form" action="{% url 'download_file' %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="download_file" value="{{ file.id }}">
+                <button type="submit" id="download_btn" class="btn btn-success" data-url="{% url 'download_file' %}"><span class="ti-download"></span></button>
+            </form>
+        </div>
+    </td>
 </tr>
 {% endif %}
 {% endfor %}

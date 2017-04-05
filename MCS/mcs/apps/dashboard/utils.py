@@ -1,5 +1,5 @@
-import os
 import hashlib
+import os
 
 from django.conf import settings
 
@@ -24,7 +24,7 @@ def handle_uploaded_file(file, filepath):
     except OSError:
         pass
 
-    _new_file_name = hashlib.md5(filepath)
+    _new_file_name = hashlib.sha256(filepath)
     with open('/tmp/' + _new_file_name.hexdigest(), 'wb+') as destination:
         for chunk in file.chunks():
             destination.write(chunk)
@@ -41,6 +41,7 @@ def get_folder_by_path(jsondata, path, result):
     elif isinstance(jsondata, list):
         for item in jsondata:
             get_folder_by_path(item, path, result)
+
 
 def generate_hash_key(str_to_hash):
     """Generate hash key for given string"""
