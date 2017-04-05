@@ -10,6 +10,8 @@ mysql-python
 
 django-rq
 
-Pillow
+Pillow<3.5.0
+
+eventlet
 
 # calplus

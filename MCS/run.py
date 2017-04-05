@@ -1,25 +1,14 @@
-"""
-WSGI config for mcs project.
-
-It exposes the WSGI callable as a module-level variable named ``application``.
-"""
 import eventlet
 
 eventlet.monkey_patch()
 from eventlet import wsgi
 from optparse import OptionParser
 import os
-from os.path import abspath, dirname
-from sys import path
+
 from django.core.wsgi import get_wsgi_application
 
-from all_ring import RingDict
-
-SITE_ROOT = dirname(dirname(abspath(__file__)))
-path.append(SITE_ROOT)
-
 MAX_GREEN_THREADS = 25
-RINGS = RingDict()
+
 
 def run_wsgi_app(app, port=8080):
     """Run a wsgi compatible app using eventlet"""
@@ -38,7 +27,7 @@ if __name__ == "__main__":
     )
     parser.add_option(
         "-s", "--settings", type=str,
-        help="DJANGO_SETTINGS_MODULE", default="mcs.settings"
+        help="DJANGO_SETTINGS_MODULE", default="mcs.settings.local"
     )
     parser.add_option(
         "-t", "--threads", type=int,
@@ -50,5 +39,4 @@ if __name__ == "__main__":
     if options.settings:
         os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
 
-    application = get_wsgi_application()
-    run_wsgi_app(application, options.port)
+    run_wsgi_app(get_wsgi_application(), options.port)

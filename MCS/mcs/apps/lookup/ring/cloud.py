@@ -15,8 +15,11 @@ class Cloud(object):
         pass
 
     def get_usage(self):
-        """Get used"""
+        """Get used (Unit: GiB)"""
         # TODO:
         # self.usage = connect.head_account()
         #
+        pass
+
+    def check_health(self):
         pass

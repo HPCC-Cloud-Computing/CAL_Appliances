@@ -1,87 +1,8 @@
 from __future__ import unicode_literals
 
+from dashboard import utils
 from django.contrib.auth.models import User
 from django.db import models
-from dashboard import utils
-
-
-class CloudRing(models.Model):
-    class Meta:
-        db_table = 'cloudring'
-        app_label = 'dashboard'
-
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
-
-
-class CloudNode(models.Model):
-    class Meta:
-        db_table = 'cloudnode'
-        app_label = 'dashboard'
-
-    # Define cloudnode's status
-    FULL = 1
-    OK = 2
-    CORRUPTED = 3
-
-    STATUS = (
-        (FULL, 'FULL'),
-        (OK, 'OK'),
-        (CORRUPTED, 'CORRUPTED'),
-    )
-
-    config = models.TextField()
-    type = models.CharField(max_length=50)
-    ip_address = models.GenericIPAddressField(default=None)
-    # Hash from ip_address
-    identifier = models.CharField('identifier', max_length=255, null=True)
-    status = models.IntegerField(choices=STATUS, blank=True,
-                                 null=True, default=OK)
-    ring = models.ForeignKey('CloudRing', on_delete=models.CASCADE)
-
-    USERNAME_FIELD = 'identifier'
-
-    def save(self, *args, **kwargs):
-        self.identifier = utils.generate_hash_key(str(self.ip_address))
-        super(CloudNode, self).save(*args, **kwargs)
-
-    def init_finger_table(self):
-        pass
-
-    def init_successor_list(self):
-        pass
-
-    def update_successor_list(self):
-        pass
-
-    # called periodically. n asks the successor
-    # about its predecessor, verifies if n's immediate
-    # successor is consistent, and tells the successor about n
-    def stabilize(self):
-        pass
-
-    # called periodically. refreshes finger table entries.
-    # next stores the index of the finger to fix
-    def fix_fingers(self):
-        pass
-
-    # ask node n to find the successor of id
-    def find_successor(self, object_id):
-        pass
-
-    # called periodically. checks whether predecessor has failed.
-    def check_predecessor(self):
-        pass
-
-    # search the local table for the highest predecessor of id
-    def closest_preceding_node(self, object_id):
-        pass
-
-    def create(self):
-        pass
-
-    # join a Chord ring containing node n'.
-    def join(self, node_id):
-        pass
 
 
 class FileManager(models.Manager):
@@ -143,21 +64,3 @@ class File(models.Model):
             return True
         except File.DoesNotExist:
             return False
-
-
-class FileReplica(models.Model):
-    class Meta:
-        db_table = 'replica'
-        app_label = 'dashboard'
-
-    UPDATE = 1
-    NOT_UPDATE = 2
-
-    STATUS = (
-        (UPDATE, 'UPDATE'),
-        (NOT_UPDATE, 'NOT_UPDATE'),
-    )
-
-    identifier = models.CharField('identifier', max_length=255, null=True)
-    status = models.IntegerField(choices=STATUS, default=NOT_UPDATE,
-                                 null=True, blank=True)

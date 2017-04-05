@@ -45,4 +45,4 @@ def get_folder_by_path(jsondata, path, result):
 
 def generate_hash_key(str_to_hash):
     """Generate hash key for given string"""
-    return hashlib.sha256(str_to_hash).hexdigest()
+    return int(hashlib.sha256(str_to_hash).hexdigest(), 16) % 64

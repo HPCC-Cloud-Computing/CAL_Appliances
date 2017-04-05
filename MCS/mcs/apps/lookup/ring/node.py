@@ -1,7 +1,7 @@
 import hashlib
 
 from finger import Finger
-from ring import RING_SIZE, FINGER_TABLE_SIZE
+from mcs.apps.lookup.ring import RING_SIZE, FINGER_TABLE_SIZE
 from utils import in_interval, decr
 
 
