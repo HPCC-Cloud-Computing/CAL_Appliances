@@ -2,7 +2,7 @@ import hashlib
 import random
 from math import floor
 
-FINGER_TABLE_SIZE = 5
+FINGER_TABLE_SIZE = 8
 RING_SIZE = 2 ** FINGER_TABLE_SIZE
 
 

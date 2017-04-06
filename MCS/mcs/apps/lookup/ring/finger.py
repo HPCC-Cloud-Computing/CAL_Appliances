@@ -1,4 +1,4 @@
-from mcs.apps.lookup.ring import RING_SIZE
+from ring import RING_SIZE
 
 
 class Finger(object):

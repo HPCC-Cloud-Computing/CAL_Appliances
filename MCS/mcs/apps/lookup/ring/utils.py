@@ -1,5 +1,8 @@
+from ring import RING_SIZE
+
+
 def decr(value, size):
-    if size <= size:
+    if size <= value:
         return value - size
     else:
         return RING_SIZE - (size - value)

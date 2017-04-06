@@ -1,7 +1,7 @@
 import hashlib
 
 from finger import Finger
-from mcs.apps.lookup.ring import RING_SIZE, FINGER_TABLE_SIZE
+from ring import RING_SIZE, FINGER_TABLE_SIZE
 from utils import in_interval, decr
 
 
@@ -11,14 +11,14 @@ class Node(object):
         self.username = username
         self.clouds = clouds
         self.finger_table = []
-        self.generate_id()
+        self._generate_id()
         self._generate_finger_table()
 
     def create(self):
         self.successor = self
         self.predecessor = None
 
-    def generate_id(self):
+    def _generate_id(self):
         """Generate node's id by hashing username and cloud addresses"""
         ip_addresses = self.username
         for cloud in self.clouds:
@@ -27,6 +27,8 @@ class Node(object):
 
     def find_successor(self, id):
         """Ask node n to find id's successor"""
+        if in_interval(id, self.predecessor.id, self.id, equal_right=True):
+            return self
         node = self.find_predecessor(id)
         return node.successor
 
@@ -51,15 +53,14 @@ class Node(object):
     def join(self, exist_node):
         """Node join the network with exist_node
         is an arbitrary in the network."""
-        if exist_node:
-            self.init_finger_table(exist_node)
-            self.update_others()
-            # Move keys in (predecessor, self] from successor
-        else:
-            # if n is the only node in the network
+        if self == exist_node:
             for i in range(FINGER_TABLE_SIZE):
                 self.finger_table[i].node = self
             self.predecessor = self
+        else:
+            self.init_finger_table(exist_node)
+            self.update_others()
+            # Move keys in (predecessor, self] from successor
 
     def _generate_finger_table(self):
         for i in range(0, FINGER_TABLE_SIZE):
@@ -97,7 +98,8 @@ class Node(object):
     def update_finger_table(self, s, i):
         """If s is ith finger of n, update n's finger table with s"""
         if in_interval(s.id, self.id,
-                       self.finger_table[i].node.id, equal_left=True):
+                       self.finger_table[i].node.id,
+                       equal_left=True) and self.id != s.id:
             self.finger_table[i].node = s
             p = self.predecessor
             p.update_finger_table(s, i)
