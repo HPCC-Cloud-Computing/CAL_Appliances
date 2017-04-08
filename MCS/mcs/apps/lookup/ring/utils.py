@@ -1,7 +1,8 @@
-from ring import RING_SIZE
+from lookup.ring.ring import RING_SIZE
 
 
 def decr(value, size):
+    """Decrement"""
     if size <= value:
         return value - size
     else:

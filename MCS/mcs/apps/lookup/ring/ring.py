@@ -8,7 +8,7 @@ RING_SIZE = 2 ** FINGER_TABLE_SIZE
 
 class Ring(object):
     def __init__(self, username, clouds):
-        self.id = int(hashlib.sha256(username).hexdigest(), 16) % RING_SIZE
+        self.id = int(hashlib.md5(username).hexdigest(), 16) % RING_SIZE
         self.size = RING_SIZE
         self.nodes = []
         # clouds = [cloud1, cloud2, cloud3...]
