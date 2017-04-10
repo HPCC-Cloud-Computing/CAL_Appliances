@@ -2,7 +2,11 @@ import hashlib
 import random
 from math import floor
 
-FINGER_TABLE_SIZE = 8
+# from lookup.ring.cloud import Cloud
+from lookup.ring.node import Node
+from lookup.ring import utils
+
+FINGER_TABLE_SIZE = 5
 RING_SIZE = 2 ** FINGER_TABLE_SIZE
 
 
@@ -17,8 +21,15 @@ class Ring(object):
         self.clouds = clouds
         self._gen_clouds_duplicate_list()
 
-    def generate_ring(self):
-        pass
+    def generate_ring(self, username):
+        """Generate ring"""
+        first_node = Node(username, 0, self.duplicates[0])
+        first_node.join(first_node)
+        self.nodes.append(first_node)
+        for id in range(1, RING_SIZE):
+            node = Node(username, id, self.duplicates[id])
+            node.join(first_node)
+            self.nodes.append(node)
 
     def _calculate_sum_quota(self):
         """Calculate sum quota"""
@@ -51,5 +62,9 @@ class Ring(object):
             for i in range(map[1]):
                 _fork = map[0]
                 self.duplicates.append(_fork)
-        # Shuffle duplicates
-        random.shuffle(self.duplicates)
+        while True:
+            # Shuffle duplicates
+            random.shuffle(self.duplicates)
+            if utils.check_diff_seq_elements(self.duplicates):
+                break
+        self.duplicates = [list(e) for e in zip(self.duplicates[:-1], self.duplicates[1:], self.duplicates[2:])]

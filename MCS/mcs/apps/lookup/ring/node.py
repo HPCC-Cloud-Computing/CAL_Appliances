@@ -11,28 +11,20 @@ LOG = logging.getLogger(__name__)
 class Node(object):
     """Abstract Node in Ring"""
 
-    def __init__(self, username, clouds):
+    def __init__(self, username, id, clouds):
         """
         :param username (string):
         :param clouds (list): List of cloud object.
         """
         self.ring = hashlib.sha256(username).hexdigest()
+        self.id = id
         self.username = username
         self.clouds = clouds
         self.finger_table = []
-        self._generate_id()
         self._generate_finger_table()
 
     def successor(self):
         return self.finger_table[0].node
-
-    def _generate_id(self):
-        """Generate node's id by hashing username and cloud addresses"""
-        ip_addresses = self.username
-        for cloud in self.clouds:
-            ip_addresses += cloud.address
-        self.id = int(hashlib.md5(ip_addresses).hexdigest(), 16) % RING_SIZE
-        LOG.debug('Generate id for node ' + str(self.id))
 
     def find_successor(self, id):
         """Ask node n to find id's successor"""

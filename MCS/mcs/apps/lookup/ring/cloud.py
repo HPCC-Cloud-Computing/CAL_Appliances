@@ -23,3 +23,7 @@ class Cloud(object):
 
     def check_health(self):
         pass
+
+    def set_weight(self, sum_quotas):
+        self.get_quota()
+        self.weight = self.quota / sum_quotas
