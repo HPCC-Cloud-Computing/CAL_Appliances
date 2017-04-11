@@ -32,7 +32,8 @@ INSTALLED_APPS = [
 
 PROJECT_APPS = [
     'authentication',
-    'dashboard'
+    'dashboard',
+    'eventlet_semaphore'
 ]
 
 INSTALLED_APPS += PROJECT_APPS

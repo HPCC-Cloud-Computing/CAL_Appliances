@@ -91,3 +91,6 @@ ENV/
 .vscode/*
 .idea/*
 MCS/.idea/*
+
+# Test folder
+MCS/tests/
