@@ -2,12 +2,13 @@ import hashlib
 import random
 from math import floor
 
+from django.conf import settings
+from lookup.ring import utils
 # from lookup.ring.cloud import Cloud
 from lookup.ring.node import Node
-from lookup.ring import utils
 
-FINGER_TABLE_SIZE = 5
-RING_SIZE = 2 ** FINGER_TABLE_SIZE
+FINGER_TABLE_SIZE = settings.FINGER_TABLE_SIZE
+RING_SIZE = settings.RING_SIZE
 
 
 class Ring(object):
