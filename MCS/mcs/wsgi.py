@@ -5,7 +5,7 @@ It exposes the WSGI callable as a module-level variable named ``application``.
 """
 import eventlet
 
-eventlet.monkey_patch()
+#eventlet.monkey_patch()
 from eventlet import wsgi
 from optparse import OptionParser
 import os
@@ -18,7 +18,7 @@ from all_ring import RingDict
 SITE_ROOT = dirname(dirname(abspath(__file__)))
 path.append(SITE_ROOT)
 
-MAX_GREEN_THREADS = 25
+MAX_GREEN_THREADS = 500
 RINGS = RingDict()
 
 def run_wsgi_app(app, port=8080):
