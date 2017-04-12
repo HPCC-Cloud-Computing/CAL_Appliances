@@ -1,6 +1,6 @@
 import hashlib
-import os
 
+import os
 from django.conf import settings
 
 
@@ -46,3 +46,12 @@ def get_folder_by_path(jsondata, path, result):
 def generate_hash_key(str_to_hash):
     """Generate hash key for given string"""
     return int(hashlib.sha256(str_to_hash).hexdigest(), 16) % 64
+
+
+def sizeof_fmt(num, suffix='B'):
+    """Size format"""
+    for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
+        if abs(num) < 1024.0:
+            return "%3.1f%s%s" % (num, unit, suffix)
+        num /= 1024.0
+    return "%.1f%s%s" % (num, 'Yi', suffix)
