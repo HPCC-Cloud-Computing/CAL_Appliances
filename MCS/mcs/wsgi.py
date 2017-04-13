@@ -5,21 +5,25 @@ It exposes the WSGI callable as a module-level variable named ``application``.
 """
 import eventlet
 
-#eventlet.monkey_patch()
+eventlet.monkey_patch()
 from eventlet import wsgi
 from optparse import OptionParser
 import os
 from os.path import abspath, dirname
 from sys import path
 from django.core.wsgi import get_wsgi_application
-
-from all_ring import RingDict
+# from eventlet import Semaphore
+from all_ring import RingDict, DataObjecRings, GlobalRing
 
 SITE_ROOT = dirname(dirname(abspath(__file__)))
 path.append(SITE_ROOT)
 
 MAX_GREEN_THREADS = 500
+
+global_rings = [GlobalRing(), GlobalRing(), GlobalRing()]
+
 RINGS = RingDict()
+
 
 def run_wsgi_app(app, port=8080):
     """Run a wsgi compatible app using eventlet"""
