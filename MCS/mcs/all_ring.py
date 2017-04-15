@@ -53,9 +53,8 @@ class GlobalException(Exception):
         self.message = message
 
 
-class GlobalRing(Ring):
-    def __init__(self, username, clouds):
-        super(GlobalRing, self).__init__(username, clouds)
+class GlobalRing():
+    def __init__(self):
         self.ring = 0
         self.global_ring_lock = Semaphore(1)
         self.version = 0

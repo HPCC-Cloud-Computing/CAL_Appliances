@@ -2,7 +2,7 @@ import logging
 import pickle
 
 import os
-from lookup.ring.ring import RING_SIZE
+RING_SIZE = 5
 
 LOG = logging.getLogger(__name__)
 

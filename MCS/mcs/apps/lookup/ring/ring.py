@@ -3,8 +3,8 @@ import random
 from math import floor
 
 # from lookup.ring.cloud import Cloud
-from lookup.ring.node import Node
-from lookup.ring import utils
+from mcs.apps.lookup.ring.node import Node
+from mcs.apps.lookup.ring import utils
 
 FINGER_TABLE_SIZE = 5
 RING_SIZE = 2 ** FINGER_TABLE_SIZE

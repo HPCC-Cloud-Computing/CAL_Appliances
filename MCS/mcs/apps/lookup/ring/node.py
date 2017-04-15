@@ -1,9 +1,10 @@
 import hashlib
 import logging
 
-from lookup.ring.finger import Finger
-from lookup.ring.ring import RING_SIZE, FINGER_TABLE_SIZE
-from lookup.ring.utils import in_interval, decr
+from mcs.apps.lookup.ring.finger import Finger
+FINGER_TABLE_SIZE = 5
+RING_SIZE = 2 ** FINGER_TABLE_SIZE
+from mcs.apps.lookup.ring.utils import in_interval, decr
 
 LOG = logging.getLogger(__name__)
 
