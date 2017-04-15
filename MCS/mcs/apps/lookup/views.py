@@ -2,10 +2,10 @@ import hashlib
 
 from django.conf import settings
 from django.shortcuts import redirect, render
-
 from lookup import forms
 from lookup import utils
 from lookup.chord.ring import Ring
+
 from mcs.wsgi import RINGS
 
 
@@ -30,5 +30,6 @@ def init_ring(request):
         form = forms.UploadCloudConfigsForm()
     return render(request, 'lookup/config.html',
                   {
+                      'form': form,
                       'username': request.user.username,
                   })

@@ -2,12 +2,8 @@
 {% block main %}
 <form class="cloud-config-form" method="post" enctype="multipart/form-data">
 	{% csrf_token %}
-    <!--<div class="form-group">-->
-        <!--<label class="upload-btn">Upload cloud config</label>-->
-        <!--<input type="file" name="cloud_config">-->
-    <!--</div>-->
     <label>Choose your config file</label>
-    <p class="message">Note: Check <a href="#">sample file</a></p>
+    <p class="message">Note: Check <a href="{{ MEDIA_URL }}configs/sample-clouds.json" download>sample file</a></p>
     <br>
     <input type="file" name="cloud_configs">
     <br>
