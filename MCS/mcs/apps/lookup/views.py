@@ -19,7 +19,7 @@ def init_ring(request):
             clouds = utils.load_cloud_configs(request.FILES['cloud_configs'])
             # Write json to file
             file_name = hashlib.md5(username).hexdigest() + '.json'
-            with open(settings.CONFIG_DIR + file_name, 'wb+') as json_file:
+            with open(settings.MEDIA_ROOT + 'configs/' + file_name, 'wb+') as json_file:
                 for chunk in request.FILES['cloud_configs'].chunks():
                     json_file.write(chunk)
 
