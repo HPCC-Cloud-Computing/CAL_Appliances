@@ -13,7 +13,7 @@ from os.path import abspath, dirname
 from sys import path
 from django.core.wsgi import get_wsgi_application
 # from eventlet import Semaphore
-from all_ring import RingDict, DataObjecRings, GlobalRing
+from all_ring import RingDict, GlobalRing
 
 SITE_ROOT = dirname(dirname(abspath(__file__)))
 path.append(SITE_ROOT)
