@@ -2,7 +2,8 @@ import logging
 import pickle
 
 import os
-from lookup.ring.ring import RING_SIZE
+# from lookup.chord.ring import RING_SIZE
+from django.conf import settings
 
 LOG = logging.getLogger(__name__)
 
@@ -12,7 +13,7 @@ def decr(value, size):
     if size <= value:
         return value - size
     else:
-        return RING_SIZE - (size - value)
+        return settings.RING_SIZE - (size - value)
 
 
 def in_interval(val, left, right, equal_left=False, equal_right=False):
@@ -31,10 +32,10 @@ def in_interval(val, left, right, equal_left=False, equal_right=False):
 
     if (right < left):
         if (val < left):
-            left = left - RING_SIZE
+            left = left - settings.RING_SIZE
         else:
             if (val > left):
-                right = right + RING_SIZE
+                right = right + settings.RING_SIZE
 
         if (val > left and val < right):
             return True

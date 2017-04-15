@@ -1,0 +1,44 @@
+{
+    "hust001": {
+        "type": "openstack",
+        "address": "192.168.47.110",
+        "config": {
+            "os_auth_url": "http://192.168.47.110:5000/v3",
+            "os_project_name": "admin",
+            "os_username": "admin",
+            "os_password": "admin@123",
+            "os_project_domain_name": "default",
+            "os_identity_api_version": "3",
+            "os_auth_version": "3",
+            "os_image_api_version": "2",
+            "os_novaclient_version": "2.1",
+            "os_swiftclient_version": "2.0"
+        }
+    },
+    "hust002": {
+        "type": "amazon",
+        "address": "192.168.47.201",
+        "config": {
+            "aws_access_key_id": "asdasd123asdasd123123",
+            "aws_secret_access_key": "asdasd21211112asdasdad",
+            "region_name": "RegionOne",
+            "endpoint_url": "http://192.168.47.201:8778"
+        }
+    },
+    "hust003": {
+        "type": "openstack",
+        "address": "192.168.47.150",
+        "config": {
+            "os_auth_url": "http://192.168.47.150:5000/v3",
+            "os_project_name": "admin",
+            "os_username": "admin",
+            "os_password": "admin@123",
+            "os_project_domain_name": "default",
+            "os_identity_api_version": "3",
+            "os_auth_version": "3",
+            "os_image_api_version": "2",
+            "os_novaclient_version": "2.1",
+            "os_swiftclient_version": "2.0"
+        }
+    }
+}

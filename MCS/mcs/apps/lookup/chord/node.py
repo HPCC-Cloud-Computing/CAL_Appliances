@@ -1,9 +1,10 @@
 import hashlib
 import logging
 
-from lookup.ring.finger import Finger
-from lookup.ring.ring import RING_SIZE, FINGER_TABLE_SIZE
-from lookup.ring.utils import in_interval, decr
+from django.conf import settings
+
+from lookup.chord.finger import Finger
+from lookup.chord.utils import in_interval, decr
 
 LOG = logging.getLogger(__name__)
 
@@ -48,7 +49,7 @@ class Node(object):
     def closest_preceding_finger(self, id):
         """Return closest finger preceding id"""
         LOG.debug('Node {} - Get closest preceding finger for {}'.format(str(self.id), str(id)))
-        for i in range(FINGER_TABLE_SIZE - 1, -1, -1):
+        for i in range(settings.FINGER_TABLE_SIZE - 1, -1, -1):
             _node = self.finger_table[i].node
             if _node and in_interval(_node.id, self.id, id):
                 return _node
@@ -59,7 +60,7 @@ class Node(object):
         is an arbitrary in the network."""
         LOG.debug('Node {} - join to ring with node {}'.format(str(exist_node.id), str(self.id)))
         if self == exist_node:
-            for i in range(FINGER_TABLE_SIZE):
+            for i in range(settings.FINGER_TABLE_SIZE):
                 self.finger_table[i].node = self
             self.predecessor = self
         else:
@@ -70,7 +71,7 @@ class Node(object):
 
     def _generate_finger_table(self):
         """Generate finger's start in finger table"""
-        for i in range(0, FINGER_TABLE_SIZE):
+        for i in range(0, settings.FINGER_TABLE_SIZE):
             _finger = Finger(self.id, i)
             self.finger_table.append(_finger)
 
@@ -83,7 +84,7 @@ class Node(object):
         self.predecessor = self.successor().predecessor
         self.successor().predecessor = self
         self.predecessor.finger_table[0].node = self
-        for i in range(FINGER_TABLE_SIZE - 1):
+        for i in range(settings.FINGER_TABLE_SIZE - 1):
             if in_interval(self.finger_table[i + 1].start,
                            self.id, self.finger_table[i].node.id,
                            equal_left=True):
@@ -95,7 +96,7 @@ class Node(object):
     def update_others(self):
         """Update all nodes whose finger table"""
         LOG.debug('Node {} - Update others'.format(str(self.id)))
-        for i in range(FINGER_TABLE_SIZE):
+        for i in range(settings.FINGER_TABLE_SIZE):
             # Find last node p whose ith finger might be n
             prev = decr(self.id, 2 ** i)
             p = self.find_predecessor(prev)
@@ -114,7 +115,7 @@ class Node(object):
             p.update_finger_table(s, i)
 
     def update_others_leave(self):
-        for i in range(FINGER_TABLE_SIZE):
+        for i in range(settings.FINGER_TABLE_SIZE):
             prev = decr(self.id, 2 ** i)
             p = self.find_predecessor(prev)
             p.update_finger_table(self.successor(), i)

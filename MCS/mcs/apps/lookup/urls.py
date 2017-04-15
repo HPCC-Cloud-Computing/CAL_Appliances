@@ -1,7 +1,9 @@
 from django.conf.urls import url
-from django.views.generic import TemplateView
+
+from lookup import views
+
 
 urlpatterns = [
-    url(r'^init_ring/$', TemplateView.as_view(template_name='lookup/config.html'),
+    url(r'^init_ring/$', views.init_ring,
         name='init_ring'),
 ]

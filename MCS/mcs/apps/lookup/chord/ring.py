@@ -3,31 +3,28 @@ import random
 from math import floor
 
 from django.conf import settings
-from lookup.ring import utils
-# from lookup.ring.cloud import Cloud
-from lookup.ring.node import Node
-
-FINGER_TABLE_SIZE = settings.FINGER_TABLE_SIZE
-RING_SIZE = settings.RING_SIZE
+from lookup.chord import utils
+# from lookup.chord.cloud import Cloud
+from lookup.chord.node import Node
 
 
 class Ring(object):
     def __init__(self, username, clouds):
-        self.id = int(hashlib.md5(username).hexdigest(), 16) % RING_SIZE
-        self.size = RING_SIZE
+        self.id = int(hashlib.md5(username).hexdigest(), 16) % settings.RING_SIZE
+        self.size = settings.RING_SIZE
         self.nodes = []
         # clouds = [cloud1, cloud2, cloud3...]
         # # cloud1 = Cloud(type, config, address)
         # # cloud1 is an instance of class Cloud
         self.clouds = clouds
-        self._gen_clouds_duplicate_list()
+        # self._gen_clouds_duplicate_list()
 
     def generate_ring(self, username):
         """Generate ring"""
         first_node = Node(username, 0, self.duplicates[0])
         first_node.join(first_node)
         self.nodes.append(first_node)
-        for id in range(1, RING_SIZE):
+        for id in range(1, settings.RING_SIZE):
             node = Node(username, id, self.duplicates[id])
             node.join(first_node)
             self.nodes.append(node)
@@ -36,7 +33,8 @@ class Ring(object):
         """Calculate sum quota"""
         _sum = 0
         for cloud in self.clouds:
-            _sum += cloud.quota
+            # TODO: Convert quotas from string to long/int
+            _sum += cloud.get_quota()
         return _sum
 
     def _set_weight_cloud(self):
@@ -49,7 +47,8 @@ class Ring(object):
         """Create n duplicates per cloud."""
         self.duplicates = []
         # Number of duplicates (all clouds)
-        total_duplicates = RING_SIZE * 3
+        total_duplicates = settings.RING_SIZE * 3
+        self._set_weight_cloud()
         # Number duplicates per cloud (int)
         num_dupl_per_cloud = []
         for cloud in self.clouds:

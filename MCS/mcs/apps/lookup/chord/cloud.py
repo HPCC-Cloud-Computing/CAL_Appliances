@@ -5,7 +5,8 @@ from calplus.provider import Provider
 
 
 class Cloud(object):
-    def __init__(self, type, address, config):
+    def __init__(self, name, type, address, config):
+        self.name = name
         self.address = address
         self.status = 'OK'
         self.provider = Provider(type, config)
