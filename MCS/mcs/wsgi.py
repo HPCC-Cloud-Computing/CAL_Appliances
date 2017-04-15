@@ -21,6 +21,7 @@ path.append(SITE_ROOT)
 MAX_GREEN_THREADS = 25
 RINGS = RingDict()
 
+
 def run_wsgi_app(app, port=8080):
     """Run a wsgi compatible app using eventlet"""
     print "starting eventlet server on port %i" % port
