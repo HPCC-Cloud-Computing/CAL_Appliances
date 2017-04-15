@@ -17,10 +17,12 @@ def upload_file(file, content):
     node = ring.lookup(file.identifier)
     update_status_file(file.path, File.NOT_AVAILABLE)
     for cloud in node.clouds:
+        # Put task to queue 'default'
         upload_object.delay(cloud, content, file)
+    update_status_file(file.path, File.UPDATE)
 
 
-@job()
+@job
 def upload_object(cloud, content, file):
     """Upload object to cloud node with absolute_name
     :param cloud: object of model Cloud.
@@ -32,9 +34,12 @@ def upload_object(cloud, content, file):
     if not cloud.connector.state_container(container):
         cloud.connector.create_container(container)
     try:
-        cloud.connector.upload_object(container, file.path, contents=content.chunk(),
+        cloud.connector.upload_object(container, file.path,
+                                      contents=content.chunk(),
                                       metadata={'status': 'UPDATED'})
     except exceptions.UploadObjectError as e:
+        # TODO:
+        # return message.error(e)
         raise e
     # Update file's status
     if get_status_file(file.path) == File.NOT_AVAILABLE:
@@ -50,7 +55,8 @@ def download_file(file):
     container = file.owner.username
     for cloud in node.clouds:
         object_stat = cloud.connector.stat_object(container, file.path)
-        object_status = [object_stat[key] for key in object_stat.keys() if 'status' in key]
+        object_status = [object_stat[key]
+                         for key in object_stat.keys() if 'status' in key]
         if object_status == 'UPDATED':
             return cloud.connector.download_object(container, file.path)
     return None
@@ -68,6 +74,7 @@ def update_status_file(file_path, new_status):
 
 
 def get_status_file(file_path):
+    """Get File object's status"""
     try:
         file = File.objects.get(path=file_path)
         return file.status
