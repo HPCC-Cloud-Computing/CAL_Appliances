@@ -18,9 +18,9 @@ class LoginView(TemplateView):
                             password=request.POST['password'])
         if user is not None:
             login(request, user)
-            return redirect('/home')
+            return redirect('init_ring')
         else:
-            return redirect('/auth/login')
+            return redirect('login')
 
 
 class RegisterView(TemplateView):
@@ -46,7 +46,7 @@ class RegisterView(TemplateView):
         )
         user.set_password(password)
         user.save()
-        return redirect('/auth/login')
+        return redirect('login')
 
 
 @require_POST
