@@ -27,7 +27,7 @@ Follow these steps:
     docker run -p 3306:3306 --name mcs-db -e \
     MYSQL_ROOT_PASSWORD=<mysql_password> -e MYSQL_DATABASE=mcs -d mysql:latest
 
-    docker run --name mcs-redis redis redis-server --requirepass "<redis_password>"
+    docker run --name mcs-redis -d redis redis-server --requirepass "<redis_password>"
     ```
 
 5. Go to mcs/settings/local.py, and fill your container's ip and password.
