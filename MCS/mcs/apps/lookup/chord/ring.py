@@ -4,20 +4,21 @@ from math import floor
 
 from django.conf import settings
 from lookup.chord import utils
-# from lookup.chord.cloud import Cloud
 from lookup.chord.node import Node
 
 
 class Ring(object):
+
     def __init__(self, username, clouds):
-        self.id = int(hashlib.md5(username).hexdigest(), 16) % settings.RING_SIZE
+        self.id = int(hashlib.md5(username).hexdigest(),
+                      16) % settings.RING_SIZE
         self.size = settings.RING_SIZE
         self.nodes = []
         # clouds = [cloud1, cloud2, cloud3...]
         # # cloud1 = Cloud(type, config, address)
         # # cloud1 is an instance of class Cloud
         self.clouds = clouds
-        # self._gen_clouds_duplicate_list()
+        self._gen_clouds_duplicate_list()
 
     def generate_ring(self, username):
         """Generate ring"""
@@ -31,17 +32,18 @@ class Ring(object):
 
     def _calculate_sum_quota(self):
         """Calculate sum quota"""
-        _sum = 0
+        sum_quotas = 0
         for cloud in self.clouds:
             # TODO: Convert quotas from string to long/int
-            _sum += cloud.get_quota()
-        return _sum
+            sum_quotas += cloud.quota
+        return sum_quotas
 
     def _set_weight_cloud(self):
         """Set cloud's weight:
         cloud.weight = cloud.quota / sum_quota"""
+        sum_quotas = self._calculate_sum_quota()
         for cloud in self.clouds:
-            cloud.set_weight(self._calculate_sum_quota())
+            cloud.set_weight(sum_quotas)
 
     def _gen_clouds_duplicate_list(self):
         """Create n duplicates per cloud."""
@@ -56,7 +58,8 @@ class Ring(object):
         # Re-check
         if sum(num_dupl_per_cloud) != total_duplicates:
             rand_elm = random.randrange(0, len(num_dupl_per_cloud))
-            num_dupl_per_cloud[rand_elm] += (total_duplicates - sum(num_dupl_per_cloud))
+            num_dupl_per_cloud[
+                rand_elm] += (total_duplicates - sum(num_dupl_per_cloud))
         # Create multi references of one cloud object.
         for map in zip(self.clouds, num_dupl_per_cloud):
             for i in range(map[1]):
@@ -67,4 +70,5 @@ class Ring(object):
             random.shuffle(self.duplicates)
             if utils.check_diff_seq_elements(self.duplicates):
                 break
-        self.duplicates = [list(e) for e in zip(self.duplicates[:-1], self.duplicates[1:], self.duplicates[2:])]
+        self.duplicates = [list(e) for e in zip(
+            self.duplicates[:-1], self.duplicates[1:], self.duplicates[2:])]

@@ -5,9 +5,11 @@ from calplus.provider import Provider
 
 
 class Cloud(object):
+
     def __init__(self, name, type, address, config):
         self.name = name
         self.address = address
+        self.type = type
         self.status = 'OK'
         self.provider = Provider(type, config)
         self.connector = Client(version='1.0.0', resource='object_storage',
@@ -15,25 +17,21 @@ class Cloud(object):
 
     def get_quota(self, username):
         """Return quota (unit - bytes)"""
-        # TODO:
-        # Set metadata 'quota' to container:
         container_stat = self.connector.stat_container(username)
         for stat in container_stat.keys():
             if 'quota' in stat:
-                return container_stat[stat]
-        return None
+                self.quota = container_stat[stat]
+        self.quota = long(8589934592)  # Unit: Bytes
 
     def get_usage(self, username):
         """Get used (unit- bytes)"""
-        # TODO:
-        # Set metadata 'used' to container:
-        # used = sum(object.content) for object in objects_in_container
-        # update 'used' when upload and delete object.
-        container_stat = self.connector.stat_container(username)
-        for stat in container_stat.keys():
-            if 'used' in stat:
-                return container_stat[stat]
-        return None
+        self.used = 0  # Unit: Bytes
+        if self.type.lower() == 'openstack':
+            for obj in self.connector.list_container_objects(username):
+                self.used += obj['bytes']
+        elif self.type.lower() == 'amazon':
+            for obj in self.connector.list_container_objects(username)['Contents']:
+                self.used += obj['Size']
 
     def check_health(self):
         """Check health - simple with ping"""
