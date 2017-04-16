@@ -1,13 +1,12 @@
-from django.utils.encoding import smart_str
+from dashboard.forms import CreateFolderForm, UploadFileForm
+from dashboard.models import File
+from dashboard.tasks import objects
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
-
-from dashboard.forms import CreateFolderForm, UploadFileForm
-from dashboard.models import File
-from dashboard.tasks import objects
+from django.utils.encoding import smart_str
 
 
 def _get_folder(request, folder_id=None, urls={}):
