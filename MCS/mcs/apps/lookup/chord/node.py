@@ -106,7 +106,7 @@ class Node(object):
 
     def update_finger_table(self, s, i):
         """If s is ith finger of n, update n's finger table with s"""
-        LOG.debug('Node {} - Update finger table for {}'.format(str(self.id)))
+        LOG.debug('Node {} - Update finger table for {}'.format(str(self.id), s.id))
         if in_interval(s.id, self.id,
                        self.finger_table[i].node.id,
                        equal_left=True) and self.id != s.id:
