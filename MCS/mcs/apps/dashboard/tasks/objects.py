@@ -5,7 +5,7 @@ from django_rq import job
 
 from mcs.wsgi import RINGS
 
-SCHEDULER = django_rq.get_scheduler('default')
+# SCHEDULER = django_rq.get_scheduler('default')
 
 
 def upload_file(file, content):
@@ -31,8 +31,7 @@ def upload_object(cloud, content, file):
     """
     # Create container named = username if it doesnt exist
     container = file.owner.username
-    if not cloud.connector.state_container(container):
-        cloud.connector.create_container(container)
+
     try:
         cloud.connector.upload_object(container, file.path,
                                       contents=content.chunk(),
