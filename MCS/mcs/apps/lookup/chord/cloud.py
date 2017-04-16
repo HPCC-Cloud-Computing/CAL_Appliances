@@ -15,7 +15,7 @@ class Cloud(object):
         self.connector = Client(version='1.0.0', resource='object_storage',
                                 provider=self.provider)
 
-    def get_quota(self, username):
+    def set_quota(self, username):
         """Return quota (unit - bytes)"""
         container_stat = self.connector.stat_container(username)
         for stat in container_stat.keys():
@@ -23,7 +23,7 @@ class Cloud(object):
                 self.quota = container_stat[stat]
         self.quota = long(8589934592)  # Unit: Bytes
 
-    def get_usage(self, username):
+    def set_usage(self, username):
         """Get used (unit- bytes)"""
         self.used = 0  # Unit: Bytes
         if self.type.lower() == 'openstack':
@@ -42,5 +42,5 @@ class Cloud(object):
             self.status = 'CORRUPTED'
 
     def set_weight(self, sum_quotas):
-        self.get_quota()
+        self.set_quota()
         self.weight = self.quota / sum_quotas
