@@ -16,7 +16,7 @@ SECRET_KEY = 'VERY_SECRET_KEY'
 DEBUG = True
 IN_TESTING = sys.argv[1:2] == ['test']
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
