@@ -18,9 +18,9 @@ class Ring(object):
         # # cloud1 = Cloud(type, config, address)
         # # cloud1 is an instance of class Cloud
         self.clouds = clouds
-        self._gen_clouds_duplicate_list()
-        # self.generate_ring()
         self._generate_duplicate_clouds_list()
+        self.generate_ring()
+        # self._gen_clouds_duplicate_list()
 
     def generate_ring(self):
         """Generate ring"""
@@ -94,6 +94,6 @@ class Ring(object):
             rand_elm = random.randrange(0, len(num_dupl_per_cloud))
             num_dupl_per_cloud[rand_elm] += (total_duplicates - sum(num_dupl_per_cloud))
         self.duplicates = []
-        for i in settings.RING_SIZE:
+        for i in range(0, settings.RING_SIZE):
             self.duplicates.append(self.clouds)
 

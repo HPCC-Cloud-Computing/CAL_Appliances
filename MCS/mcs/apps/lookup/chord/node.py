@@ -17,7 +17,6 @@ class Node(object):
         :param username (string):
         :param clouds (list): List of cloud object.
         """
-        self.ring = hashlib.sha256(username).hexdigest()
         self.id = id
         self.username = username
         self.clouds = clouds
