@@ -19,7 +19,8 @@ class Ring(object):
         # # cloud1 is an instance of class Cloud
         self.clouds = clouds
         self._gen_clouds_duplicate_list()
-        self.generate_ring()
+        # self.generate_ring()
+        self._generate_duplicate_clouds_list()
 
     def generate_ring(self):
         """Generate ring"""
@@ -76,3 +77,23 @@ class Ring(object):
 
         self.duplicates = [list(e) for e in zip(
             self.duplicates[:-1], self.duplicates[1:], self.duplicates[2:])]
+
+    def _generate_duplicate_clouds_list(self):
+        """Create n duplicates per cloud."""
+        # Number of duplicates (all clouds)
+        total_duplicates = settings.RING_SIZE * len(self.clouds)
+        self._set_weight_cloud()
+        # Assumptions: cloud1.weigh = cloud2.weigh = cloud3.weigh
+        # so bellow step is unnecessary.
+        # Number duplicates/cloud
+        num_dupl_per_cloud = []
+        for cloud in self.clouds:
+            num_dupl_per_cloud.append(int(floor(cloud.weight * total_duplicates)))
+        # Re-check
+        if sum(num_dupl_per_cloud) != total_duplicates:
+            rand_elm = random.randrange(0, len(num_dupl_per_cloud))
+            num_dupl_per_cloud[rand_elm] += (total_duplicates - sum(num_dupl_per_cloud))
+        self.duplicates = []
+        for i in settings.RING_SIZE:
+            self.duplicates.append(self.clouds)
+
