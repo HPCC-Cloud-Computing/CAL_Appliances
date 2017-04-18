@@ -45,7 +45,7 @@ def get_folder_by_path(jsondata, path, result):
 
 def generate_hash_key(str_to_hash):
     """Generate hash key for given string"""
-    return int(hashlib.md5(str_to_hash).hexdigest(), 16) % 64
+    return int(hashlib.md5(str_to_hash).hexdigest(), 16) % settings.RING_SIZE
 
 
 def sizeof_fmt(num, suffix='B'):
