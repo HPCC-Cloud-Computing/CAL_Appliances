@@ -18,11 +18,12 @@ def upload_file(file, content):
     update_status_file(file.path, File.NOT_AVAILABLE)
     for cloud in node.clouds:
         # Put task to queue 'default'
-        upload_object.delay(cloud, content, file)
+        # upload_object.delay(cloud, content, file)
+        upload_object(cloud, content, file)
     update_status_file(file.path, File.UPDATE)
 
 
-@job
+# @job
 def upload_object(cloud, content, file):
     """Upload object to cloud node with absolute_name
     :param cloud: object of model Cloud.
@@ -33,8 +34,9 @@ def upload_object(cloud, content, file):
     container = file.owner.username
 
     try:
-        cloud.connector.upload_object(container, file.path,
-                                      contents=content.chunk(),
+        tmp = cloud.connector.upload_object(container, file.path,
+                                      contents=content.read(),
+                                      content_length=content.size,
                                       metadata={'status': 'UPDATED'})
     except exceptions.UploadObjectError as e:
         # TODO:
