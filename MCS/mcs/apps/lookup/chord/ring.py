@@ -96,4 +96,3 @@ class Ring(object):
         self.duplicates = []
         for i in range(0, settings.RING_SIZE):
             self.duplicates.append(self.clouds)
-
