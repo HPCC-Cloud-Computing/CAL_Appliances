@@ -23,10 +23,9 @@ def init_ring(request):
             ring = Ring(username, clouds)
             RINGS[username] = ring
 
-            # Write json to file
-            file_name = hashlib.md5(username).hexdigest()
-            # Temporary
-            utils.save(ring, settings.MEDIA_ROOT + '/configs/' + file_name + '.pickle')
+            # file_name = hashlib.md5(username).hexdigest()
+            # # Temporary
+            # utils.save(ring, settings.MEDIA_ROOT + '/configs/' + file_name + '.pickle')
             return redirect('home')
     else:
         form = forms.UploadCloudConfigsForm()
