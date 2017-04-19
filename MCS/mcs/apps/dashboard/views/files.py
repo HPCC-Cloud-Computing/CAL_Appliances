@@ -1,7 +1,10 @@
+import os
 from dashboard.forms import CreateFolderForm, UploadFileForm
 from dashboard.models import File
 from dashboard.tasks import objects
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
@@ -122,6 +125,8 @@ def delete_files(request):
     files = File.objects.filter(
         id__in=request.POST.getlist('checked_file'))
     # Delete the files -> Done
+    for file in files:
+        objects.delete_file(file)
     files.delete()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -152,9 +157,15 @@ def upload_file(request, folder_id=None):
                 new_file.size = request.FILES['content'].size
                 new_file.is_folder = False
                 new_file.owner = request.user
-                new_file.save()
                 # Save file as object
-                objects.upload_file(new_file, request.FILES['content'])
+                new_file_content = ContentFile(request.FILES['content'].read())
+                new_file.save()
+                objects.upload_file(new_file, new_file_content)
+                # Remove saved file
+                try:
+                    os.remove(settings.MEDIA_ROOT + '/' + new_file.name)
+                except OSError:
+                    pass
                 return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
         else:
             data['form_is_valid'] = False

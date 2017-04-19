@@ -1,6 +1,5 @@
 from dashboard import exceptions
 from dashboard.models import File
-from django_rq import job
 
 from mcs.wsgi import RINGS
 
@@ -34,7 +33,7 @@ def upload_object(cloud, content, file):
     container = file.owner.username
 
     try:
-        tmp = cloud.connector.upload_object(container, file.path,
+        cloud.connector.upload_object(container, file.path.strip('/'),
                                       contents=content.read(),
                                       content_length=content.size,
                                       metadata={'status': 'UPDATED'})
@@ -55,11 +54,11 @@ def download_file(file):
     node = ring.lookup(file.identifier)
     container = file.owner.username
     for cloud in node.clouds:
-        object_stat = cloud.connector.stat_object(container, file.path)
+        object_stat = cloud.connector.stat_object(container, file.path.strip('/'))
         object_status = [object_stat[key]
                          for key in object_stat.keys() if 'status' in key]
         if object_status == 'UPDATED':
-            return cloud.connector.download_object(container, file.path)
+            return cloud.connector.download_object(container, file.path.strip('/'))
     return None
 
 
@@ -92,3 +91,11 @@ def update_status_object(cloud, container, object, new_status):
                                       metadata={'status': new_status})
     except exceptions.UpdateObjectError as e:
         raise e
+
+
+def delete_file(file):
+    ring = RINGS[file.owner.username]
+    node = ring.lookup(file.identifier)
+    container = file.owner.username
+    for cloud in node.clouds:
+        cloud.connector.delete_object(container, file.path.strip('/'))
