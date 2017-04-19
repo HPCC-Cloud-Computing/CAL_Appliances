@@ -156,3 +156,23 @@ Trình bày về tầng 2:  Trình bày quy trình xây dựng thư viện Abstr
 Trình bày về tầng 3: Các cơ chế tối ưu hóa hệ thống, các tính năng nâng cao như phân tán tải - load balance giữa các cloud Server, cơ chế sao lưu replicate, cơ chế tối ưu hóa hiệu năng, cơ chế sử dụng Message Queue để time-coupling, cơ chế đồng bộ hóa cho các bản sao, cơ chế chống lỗi, cơ chế phục hồi - recovery, .....
 
 Đề xuất của em: Chuyển đồ án sang đặt nặng hướng nghiên cứu hơn ==> Tập trung vào thiết kế của hệ thống, còn sản phẩm minh họa chỉ cần thực hiện được một số tính năng là được.
+
+## 19/04/2017
+
+Vấn đề về folder trong MCS
+
+Trong hệ thống MCS, hôm trước như thiết kế thì chúng ta có tính đến việc cho phép người dùng sử dụng cấu trúc cây thư mục để lưu trữ các Data Object. Tuy nhiên, việc sử dụng cấu trúc cây thư mục có một số vấn đề như sau:
+
+Thứ nhất, nếu cho phép thao tác đổi tên thư mục được xảy ra, thì chúng ta phải sử dụng một phương thức khóa nào đó để ngăn thao tác này được diễn ra khi một file con trong thư mục này đang được tạo ra, hoặc đang được cập nhật nội dung.
+
+Ví dụ: Trong hệ thống có một thư mục **folder1** có địa chỉ tuyệt đối là **/root/media/folder1**. Tại một thời điểm **t** xác định, process **create\_data\_object\_process** trong hệ thống đang trong quá trình tạo ra một file **m1.sql** có kích thước 500 MB trong thư mục này, m1.sql có đường dẫn tuyệt đối là **/root/media/folder1/m1.sql**. Tại thời điểm **t**, process này đang tạo ra replica thứ 2 của file **m1.sql**
+
+Cũng tại thời điểm **t**, người dùng gửi request yêu cầu đổi tên thư mục **folder1** thành **folder2**. Nếu như không có lock, thì thao tác đổi tên thư mục sẽ diễn ra đồng thời, song song cùng một lúc với thao tác tạo file **m1.sql**. Nếu thao tác đổi tên diễn ra nhanh hơn thao tác tạo file **m1.sql**, thì rất có khả năng xảy ra sự không nhất quán trong hệ thống, sẽ có thể xảy ra trường hợp 2 replica đầu tiên của file **m1.sql** sẽ được đổi tên (tên tuyệt đối) thành **/root/media/folder2/m1.sql**, còn replica thứ 3 thì lại có tên là **/root/media/folder1/m1.sql** (Vì thao tác đổi tên xảy ra xong trước khi **create\_data\_object\_process** tạo ra replica 3 cho file **m1.sql**), hoặc cũng có thể xảy ra lỗi, khi process thực hiện đổi tên không tìm thấy replica thứ 3 của file **m1.sql**, vì đơn giản là tại thời điểm process thực hiện đổi tên đi tìm replica thứ 3 này, replica thứ 3 vẫn chưa được tạo ra. (Lý do mà process thực hiện thao tác đổi tên folder phải đi tìm replica thứ 3 của file **m1.sql**, là vì như đã trình bày trong thiết kế, khi thao tác đổi tên được xảy ra trên một folder, thì chúng ta cũng phải đổi tên tất cả các folder/file con nằm trong folder đó, vì MCS lưu file dưới dạng tên tuyệt đối).
+
+Vấn đề tương tự xảy ra khi chúng ta muốn xóa một folder trong hệ thống, chúng ta cũng cần phải có các thao tác đồng bộ, để đảm bảo thao tác xóa folder được thực hiện chỉ khi không còn thao tác đọc/ghi dữ liệu diễn ra trong folder đó, cũng như trong các file/folder nằm trong thư mục đó.
+
+Đề xuất: Không cung cấp hai thao tác đổi tên file/folder và xóa file/folder ? Hoặc thiết kế một cơ chế nào đó cho phép đồng bộ hóa các thao tác trong hệ thống ?
+
+Vấn đề được phát hiện khi em đọc bài viết về Google File System. Họ phải dùng lock để đồng bộ hóa các thao tác tạo mới/đổi tên/xóa/cập nhật/đọc/ghi:
+
+[https://github.com/haminhcong/openstack-manual/blob/master/DistributedSystem/Google_File_Sytem.md#41-qu%E1%BA%A3n-l%C3%BD-namespace-v%C3%A0-locking](https://github.com/haminhcong/openstack-manual/blob/master/DistributedSystem/Google_File_Sytem.md#41-qu%E1%BA%A3n-l%C3%BD-namespace-v%C3%A0-locking)
