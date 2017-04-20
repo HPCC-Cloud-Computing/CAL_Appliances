@@ -171,7 +171,7 @@ Cũng tại thời điểm **t**, người dùng gửi request yêu cầu đổi
 
 Vấn đề tương tự xảy ra khi chúng ta muốn xóa một folder trong hệ thống, chúng ta cũng cần phải có các thao tác đồng bộ, để đảm bảo thao tác xóa folder được thực hiện chỉ khi không còn thao tác đọc/ghi dữ liệu diễn ra trong folder đó, cũng như trong các file/folder nằm trong thư mục đó.
 
-Đề xuất: Không cung cấp hai thao tác đổi tên file/folder và xóa file/folder ? Hoặc thiết kế một cơ chế nào đó cho phép đồng bộ hóa các thao tác trong hệ thống ?
+Đề xuất: Không cung cấp hai thao tác đổi tên file/folder và xóa file/folder ? Hoặc thiết kế một cơ chế nào đó cho phép đồng bộ hóa các thao tác trong hệ thống ? Hoặc thiết kế lại mô hình folder trong MCS ?
 
 Vấn đề được phát hiện khi em đọc bài viết về Google File System. Họ phải dùng lock để đồng bộ hóa các thao tác tạo mới/đổi tên/xóa/cập nhật/đọc/ghi:
 
