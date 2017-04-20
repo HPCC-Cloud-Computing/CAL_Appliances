@@ -186,6 +186,5 @@ def download_file(request):
     file_content = objects.download_file(file)
     response = HttpResponse(file_content,
                             content_type='application/octet-stream')
-    response['Content-Disposition'] = 'attachment; filename=%s' % smart_str(
-        file.name)
+    response['Content-Disposition'] = 'attachment; filename=%s' % smart_str(file.name)
     return response

@@ -15,13 +15,13 @@ def upload_file(file, content):
     :param content: content of file (stream
 .    """
     ring = RINGS[file.owner.username]
-    node = ring.lookup(file.identifier)
+    node = ring.lookup(long(file.identifier))
     update_status_file(file.path, File.NOT_AVAILABLE)
     for cloud in node.clouds:
         # Put task to queue 'default'
         _content = copy.deepcopy(content)
-        # upload_object(cloud, _content, file)
-        upload_object.delay(cloud, _content, file)
+        upload_object(cloud, _content, file)
+        # upload_object.delay(cloud, _content, file)
     update_status_file(file.path, File.UPDATE)
 
 
@@ -54,15 +54,27 @@ def download_file(file):
     :param file: object of model File.
     """
     ring = RINGS[file.owner.username]
-    node = ring.lookup(file.identifier)
+    node = ring.lookup(long(file.identifier))
     container = file.owner.username
     for cloud in node.clouds:
-        object_stat = cloud.connector.stat_object(container, file.path.strip('/'))
-        object_status = [object_stat[key]
-                         for key in object_stat.keys() if 'status' in key]
-        if object_status == 'UPDATED':
-            return cloud.connector.download_object(container, file.path.strip('/'))
-    return None
+        try:
+            object_stat = cloud.connector.stat_object(container, file.path.strip('/'))
+        except:
+            continue
+
+        # Temporary handle.
+        stream_key = 1
+        if cloud.type == 'amazon':
+            object_stat = object_stat['Metadata']
+            stream_key = 'Body'
+        object_status = [object_stat[key] for key in object_stat.keys() if 'status' in key]
+        if object_status[0] == 'UPDATED':
+            file_content = cloud.connector.download_object(container,
+                                                           file.path.strip('/'))[stream_key]
+            if cloud.type == 'amazon':
+                return file_content.read()
+            return file_content
+    return None  # Should raise message error.
 
 
 def update_status_file(file_path, new_status):
@@ -97,8 +109,9 @@ def update_status_object(cloud, container, object, new_status):
 
 
 def delete_file(file):
+    """Delete file"""
     ring = RINGS[file.owner.username]
-    node = ring.lookup(file.identifier)
+    node = ring.lookup(long(file.identifier))
     container = file.owner.username
     for cloud in node.clouds:
         cloud.connector.delete_object(container, file.path.strip('/'))
