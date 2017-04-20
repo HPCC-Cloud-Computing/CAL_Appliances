@@ -29,7 +29,7 @@ def upload_file(file, content):
 def upload_object(cloud, content, file):
     """Upload object to cloud node with absolute_name
     :param cloud: object of model Cloud.
-    :parem content: content of file (Stream).
+    :param content: content of file (Stream).
     :param file: object of model File.
     """
     # Create container named = username if it doesnt exist
@@ -78,6 +78,10 @@ def download_file(file):
 
 
 def update_status_file(file_path, new_status):
+    """Update status of file
+    :param file_path: path of file.
+    :param new_status: new status of file.
+    """
     try:
         file = File.objects.get(path=file_path)
         file.status = new_status
@@ -100,7 +104,12 @@ def get_status_file(file_path):
 
 
 def update_status_object(cloud, container, object, new_status):
-    """Upload exist object's status"""
+    """Upload exist object's status
+    :param cloud: object of class Cloud.
+    :param container: container name.
+    :param object: object name.
+    :param new_status: new status of file.
+    """
     try:
         cloud.connector.update_object(container, object,
                                       metadata={'status': new_status})
@@ -109,9 +118,14 @@ def update_status_object(cloud, container, object, new_status):
 
 
 def delete_file(file):
-    """Delete file"""
+    """Delete file
+    :param file: object of model File.
+    """
     ring = RINGS[file.owner.username]
     node = ring.lookup(long(file.identifier))
     container = file.owner.username
     for cloud in node.clouds:
-        cloud.connector.delete_object(container, file.path.strip('/'))
+        try:
+            cloud.connector.delete_object(container, file.path.strip('/'))
+        except Exception:
+            pass
