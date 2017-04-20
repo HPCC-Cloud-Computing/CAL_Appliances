@@ -1,6 +1,6 @@
 import copy
 
-from    dashboard import exceptions
+from dashboard import exceptions
 from dashboard.models import File
 
 from mcs.wsgi import RINGS
@@ -19,9 +19,9 @@ def upload_file(file, content):
     update_status_file(file.path, File.NOT_AVAILABLE)
     for cloud in node.clouds:
         # Put task to queue 'default'
-        # upload_object.delay(cloud, content, file)
         _content = copy.deepcopy(content)
-        upload_object(cloud, _content, file)
+        # upload_object(cloud, _content, file)
+        upload_object.delay(cloud, _content, file)
     update_status_file(file.path, File.UPDATE)
 
 
