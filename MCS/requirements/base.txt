@@ -10,8 +10,12 @@ mysql-python
 
 django-rq
 
+dill
+
 Pillow<3.5.0
 
 eventlet
 
-calplus
+-e git+https://github.com/ntk148v/rq.git#egg=rq
+
+-e git+https://github.com/ntk148v/CAL.git#egg=calplus
