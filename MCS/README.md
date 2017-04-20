@@ -35,8 +35,8 @@ Follow these steps:
 6. Run migrate databse and wsgi server.
 
     ```
-    python manage.py migrate
-    python mcs/wsgi.py
+    python manage.py migrate  # DB create
+    python mcs/wsgi.py rqworker default # start wsgi server
     ```
 
 7. Open browser, go to http://127.0.0.1:8080/auth/register and complete
