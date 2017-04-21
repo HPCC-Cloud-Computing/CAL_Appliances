@@ -32,7 +32,7 @@ def init_ring(request):
             ring = Ring(username, clouds)
             RINGS[username] = ring
             # Temporary
-            # utils.save(ring, pickle_path)
+            utils.save(ring, pickle_path)
             return redirect('home')
     else:
         form = forms.UploadCloudConfigsForm()
