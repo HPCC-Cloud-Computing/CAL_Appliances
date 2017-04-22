@@ -4,9 +4,10 @@ import os
 from calplus.client import Client
 from calplus.provider import Provider
 
+from dashboard.utils import sizeof_fmt
+
 
 class Cloud(object):
-
     def __init__(self, username, name, type, address, config):
         self.name = name
         self.address = address
@@ -38,8 +39,17 @@ class Cloud(object):
             for obj in self.connector.list_container_objects(self.username):
                 self.used += obj['bytes']
         elif self.type.lower() == 'amazon':
-            for obj in self.connector.list_container_objects(self.username)['Contents']:
+            for obj in self.connector.list_container_objects(self.username,
+                                                             prefix='',
+                                                             delimiter='')['Contents']:
                 self.used += obj['Size']
+
+    def set_used_rate(self):
+        """Set used rate = used/quota"""
+        self.set_usage()
+        used = sizeof_fmt(float(self.used))
+        quota = sizeof_fmt(float(self.quota))
+        self.used_rate = used + '/' + quota
 
     def check_health(self):
         """Check health - simple with ping"""
