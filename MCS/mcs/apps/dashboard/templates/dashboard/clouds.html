@@ -12,20 +12,20 @@
             <div class="content table-responsive table-full-width">
                 <table class="table table-striped">
                     <thead>
-                        <th>ID</th>
+                        <th>NAME</th>
                         <th>IP ADDRESS</th>
                         <th>TYPE</th>
-                        <th>CAPACITY</th>
+                        <th>USED</th>
                         <th>STATUS</th>
                     </thead>
                     <tbody>
-                        {% for item in items %}
+                        {% for cloud in clouds %}
                         <tr>
-                            <td>{{ item.id }}</td>
-                            <td>{{ item.ipaddress }}</td>
-                            <td>{{ item.type }}</td>
-                            <td>{{ item.capacity }}</td>
-                            <td>{{ item.status }}</td>
+                            <td>{{ cloud.name }}</td>
+                            <td>{{ cloud.address }}</td>
+                            <td>{{ cloud.type }}</td>
+                            <td>{{ cloud.used_rate }}</td>
+                            <td>{{ cloud.status }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

@@ -3,14 +3,14 @@ from django.views.generic import TemplateView
 from django.conf.urls.static import static
 from django.conf import settings
 
-from mcs.apps.dashboard.views import files, user
+from mcs.apps.dashboard.views import clouds, files, user
 
 urlpatterns = [
     url(r'^home/$',
         TemplateView.as_view(template_name='dashboard/home.html'),
         name='home'),
     url(r'^clouds/$',
-        TemplateView.as_view(template_name='dashboard/clouds.html'),
+        clouds.list_clouds,
         name='clouds'),
     url(r'^files/$',
         files.list_files,
