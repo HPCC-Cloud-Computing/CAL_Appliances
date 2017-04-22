@@ -2,8 +2,8 @@ import json
 import logging
 import os
 
-import cloudpickle
-import pickle
+import dill
+
 from lookup.chord.cloud import Cloud
 
 LOG = logging.getLogger(__name__)
@@ -39,8 +39,8 @@ def save(obj, path):
     if os.path.isfile(path):
         LOG.info('File existed! Use load() method.')
     else:
-        cloudpickle.dump(obj, open(path, 'wb'),
-                         protocol=pickle.HIGHEST_PROTOCOL)
+        dill.dump(obj, open(path, 'wb'),
+                  protocol=dill.HIGHEST_PROTOCOL)
 
 
 def load(path):
@@ -49,4 +49,4 @@ def load(path):
         LOG.info('File doesnt existed!')
         raise IOError()
     else:
-        return cloudpickle.load(open(path, 'rb'))
+        return dill.load(open(path, 'rb'))

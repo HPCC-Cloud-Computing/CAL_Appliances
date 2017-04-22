@@ -19,10 +19,13 @@ def init_ring(request):
     pickle_name = hashlib.md5(username).hexdigest()
     pickle_path = settings.MEDIA_ROOT + '/configs/' + pickle_name + '.pickle'
     # Check if pickle file exists, load ring from it.
-    # if os.path.exists(pickle_path):
-    #     ring = utils.load(pickle_path)
-    #     RINGS[username] = ring
-    #     return redirect('home')
+    if os.path.exists(pickle_path):
+        try:
+            ring = utils.load(pickle_path)
+            RINGS[username] = ring
+            return redirect('home')
+        except Exception as e:
+            print str(e)
 
     if request.method == 'POST':
         form = forms.UploadCloudConfigsForm(request.POST, request.FILES)
@@ -31,8 +34,10 @@ def init_ring(request):
             clouds = utils.load_cloud_configs(username, request.FILES['cloud_configs'])
             ring = Ring(username, clouds)
             RINGS[username] = ring
+            import copy
+            tmp_ring = copy.copy(ring)
             # Temporary
-            utils.save(ring, pickle_path)
+            utils.save(tmp_ring, pickle_path)
             return redirect('home')
     else:
         form = forms.UploadCloudConfigsForm()
