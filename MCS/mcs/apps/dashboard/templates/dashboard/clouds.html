@@ -17,6 +17,7 @@
                         <th>TYPE</th>
                         <th>USED</th>
                         <th>STATUS</th>
+                        <th>ACTION</th>
                     </thead>
                     <tbody>
                         {% for cloud in clouds %}
@@ -26,6 +27,11 @@
                             <td>{{ cloud.type }}</td>
                             <td>{{ cloud.used_rate }}</td>
                             <td>{{ cloud.status }}</td>
+                            <td>
+                                <button type="button" class="btn btn-primary">
+                                   <i class="ti-reload"></i>
+                                </button>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
