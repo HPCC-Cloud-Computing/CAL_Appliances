@@ -2,6 +2,7 @@ import copy
 
 from dashboard import exceptions
 from dashboard.models import File
+#from django_rq import job
 
 from mcs.wsgi import RINGS
 
@@ -21,11 +22,11 @@ def upload_file(file, content):
         # Put task to queue 'default'
         _content = copy.deepcopy(content)
         upload_object(cloud, _content, file)
-        # upload_object.delay(cloud, _content, file)
+        #upload_object.delay(cloud, _content, file)
     update_status_file(file.path, File.UPDATE)
 
 
-# @job
+#@job
 def upload_object(cloud, content, file):
     """Upload object to cloud node with absolute_name
     :param cloud: object of model Cloud.
