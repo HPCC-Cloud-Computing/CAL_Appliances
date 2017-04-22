@@ -3,7 +3,7 @@ import logging
 import os
 
 import dill
-
+from calplus.client import Client
 from lookup.chord.cloud import Cloud
 
 LOG = logging.getLogger(__name__)
@@ -50,3 +50,33 @@ def load(path):
         raise IOError()
     else:
         return dill.load(open(path, 'rb'))
+
+
+def set_quota_cloud(cloud):
+    """Set cloud's quota"""
+    connector = Client(version='1.0.0', resource='object_storage',
+                       provider=cloud.provider)
+    try:
+        connector.stat_container(cloud.username)
+    except Exception:
+        connector.create_container(cloud.username)
+    container_stat = connector.stat_container(cloud.username)
+    for stat in container_stat.keys():
+        if 'quota' in stat:
+            cloud.quota = container_stat[stat]
+    cloud.quota = long(8589934592)  # Unit: Bytes
+
+
+def set_usage_cloud(cloud):
+    """Set clouds's used space"""
+    connector = Client(version='1.0.0', resource='object_storage',
+                       provider=cloud.provider)
+    cloud.used = 0  # Unit: Bytes
+    if cloud.type.lower() == 'openstack':
+        for obj in connector.list_container_objects(cloud.username):
+            cloud.used += obj['bytes']
+    elif cloud.type.lower() == 'amazon':
+        for obj in connector.list_container_objects(cloud.username,
+                                                    prefix='',
+                                                    delimiter='')['Contents']:
+            cloud.used += obj['Size']

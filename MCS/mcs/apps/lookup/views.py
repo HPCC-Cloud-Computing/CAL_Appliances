@@ -19,28 +19,27 @@ def init_ring(request):
     pickle_name = hashlib.md5(username).hexdigest()
     pickle_path = settings.MEDIA_ROOT + '/configs/' + pickle_name + '.pickle'
     # Check if pickle file exists, load ring from it.
-    # if os.path.exists(pickle_path):
-    #     try:
-    #         ring = utils.load(pickle_path)
-    #         RINGS[username] = ring
-    #         return redirect('home')
-    #     except Exception as e:
-    #         print str(e)
+    if os.path.exists(pickle_path):
+        try:
+            ring = utils.load(pickle_path)
+            RINGS[username] = ring
+            return redirect('home')
+        except Exception as e:
+            print str(e)
 
     if request.method == 'POST':
         form = forms.UploadCloudConfigsForm(request.POST, request.FILES)
         if form.is_valid():
             # Init Cloud objects.
-            clouds = utils.load_cloud_configs(username, request.FILES['cloud_configs'])
+            clouds = utils.load_cloud_configs(username,
+                                              request.FILES['cloud_configs'])
+            for cloud in clouds:
+                utils.set_quota_cloud(cloud)
+                utils.set_usage_cloud(cloud)
             ring = Ring(username, clouds)
             RINGS[username] = ring
-            import copy
-            from botocore.client import BaseClient
-            tmp_ring = copy.copy(ring)
-            cls = type(str('S3'), tuple([BaseClient]), {})
-            globals()['botocore.client.S3'] = cls
             # Temporary
-            utils.save(tmp_ring, pickle_path)
+            utils.save(ring, pickle_path)
             return redirect('home')
     else:
         form = forms.UploadCloudConfigsForm()

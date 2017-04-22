@@ -2,6 +2,7 @@ import copy
 
 from dashboard import exceptions
 from dashboard.models import File
+from calplus.client import Client
 #from django_rq import job
 
 from mcs.wsgi import RINGS
@@ -22,25 +23,27 @@ def upload_file(file, content):
         # Put task to queue 'default'
         _content = copy.deepcopy(content)
         upload_object(cloud, _content, file)
-        #upload_object.delay(cloud, _content, file)
+        # upload_object.delay(cloud, _content, file)
     update_status_file(file.path, File.UPDATE)
 
 
-#@job
+# @job
 def upload_object(cloud, content, file):
     """Upload object to cloud node with absolute_name
     :param cloud: object of model Cloud.
     :param content: content of file (Stream).
     :param file: object of model File.
     """
+    connector = Client(version='1.0.0', resource='object_storage',
+                       provider=cloud.provider)
     # Create container named = username if it doesnt exist
     container = file.owner.username
 
     try:
-        cloud.connector.upload_object(container, file.path.strip('/'),
-                                      contents=content.read(),
-                                      content_length=content.size,
-                                      metadata={'status': 'UPDATED'})
+        connector.upload_object(container, file.path.strip('/'),
+                                contents=content.read(),
+                                content_length=content.size,
+                                metadata={'status': 'UPDATED'})
     except exceptions.UploadObjectError as e:
         # TODO:
         # return message.error(e)
@@ -58,9 +61,13 @@ def download_file(file):
     node = ring.lookup(long(file.identifier))
     container = file.owner.username
     for cloud in node.clouds:
+        # Init cloud's connector
+        connector = Client(version='1.0.0', resource='object_storage',
+                           provider=cloud.provider)
         try:
-            object_stat = cloud.connector.stat_object(container, file.path.strip('/'))
-        except:
+            object_stat = connector.stat_object(container,
+                                                file.path.strip('/'))
+        except Exception:
             continue
 
         # Temporary handle.
@@ -68,10 +75,11 @@ def download_file(file):
         if cloud.type == 'amazon':
             object_stat = object_stat['Metadata']
             stream_key = 'Body'
-        object_status = [object_stat[key] for key in object_stat.keys() if 'status' in key]
+        object_status = [object_stat[key]
+                         for key in object_stat.keys() if 'status' in key]
         if object_status[0] == 'UPDATED':
-            file_content = cloud.connector.download_object(container,
-                                                           file.path.strip('/'))[stream_key]
+            file_content = connector.download_object(container,
+                                                     file.path.strip('/'))[stream_key]
             if cloud.type == 'amazon':
                 return file_content.read()
             return file_content
@@ -111,9 +119,11 @@ def update_status_object(cloud, container, object, new_status):
     :param object: object name.
     :param new_status: new status of file.
     """
+    connector = Client(version='1.0.0', resource='object_storage',
+                       provider=cloud.provider)
     try:
-        cloud.connector.update_object(container, object,
-                                      metadata={'status': new_status})
+        connector.update_object(container, object,
+                                metadata={'status': new_status})
     except exceptions.UpdateObjectError as e:
         raise e
 
@@ -126,7 +136,9 @@ def delete_file(file):
     node = ring.lookup(long(file.identifier))
     container = file.owner.username
     for cloud in node.clouds:
+        connector = Client(version='1.0.0', resource='object_storage',
+                           provider=cloud.provider)
         try:
-            cloud.connector.delete_object(container, file.path.strip('/'))
+            connector.delete_object(container, file.path.strip('/'))
         except Exception:
             pass
