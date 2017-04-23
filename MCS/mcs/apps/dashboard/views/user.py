@@ -1,9 +1,10 @@
-from dashboard.forms import UserForm, UserProfileForm
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+
+from dashboard.forms import UserForm, UserProfileForm
 
 
 @login_required(login_url='/auth/login')

@@ -1,9 +1,9 @@
 import copy
 
 from calplus.client import Client
+
 from dashboard import exceptions
 from dashboard.models import File
-
 from mcs.wsgi import RINGS
 
 

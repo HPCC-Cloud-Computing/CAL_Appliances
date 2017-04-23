@@ -1,5 +1,6 @@
-from django.conf import settings
 from random import shuffle
+
+from django.conf import settings
 
 
 def decr(value, size):

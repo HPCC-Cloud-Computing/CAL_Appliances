@@ -4,6 +4,7 @@ import logging
 import dill
 import os
 from calplus.client import Client
+
 from lookup.chord.cloud import Cloud
 
 LOG = logging.getLogger(__name__)

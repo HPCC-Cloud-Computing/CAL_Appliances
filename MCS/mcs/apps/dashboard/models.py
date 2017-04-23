@@ -1,9 +1,8 @@
 from __future__ import unicode_literals
-import os
-from dashboard import utils
 from django.contrib.auth.models import User
 from django.db import models
 
+from dashboard import utils
 
 class FileManager(models.Manager):
     pass

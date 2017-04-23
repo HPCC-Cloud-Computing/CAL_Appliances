@@ -1,6 +1,6 @@
 import hashlib
-
 import os
+
 from django.conf import settings
 
 
