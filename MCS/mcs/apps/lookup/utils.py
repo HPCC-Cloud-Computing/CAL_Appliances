@@ -80,6 +80,5 @@ def set_usage_cloud(cloud):
                                                         prefix='',
                                                         delimiter='')
         if 'Contents' in list_objects:
-            cloud.used = 0
-        for obj in list_objects['Contents']:
-            cloud.used += obj['Size']
+            for obj in list_objects['Contents']:
+                cloud.used += obj['Size']
