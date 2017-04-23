@@ -47,6 +47,7 @@ class File(models.Model):
                                   default=False)
     size = models.IntegerField('size', null=True,
                                editable=False)
+    size_format = models.CharField('size_format', max_length=255, null=True)
     parent = models.ForeignKey('self', verbose_name=('parent'),
                                null=True, blank=True,
                                related_name='children')
@@ -55,6 +56,8 @@ class File(models.Model):
 
     def save(self, *args, **kwargs):
         self.identifier = utils.generate_hash_key(str(self.path))
+        if not self.is_folder:
+            self.size_format = utils.sizeof_fmt(self.size)
         super(File, self).save(*args, **kwargs)
 
     def contains_file(self, folder_name):

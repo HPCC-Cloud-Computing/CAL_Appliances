@@ -3,7 +3,7 @@
 <tr>
     <td>
         <div class="checkbox">
-          <input type="checkbox" name="checked_file" value="{{ file.id }}">
+          <input type="checkbox" name="checked_file" value="{{ file.id }}" disabled>
         </div>
     </td>
     <td>
@@ -27,7 +27,7 @@
         <a><i class="ti-file"> {{ file.name }}</i></a>
     </td>
     <td><p>{{ file.last_modified }}</p></td>
-    <td><p>{{ file.size }}</p></td>
+    <td><p>{{ file.size_format }}</p></td>
     <td>
         <div class="text-center" style="width: 50%">
             <form id="download-form" action="{% url 'download_file' %}" method="POST">
