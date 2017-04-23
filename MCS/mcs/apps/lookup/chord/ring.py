@@ -34,6 +34,8 @@ class Ring(object):
 
     def lookup(self, key):
         """Lookup key"""
+        if not (isinstance(key, int) or isinstance(key, long)):
+            key = long(key)
         return self.nodes[0].find_successor(key)
 
     def _calculate_sum_quota(self):
@@ -59,11 +61,13 @@ class Ring(object):
         # Number duplicates per cloud (int)
         num_dupl_per_cloud = []
         for cloud in self.clouds:
-            num_dupl_per_cloud.append(int(floor(cloud.weight * total_duplicates)))
+            num_dupl_per_cloud.append(
+                int(floor(cloud.weight * total_duplicates)))
         # Re-check
         if sum(num_dupl_per_cloud) != total_duplicates:
             rand_elm = random.randrange(0, len(num_dupl_per_cloud))
-            num_dupl_per_cloud[rand_elm] += (total_duplicates - sum(num_dupl_per_cloud))
+            num_dupl_per_cloud[
+                rand_elm] += (total_duplicates - sum(num_dupl_per_cloud))
         # Create multi references of one cloud object.
         for map in zip(self.clouds, num_dupl_per_cloud):
             for i in range(map[1]):
@@ -88,11 +92,13 @@ class Ring(object):
         # Number duplicates/cloud
         num_dupl_per_cloud = []
         for cloud in self.clouds:
-            num_dupl_per_cloud.append(int(floor(cloud.weight * total_duplicates)))
+            num_dupl_per_cloud.append(
+                int(floor(cloud.weight * total_duplicates)))
         # Re-check
         if sum(num_dupl_per_cloud) != total_duplicates:
             rand_elm = random.randrange(0, len(num_dupl_per_cloud))
-            num_dupl_per_cloud[rand_elm] += (total_duplicates - sum(num_dupl_per_cloud))
+            num_dupl_per_cloud[
+                rand_elm] += (total_duplicates - sum(num_dupl_per_cloud))
         self.duplicates = []
         for i in range(0, settings.RING_SIZE):
             self.duplicates.append(self.clouds)
