@@ -1,8 +1,8 @@
 import json
 import logging
-import os
 
 import dill
+import os
 from calplus.client import Client
 from lookup.chord.cloud import Cloud
 
@@ -76,7 +76,10 @@ def set_usage_cloud(cloud):
         for obj in connector.list_container_objects(cloud.username):
             cloud.used += obj['bytes']
     elif cloud.type.lower() == 'amazon':
-        for obj in connector.list_container_objects(cloud.username,
-                                                    prefix='',
-                                                    delimiter='')['Contents']:
+        list_objects = connector.list_container_objects(cloud.username,
+                                                        prefix='',
+                                                        delimiter='')
+        if 'Contents' in list_objects:
+            cloud.used = 0
+        for obj in list_objects['Contents']:
             cloud.used += obj['Size']

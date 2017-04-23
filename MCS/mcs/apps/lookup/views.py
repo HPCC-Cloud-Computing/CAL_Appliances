@@ -4,6 +4,7 @@ import os.path
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
+from django.http import HttpResponse
 from lookup import forms
 from lookup import utils
 from lookup.chord.ring import Ring
@@ -25,7 +26,7 @@ def init_ring(request):
             RINGS[username] = ring
             return redirect('home')
         except Exception as e:
-            print str(e)
+            return HttpResponse(str(e))
 
     if request.method == 'POST':
         form = forms.UploadCloudConfigsForm(request.POST, request.FILES)

@@ -1,11 +1,13 @@
 import copy
 
+from calplus.client import Client
 from dashboard import exceptions
 from dashboard.models import File
-from calplus.client import Client
-#from django_rq import job
 
 from mcs.wsgi import RINGS
+
+
+# from django_rq import job
 
 
 # SCHEDULER = django_rq.get_scheduler('default')

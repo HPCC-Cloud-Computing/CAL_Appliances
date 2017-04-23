@@ -2,7 +2,6 @@ from __future__ import division
 
 import os
 from calplus.provider import Provider
-
 from dashboard.utils import sizeof_fmt
 
 
