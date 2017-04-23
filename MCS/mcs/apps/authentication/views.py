@@ -10,7 +10,7 @@ class LoginView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         if request.user.id:
-            return redirect('/home')
+            return redirect('init_ring')
         return self.render_to_response({})
 
     def post(self, request, *args, **kwargs):

@@ -1,6 +1,6 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
@@ -24,9 +24,10 @@ def update_user(request):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+            messages.info(request, 'Update user\'s information successfully!')
         else:
             messages.error(request, 'Please correct the error below.')
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     else:
         user_form = UserForm(instance=request.user)
         profile_form = UserProfileForm(instance=request.user.profile)

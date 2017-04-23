@@ -2,9 +2,9 @@ import hashlib
 import os.path
 
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
-from django.http import HttpResponse
 
 from lookup import forms
 from lookup import utils
@@ -24,9 +24,10 @@ def init_ring(request):
         try:
             ring = utils.load(pickle_path)
             RINGS[username] = ring
+            messages.info(request, 'Ring is loaded')
             return redirect('home')
         except Exception as e:
-            return HttpResponse(str(e))
+            messages.error(request, 'Error when load ring: %s' % str(e))
 
     if request.method == 'POST':
         form = forms.UploadCloudConfigsForm(request.POST, request.FILES)
@@ -41,6 +42,7 @@ def init_ring(request):
             RINGS[username] = ring
             # Temporary
             utils.save(ring, pickle_path)
+            messages.info(request, 'Ring is saved')
             return redirect('home')
     else:
         form = forms.UploadCloudConfigsForm()

@@ -1,3 +1,5 @@
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
 from dashboard import utils as dashboard_utils
@@ -6,6 +8,7 @@ from lookup import utils as lookup_utils
 from mcs.wsgi import RINGS
 
 
+@login_required(login_url='/auth/login/')
 def show_home(request):
     username = request.user.username
     ring = RINGS[username]
@@ -24,7 +27,7 @@ def show_home(request):
     total_files = File.objects.filter(owner=request.user).count()
     total_used = dashboard_utils.sizeof_fmt(total_used)
     total_quota = dashboard_utils.sizeof_fmt(total_quota)
-
+    messages.info(request, 'Get metric about your system successfully.')
     return render(request, 'dashboard/home.html',
                   {
                       'total_quota': total_quota,

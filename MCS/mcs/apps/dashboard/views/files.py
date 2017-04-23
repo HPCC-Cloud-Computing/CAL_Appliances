@@ -1,5 +1,6 @@
 import os
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
@@ -41,7 +42,7 @@ def _get_folder(request, folder_id=None, urls={}):
             url = reverse(urls['afolder'],
                           kwargs={'folder_id': folder_id})
         except File.DoesNotExist as e:
-            raise e
+            messages.error(request, 'File doesn\'t exist: %s' % str(e))
     else:
         # Check if root doesn't exist, create it
         try:
@@ -99,6 +100,7 @@ def create_folder(request, folder_id=None):
                 # TODO: Show error in form
                 form._errors['name'] = form.error_class(['Folder with this \
                                                          name already exists'])
+                messages.error(request, 'Folder with this name already exists')
             else:
                 new_folder.parent = folder
                 # new_folder.owner = request.user
@@ -106,6 +108,7 @@ def create_folder(request, folder_id=None):
                 new_folder.path = folder.path + str(new_folder.name) + '/'
                 new_folder.owner = request.user
                 new_folder.save()
+                messages.info(request, 'Create folder successfully!')
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
         else:
             data['form_is_valid'] = False
@@ -127,7 +130,7 @@ def delete_files(request):
         id__in=request.POST.getlist('checked_file'))
     # Delete the files -> Done
     for file in files:
-        objects.delete_file(file)
+        objects.delete_file(request, file)
     files.delete()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -151,6 +154,7 @@ def upload_file(request, folder_id=None):
                 # TODO: Show error in form
                 form._errors['name'] = form.error_class(['File with this \
                                                          name already exists'])
+                messages.error(request, 'Folder with this name already exists')
             else:
                 new_file.parent = folder
                 # new_folder.owner = request.user
@@ -161,13 +165,13 @@ def upload_file(request, folder_id=None):
                 # Save file as object
                 new_file_content = ContentFile(request.FILES['content'].read())
                 new_file.save()
-                objects.upload_file(new_file, new_file_content)
+                objects.upload_file(request, new_file, new_file_content)
                 # Remove saved file
                 try:
                     os.remove(settings.MEDIA_ROOT + '/' + new_file.name)
                 except OSError:
                     pass
-                return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
         else:
             data['form_is_valid'] = False
     else:
@@ -185,7 +189,12 @@ def download_file(request):
     """Download file - Get file as object from cloud"""
     file = File.objects.get(id=request.POST.get('download_file'))
     file_content = objects.download_file(file)
-    response = HttpResponse(file_content,
-                            content_type='application/octet-stream')
-    response['Content-Disposition'] = 'attachment; filename=%s' % smart_str(file.name)
-    return response
+    if file_content:
+        messages.info(request, 'Download file %s successfully!' % file.name)
+        response = HttpResponse(file_content,
+                                content_type='application/octet-stream')
+        response['Content-Disposition'] = 'attachment; filename=%s' % smart_str(file.name)
+        return response
+    else:
+        messages.error(request, 'Download file %s failed' % file.name)
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

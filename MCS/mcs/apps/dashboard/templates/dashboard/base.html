@@ -102,26 +102,24 @@
                 </div>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-right">
-                        <li>
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                <i class="ti-panel"></i>
-                                <p>Stats</p>
-                            </a>
-                        </li>
                         <li class="dropdown">
                               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                     <i class="ti-bell"></i>
-                                    <p class="notification">5</p>
+                                    <p class="notification"></p>
                                     <p>Notifications</p>
                                     <b class="caret"></b>
                               </a>
-                              <ul class="dropdown-menu">
-                                <li><a href="#">Notification 1</a></li>
-                                <li><a href="#">Notification 2</a></li>
-                                <li><a href="#">Notification 3</a></li>
-                                <li><a href="#">Notification 4</a></li>
-                                <li><a href="#">Another notification</a></li>
-                              </ul>
+                              {% if messages %}
+                                  {% for msg in messages %}
+                                  <ul class="dropdown-menu">
+                                    <li><a><b>{{ msg.level_tag }} - </b>{{ msg.message }}</a></li>
+                                  </ul>
+                                  {% endfor %}
+                              {% else %}
+                                  <ul class="dropdown-menu">
+                                      <li><a>You have no messages</a></li>
+                                  </ul>
+                              {% endif %}
                         </li>
                         <li>
                             <a href="{% url 'logout' %}">
@@ -138,6 +136,22 @@
 
         <div class="content">
             <div class="container-fluid">
+                {% if messages %}
+                <div class="row"></div>
+                    <div class="col-md-12">
+                            {% for msg in messages %}
+                                <div class="alert alert-{{msg.level_tag}}" role="alert">
+                                    <button type="button" aria-hidden="true" class="close" onclick="this.parentElement.style.display='none';"   >×</button>
+                                    <span>
+                                        <b>{{msg.level_tag}} - </b>
+                                        {{msg.message}}
+                                    </span>
+                                </div>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
                 {% block main %}{% endblock %}
             </div>
         </div>

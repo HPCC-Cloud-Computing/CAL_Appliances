@@ -1,6 +1,7 @@
 import copy
 
 from calplus.client import Client
+from django.contrib import messages
 
 from dashboard import exceptions
 from dashboard.models import File
@@ -13,7 +14,7 @@ from mcs.wsgi import RINGS
 # SCHEDULER = django_rq.get_scheduler('default')
 
 
-def upload_file(file, content):
+def upload_file(request, file, content):
     """Upload file
     :param file: object of model File.
     :param content: content of file (stream
@@ -24,13 +25,13 @@ def upload_file(file, content):
     for cloud in node.clouds:
         # Put task to queue 'default'
         _content = copy.deepcopy(content)
-        upload_object(cloud, _content, file)
+        upload_object(request, cloud, _content, file)
         # upload_object.delay(cloud, _content, file)
     update_status_file(file.path, File.UPDATE)
 
 
 # @job
-def upload_object(cloud, content, file):
+def upload_object(request, cloud, content, file):
     """Upload object to cloud node with absolute_name
     :param cloud: object of model Cloud.
     :param content: content of file (Stream).
@@ -46,10 +47,20 @@ def upload_object(cloud, content, file):
                                 contents=content.read(),
                                 content_length=content.size,
                                 metadata={'status': 'UPDATED'})
+        messages.info(request, 'Upload file %(file)s to %(cloud)s successfully' % (
+            {
+                'file': file.name,
+                'cloud': cloud.name,
+            }
+        ))
     except exceptions.UploadObjectError as e:
-        # TODO:
-        # return message.error(e)
-        raise e
+        messages.error(request, 'Upload file %(file)s to %(cloud)s failed: %(error)s' % (
+            {
+                'file': file.name,
+                'cloud': cloud.name,
+                'error': str(e),
+            }
+        ))
     # Update file's status
     if get_status_file(file.path) == File.NOT_AVAILABLE:
         update_status_file(file.path, File.AVAILABLE)
@@ -85,7 +96,7 @@ def download_file(file):
             if cloud.type == 'amazon':
                 return file_content.read()
             return file_content
-    return None  # Should raise message error.
+    return None
 
 
 def update_status_file(file_path, new_status):
@@ -130,7 +141,7 @@ def update_status_object(cloud, container, object, new_status):
         raise e
 
 
-def delete_file(file):
+def delete_file(request, file):
     """Delete file
     :param file: object of model File.
     """
@@ -142,5 +153,13 @@ def delete_file(file):
                            provider=cloud.provider)
         try:
             connector.delete_object(container, file.path.strip('/'))
-        except Exception:
-            pass
+            messages.info(request, 'Delete file %(file)s from cloud %(cloud)s successfully!' % ({
+                'cloud': cloud.name,
+                'file': file.name
+            }))
+        except Exception as e:
+            messages.info(request, 'Delete file %(file)s from cloud %(cloud)s failed: %(error)s!' % ({
+                'cloud': cloud.name,
+                'file': file.name,
+                'error': str(e),
+            }))
