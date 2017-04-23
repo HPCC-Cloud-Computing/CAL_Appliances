@@ -21,13 +21,13 @@ def upload_file(request, file, content):
 .    """
     ring = RINGS[file.owner.username]
     node = ring.lookup(long(file.identifier))
-    update_status_file(file.path, File.NOT_AVAILABLE)
+    update_status_file(request, file.path, File.NOT_AVAILABLE)
     for cloud in node.clouds:
         # Put task to queue 'default'
         _content = copy.deepcopy(content)
         upload_object(request, cloud, _content, file)
         # upload_object.delay(cloud, _content, file)
-    update_status_file(file.path, File.UPDATE)
+    update_status_file(request, file.path, File.UPDATE)
 
 
 # @job
@@ -62,8 +62,8 @@ def upload_object(request, cloud, content, file):
             }
         ))
     # Update file's status
-    if get_status_file(file.path) == File.NOT_AVAILABLE:
-        update_status_file(file.path, File.AVAILABLE)
+    if get_status_file(request, file.path) == File.NOT_AVAILABLE:
+        update_status_file(request, file.path, File.AVAILABLE)
 
 
 def download_file(file):
@@ -99,7 +99,7 @@ def download_file(file):
     return None
 
 
-def update_status_file(file_path, new_status):
+def update_status_file(request, file_path, new_status):
     """Update status of file
     :param file_path: path of file.
     :param new_status: new status of file.
@@ -109,23 +109,18 @@ def update_status_file(file_path, new_status):
         file.status = new_status
         file.save()
     except File.DoesNotExist as e:
-        # TODO:
-        # Return message.error()
-        raise e
+        messages.error(request, 'Update status of file failed: %s' % str(e))
 
-
-def get_status_file(file_path):
+def get_status_file(request, file_path):
     """Get File object's status"""
     try:
         file = File.objects.get(path=file_path)
         return file.status
     except File.DoesNotExist as e:
-        # TODO:
-        # Return message.error()
-        raise e
+        messages.error(request, 'Get status of file failed: %s' % str(e))
 
 
-def update_status_object(cloud, container, object, new_status):
+def update_status_object(request, cloud, container, object, new_status):
     """Upload exist object's status
     :param cloud: object of class Cloud.
     :param container: container name.
@@ -137,8 +132,16 @@ def update_status_object(cloud, container, object, new_status):
     try:
         connector.update_object(container, object,
                                 metadata={'status': new_status})
+        messages.info(request, 'Update status file %(file)s from cloud %(cloud)s successfully!' % ({
+            'cloud': cloud.name,
+            'file': file.name
+        }))
     except exceptions.UpdateObjectError as e:
-        raise e
+        messages.error(request, 'Update status file %(file)s from cloud %(cloud)s failed: %(error)s!' % ({
+            'cloud': cloud.name,
+            'file': file.name,
+            'error': str(e),
+        }))
 
 
 def delete_file(request, file):
@@ -158,7 +161,7 @@ def delete_file(request, file):
                 'file': file.name
             }))
         except Exception as e:
-            messages.info(request, 'Delete file %(file)s from cloud %(cloud)s failed: %(error)s!' % ({
+            messages.error(request, 'Delete file %(file)s from cloud %(cloud)s failed: %(error)s!' % ({
                 'cloud': cloud.name,
                 'file': file.name,
                 'error': str(e),
