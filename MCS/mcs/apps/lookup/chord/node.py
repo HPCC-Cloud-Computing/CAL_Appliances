@@ -12,16 +12,19 @@ LOG = logging.getLogger(__name__)
 class Node(object):
     """Abstract Node in Ring"""
 
-    def __init__(self, username, id, clouds):
+    def __init__(self, username, id):
         """
         :param username (string):
         :param clouds (list): List of cloud object.
         """
         self.id = id
         self.username = username
-        self.clouds = clouds
+        self.clouds = []
         self.finger_table = []
         self._generate_finger_table()
+
+    def add_cloud_to_node(self, cloud):
+        self.clouds.append(cloud)
 
     def successor(self):
         return self.finger_table[0].node
