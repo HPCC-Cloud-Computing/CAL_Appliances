@@ -1,4 +1,5 @@
 import copy
+import gc
 
 from calplus.client import Client
 from django.contrib import messages
@@ -61,6 +62,10 @@ def upload_object(request, cloud, content, file):
                 'error': str(e),
             }
         ))
+    finally:
+        # Delete connector when everything was done.
+        del connector
+        gc.collect()
     # Update file's status
     if get_status_file(request, file.path) == File.NOT_AVAILABLE:
         update_status_file(request, file.path, File.AVAILABLE)
@@ -93,6 +98,8 @@ def download_file(file):
         if object_status[0] == 'UPDATED':
             file_content = connector.download_object(container,
                                                      file.path.strip('/'))[stream_key]
+            del connector
+            gc.collect()
             if cloud.type == 'amazon':
                 return file_content.read()
             return file_content
@@ -110,6 +117,7 @@ def update_status_file(request, file_path, new_status):
         file.save()
     except File.DoesNotExist as e:
         messages.error(request, 'Update status of file failed: %s' % str(e))
+
 
 def get_status_file(request, file_path):
     """Get File object's status"""
@@ -142,6 +150,10 @@ def update_status_object(request, cloud, container, object, new_status):
             'file': file.name,
             'error': str(e),
         }))
+    finally:
+        # Delete connector when everything was done.
+        del connector
+        gc.collect()
 
 
 def delete_file(request, file):
@@ -166,3 +178,7 @@ def delete_file(request, file):
                 'file': file.name,
                 'error': str(e),
             }))
+        finally:
+            # Delete connector when everything was done.
+            del connector
+            gc.collect()

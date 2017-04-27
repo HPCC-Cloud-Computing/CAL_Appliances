@@ -1,3 +1,4 @@
+import gc
 import os
 from django.conf import settings
 from django.contrib import messages
@@ -166,6 +167,7 @@ def upload_file(request, folder_id=None):
                 new_file_content = ContentFile(request.FILES['content'].read())
                 new_file.save()
                 objects.upload_file(request, new_file, new_file_content)
+                gc.collect()
                 # Remove saved file
                 try:
                     os.remove(settings.MEDIA_ROOT + '/' + new_file.name)
