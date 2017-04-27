@@ -299,7 +299,6 @@ Giải pháp thứ hai là mở rộng của giải pháp thứ nhất. Ở gi�
 
 ![solution2.png](./images/solution2.png)
 
-
 Ưu điểm của giải pháp này: Đảm bào xử lý nhanh request của người dùng mà không cần cơ chế retry - gửi lại như solution 1 - Trừ Read Request. Read Request cho phép dùng Retry vì Request này không cần gửi kèm dữ liệu, và thứ 2 là request này không làm thay đổi bất cứ dữ liệu nào trong hệ thống.
 
 Các vấn đề với giải pháp này:
@@ -307,3 +306,9 @@ Các vấn đề với giải pháp này:
 - Phải có thằng Database trung gian để trao đổi và cập nhật kết quả Giữa các thành phần
 - Phải có cơ chế lock phân tán - Distributed Mutual Exclusion giữa nhiều tiến trình, vì cái MCS với cái Secondary có chung cái Ring - Cũng chính vì thế nên dù tách chức năng ra rồi nhưng vẫn MCS vẫn có thể trả về Server Busy. Cái này thì sau này em mở rộng thì kiểu gì vẫn phải làm, nhưng nếu làm luôn bây giờ thì em lại phải ngồi đọc xem Swift với Nova nó lock giữa nhiều tiến trình như thế nào.
 - Sử dụng cách này thì em sẽ phải thiết kế lại hệ thống, thêm thằng Secondary WSGI với cái cụm Database vào.
+
+## Giải pháp của thầy cho việc xung đột truy cập tài nguyên chung giữa các process
+
+Hôm nay em gặp thầy, thầy có đưa ra một giải pháp cho cái vấn đề xung đột tài nguyên như thế này:
+
+Mình chia hệ thống thành nhiều Group. Mỗi một group bao gồm một số process của hệ thống. Khi một request cập nhật ring tới một process trong Group, tất cả các Ring trong các process của Group đó sẽ được cập nhật. Trong thời gian các process trong Group đó đang cập nhật ring thì mọi request tới các process trong group này sẽ được forward tới các group khác. Sau khi group đó cập nhật xong, group vừa được cập nhật xong sẽ gửi request tới một process trong một group khác mà chưa được cập nhật ring. Cứ như thế lần lượt tới khi tất cả các process trong các Group đều được cập nhật xong.
