@@ -33,17 +33,18 @@ def init_ring(request):
         form = forms.UploadCloudConfigsForm(request.POST, request.FILES)
         if form.is_valid():
             # Init Cloud objects.
-            clouds = utils.load_cloud_configs(username,
+            clouds = utils.load_cloud_configs(request, username,
                                               request.FILES['cloud_configs'])
-            for cloud in clouds:
-                utils.set_quota_cloud(cloud)
-                utils.set_usage_cloud(cloud)
-            ring = Ring(username, clouds)
-            RINGS[username] = ring
-            # Temporary
-            utils.save(ring, pickle_path)
-            messages.info(request, 'Ring is saved')
-            return redirect('home')
+            if clouds:
+                for cloud in clouds:
+                    utils.set_quota_cloud(cloud)
+                    utils.set_usage_cloud(cloud)
+                ring = Ring(username, clouds)
+                RINGS[username] = ring
+                # Temporary
+                utils.save(ring, pickle_path)
+                messages.info(request, 'Ring is saved')
+                return redirect('home')
     else:
         form = forms.UploadCloudConfigsForm()
     return render(request, 'lookup/config.html',

@@ -16,6 +16,35 @@
         <!-- Custom styles for this template -->
         <link href="{% static 'assets/css/style.css' %}" rel="stylesheet" type="text/css">
         <link href="{% static 'assets/css/style-responsive.css' %}" rel="stylesheet">
+        <style>
+            .alert {
+              border: 0;
+              border-radius: 0;
+              color: #FFFFFF;
+              padding: 10px 15px;
+              font-size: 14px;
+            }
+
+            .alert-info {
+              background-color: #7CE4FE;
+              color: #3091B2;
+            }
+
+            .alert-success {
+              background-color: #8EF3C5;
+              color: #42A084;
+            }
+
+            .alert-warning {
+              background-color: #FFE28C;
+              color: #BB992F;
+            }
+
+            .alert-danger {
+              background-color: #FF8F5E;
+              color: #B33C12;
+            }
+        </style>
     </head>
     <body>
         <div class="container">
@@ -24,6 +53,16 @@
             </div>
         </div>
         <div class="form">
+            {% if messages %}
+                {% for msg in messages %}
+                    <div class="{% if msg.level_tag != 'error' %}alert alert-{{msg.level_tag}}{% else %}alert alert-danger{% endif %}" role="alert">
+                        <span>
+                            <b>{{msg.level_tag}} - </b>
+                            {{msg.message}}
+                        </span>
+                    </div>
+                {% endfor %}
+            {% endif %}
             <div class="thumbnail"><img src="{% static 'assets/img/logo.png' %}"/></div>
             {% block main %}{% endblock %}
         </div>
