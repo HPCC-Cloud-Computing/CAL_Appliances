@@ -112,7 +112,8 @@ def update_status_file(request, file_path, new_status):
     :param new_status: new status of file.
     """
     try:
-        file = File.objects.get(path=file_path)
+        username = request.user.username
+        file = File.objects.filter(owner__username=username).get(path=file_path)
         file.status = new_status
         file.save()
     except File.DoesNotExist as e:
@@ -122,7 +123,8 @@ def update_status_file(request, file_path, new_status):
 def get_status_file(request, file_path):
     """Get File object's status"""
     try:
-        file = File.objects.get(path=file_path)
+        username = request.user.username
+        file = File.objects.filter(owner__username=username).get(path=file_path)
         return file.status
     except File.DoesNotExist as e:
         messages.error(request, 'Get status of file failed: %s' % str(e))

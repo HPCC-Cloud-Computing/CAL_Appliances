@@ -31,7 +31,9 @@ def update_cloud(request):
     ring = RINGS[username]
     clouds = ring.clouds
     cloud = [c for c in clouds if c.name == cloud_name][0]
+
     # Re get metric
+    utils.set_usage_cloud(cloud)
     cloud.set_used_rate()
     cloud.check_health()
 
