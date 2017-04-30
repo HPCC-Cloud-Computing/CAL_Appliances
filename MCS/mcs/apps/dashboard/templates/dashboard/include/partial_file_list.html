@@ -13,6 +13,7 @@
     </td>
     <td><p>---</p></td>
     <td><p>---</p></td>
+    <td><p>---</p></td>
     <td><p></p></td>
 </tr>
 {% endif %}
@@ -28,6 +29,19 @@
     </td>
     <td><p>{{ file.last_modified }}</p></td>
     <td><p>{{ file.size_format }}</p></td>
+    <td>
+        <p>
+            {% if file.status == 1 %}
+                UPDATE
+            {% elif file.status == 2 %}
+                NOT_UPDATE
+            {% elif file.status == 3 %}
+                AVAILABLE
+            {% else %}
+                NOT_AVAILABLE
+            {% endif %}
+        </p>
+    </td>
     <td>
         <div class="text-center" style="width: 50%">
             <form id="download-form" action="{% url 'download_file' %}" method="POST">

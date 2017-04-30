@@ -4,6 +4,7 @@ from django.db import models
 
 from dashboard import utils
 
+
 class FileManager(models.Manager):
     pass
 
