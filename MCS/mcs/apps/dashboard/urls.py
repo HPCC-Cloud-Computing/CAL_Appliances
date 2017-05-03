@@ -20,6 +20,8 @@ urlpatterns = [
         name='files'),
     url(r'^files/(?P<folder_id>\d+)/upload/$',
         files.upload_file, name='upload_file'),
+    url(r'^files/refresh/$',
+        files.refresh_status, name='refresh_status'),
     url(r'^files/upload/$',
         files.upload_file, name='upload_root_file'),
     url(r'^files/(?P<folder_id>\d+)/create/$',

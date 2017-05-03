@@ -1,5 +1,3 @@
-from random import shuffle
-
 from django.conf import settings
 
 

@@ -8,9 +8,7 @@ django-model-utils
 
 mysql-python
 
-django-rq
-
-dill
+celery
 
 Pillow<3.5.0
 

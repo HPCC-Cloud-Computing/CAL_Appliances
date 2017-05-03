@@ -1,3 +1,4 @@
+from __future__ import absolute_import, unicode_literals
 import copy
 import gc
 
@@ -6,13 +7,33 @@ from django.contrib import messages
 
 from dashboard import exceptions
 from dashboard.models import File
+from mcs.celery_tasks import app
 from mcs.wsgi import RINGS
 
 
-# from django_rq import job
+@app.task
+def upload_object(cloud, content, file):
+    """Upload object to cloud node with absolute_name
+    :param cloud: object of model Cloud.
+    :param content: content of file (Stream).
+    :param file: object of model File.
+    """
+    connector = Client(version='1.0.0', resource='object_storage',
+                       provider=cloud.provider)
+    # Create container named = username if it doesnt exist
+    container = file.owner.username
 
-
-# SCHEDULER = django_rq.get_scheduler('default')
+    try:
+        return connector.upload_object(container, file.path.strip('/'),
+                                       contents=content.read(),
+                                       content_length=content.size,
+                                       metadata={'status': 'UPDATED'})
+    except exceptions.UploadObjectError:
+        return None
+    finally:
+        # Delete connector when everything was done.
+        del connector
+        gc.collect()
 
 
 def upload_file(request, file, content):
@@ -26,49 +47,7 @@ def upload_file(request, file, content):
     for cloud in node.clouds:
         # Put task to queue 'default'
         _content = copy.deepcopy(content)
-        upload_object(request, cloud, _content, file)
-        # upload_object.delay(cloud, _content, file)
-    update_status_file(request, file.path, File.UPDATE)
-
-
-# @job
-def upload_object(request, cloud, content, file):
-    """Upload object to cloud node with absolute_name
-    :param cloud: object of model Cloud.
-    :param content: content of file (Stream).
-    :param file: object of model File.
-    """
-    connector = Client(version='1.0.0', resource='object_storage',
-                       provider=cloud.provider)
-    # Create container named = username if it doesnt exist
-    container = file.owner.username
-
-    try:
-        connector.upload_object(container, file.path.strip('/'),
-                                contents=content.read(),
-                                content_length=content.size,
-                                metadata={'status': 'UPDATED'})
-        messages.info(request, 'Upload file %(file)s to %(cloud)s successfully' % (
-            {
-                'file': file.name,
-                'cloud': cloud.name,
-            }
-        ))
-    except exceptions.UploadObjectError as e:
-        messages.error(request, 'Upload file %(file)s to %(cloud)s failed: %(error)s' % (
-            {
-                'file': file.name,
-                'cloud': cloud.name,
-                'error': str(e),
-            }
-        ))
-    finally:
-        # Delete connector when everything was done.
-        del connector
-        gc.collect()
-    # Update file's status
-    if get_status_file(request, file.path) == File.NOT_AVAILABLE:
-        update_status_file(request, file.path, File.AVAILABLE)
+        upload_object.delay(cloud, _content, file)
 
 
 def download_file(file):
@@ -106,6 +85,22 @@ def download_file(file):
     return None
 
 
+def set_status_file(request, file):
+    """Check object's status then set file's status
+    depend on it"""
+    ring = RINGS[file.owner.username]
+    node = ring.lookup(long(file.identifier))
+    container = file.owner.username
+    done = 0
+    for cloud in node.clouds:
+        if get_status_object(cloud, container, file.path.strip('/')):
+            done += 1
+    if 0 < done < len(node.clouds):
+        update_status_file(request, file.path, File.AVAILABLE)
+    elif done == len(node.clouds):
+        update_status_file(request, file.path, File.UPDATE)
+
+
 def update_status_file(request, file_path, new_status):
     """Update status of file
     :param file_path: path of file.
@@ -113,7 +108,8 @@ def update_status_file(request, file_path, new_status):
     """
     try:
         username = request.user.username
-        file = File.objects.filter(owner__username=username).get(path=file_path)
+        file = File.objects.filter(
+            owner__username=username).get(path=file_path)
         file.status = new_status
         file.save()
     except File.DoesNotExist as e:
@@ -124,10 +120,24 @@ def get_status_file(request, file_path):
     """Get File object's status"""
     try:
         username = request.user.username
-        file = File.objects.filter(owner__username=username).get(path=file_path)
+        file = File.objects.filter(
+            owner__username=username).get(path=file_path)
         return file.status
     except File.DoesNotExist as e:
         messages.error(request, 'Get status of file failed: %s' % str(e))
+
+
+def get_status_object(cloud, container, object):
+    connector = Client(version='1.0.0', resource='object_storage',
+                       provider=cloud.provider)
+    try:
+        return connector.stat_object(container, object)
+    except Exception:
+        return None
+    finally:
+        # Delete connector when everything was done.
+        del connector
+        gc.collect()
 
 
 def update_status_object(request, cloud, container, object, new_status):

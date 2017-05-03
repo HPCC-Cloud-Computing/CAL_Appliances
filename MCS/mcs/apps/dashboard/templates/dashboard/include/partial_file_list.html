@@ -15,6 +15,7 @@
     <td><p>---</p></td>
     <td><p>---</p></td>
     <td><p></p></td>
+    <td><p></p></td>
 </tr>
 {% endif %}
 {% endfor %}
@@ -30,7 +31,7 @@
     <td><p>{{ file.last_modified }}</p></td>
     <td><p>{{ file.size_format }}</p></td>
     <td>
-        <p>
+        <p id="{{ file.id }}">
             {% if file.status == 1 %}
                 UPDATE
             {% elif file.status == 2 %}
@@ -50,6 +51,11 @@
                 <button type="submit" id="download_btn" class="btn btn-success" data-url="{% url 'download_file' %}"><span class="ti-download"></span></button>
             </form>
         </div>
+    </td>
+    <td>
+        <button type="button" class="btn btn-primary" onclick="refresh_status('{{ file.id }}');">
+            <i class="ti-reload"></i>
+        </button>
     </td>
 </tr>
 {% endif %}

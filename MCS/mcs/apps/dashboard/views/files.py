@@ -102,7 +102,7 @@ def create_folder(request, folder_id=None):
                 # TODO: Show error in form
                 form._errors['name'] = form.error_class(['Folder with this \
                                                          name already exists'])
-                messages.error(request, 'Folder with this name already exists')
+                messages.error(request, 'Folder/File with this name already exists')
             else:
                 new_folder.parent = folder
                 # new_folder.owner = request.user
@@ -157,7 +157,7 @@ def upload_file(request, folder_id=None):
                 # TODO: Show error in form
                 form._errors['name'] = form.error_class(['File with this \
                                                          name already exists'])
-                messages.error(request, 'Folder with this name already exists')
+                messages.error(request, 'Folder/File with this name already exists')
             else:
                 new_file.parent = folder
                 # new_folder.owner = request.user
@@ -204,3 +204,20 @@ def download_file(request):
     else:
         messages.error(request, 'Download file %s failed' % file.name)
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required(login_url='/auth/login/')
+def refresh_status(request):
+    username = request.user.username
+    file_id = request.GET.get('file_id')
+    file = File.objects.filter(owner__username=username).get(id=file_id)
+    objects.set_status_file(request, file)
+    STATUS = {
+        1: 'UPDATE',
+        2: 'NOT_UPDATE',
+        3: 'AVAILABLE',
+        4: 'NOT_AVAILABLE'
+    }
+    status = STATUS[file.status]
+    result = {'status': status}
+    return JsonResponse(result)

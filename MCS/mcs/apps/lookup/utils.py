@@ -1,7 +1,6 @@
 import json
 import logging
-
-import dill
+import pickle
 import os
 from calplus.client import Client
 from django.contrib import messages
@@ -45,8 +44,8 @@ def save(obj, path):
     if os.path.isfile(path):
         LOG.info('File existed! Use load() method.')
     else:
-        dill.dump(obj, open(path, 'wb'),
-                  protocol=dill.HIGHEST_PROTOCOL)
+        pickle.dump(obj, open(path, 'wb'),
+                    protocol=pickle.HIGHEST_PROTOCOL)
 
 
 def load(path):
@@ -55,7 +54,7 @@ def load(path):
         LOG.info('File doesnt existed!')
         raise IOError()
     else:
-        return dill.load(open(path, 'rb'))
+        return pickle.load(open(path, 'rb'))
 
 
 def set_quota_cloud(cloud):

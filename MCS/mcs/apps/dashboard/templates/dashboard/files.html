@@ -44,7 +44,7 @@
                             <th>Modified</th>
                             <th>Size</th>
                             <th>Status</th>
-                            <th>Action</th>
+                            <th colspan="2">Action</th>
                         </thead>
                         <tbody>
                             {% include 'dashboard/include/partial_file_list.html' %}
@@ -64,4 +64,18 @@
       </div>
     </div>
 </div>
+
+<script>
+    function refresh_status(file_id) {
+        $.ajax({
+            url: "{% url 'refresh_status' %}",
+            type: "GET",
+            data: {file_id: file_id},
+
+            success: function (data) {
+                $('#' + file_id).html(data.status);
+            }
+        });
+    };
+</script>
 {% endblock %}

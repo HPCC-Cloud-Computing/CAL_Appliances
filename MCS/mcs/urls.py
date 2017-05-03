@@ -4,7 +4,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
                   url(r'^admin/', admin.site.urls),
-                  url(r'^django-rq/', include('django_rq.urls')),
+                  #url(r'^django-rq/', include('django_rq.urls')),
                   url(r'^auth/', include('authentication.urls')),
                   url(r'^lookup/', include('lookup.urls')),
                   url(r'^', include('dashboard.urls'))

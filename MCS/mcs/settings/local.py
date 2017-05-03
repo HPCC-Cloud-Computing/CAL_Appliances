@@ -11,15 +11,12 @@ DATABASES = {
     }
 }
 
-RQ_QUEUES = {
-    'default': {
-        'HOST': '172.17.0.3',
-        'PORT': 6379,
-        'DB': 0,
-        'PASSWORD': 'secret',
-        'DEFAULT_TIMEOUT': 360,
-    }
-}
+CELERY_BROKER_URL = 'redis://redis:secret@172.17.0.3:6379'
+CELERY_RESULT_BACKEND = 'redis://redis:secret@172.17.0.3:6379'
+CELERY_ACCEPT_CONTENT = ['application/x-python-serialize']
+CELERY_TASK_SERIALIZER = 'pickle'
+CELERY_RESULT_SERIALIZER = 'pickle'
+CELERY_TIMEZONE = 'Asia/Ho_Chi_Minh'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'

@@ -36,7 +36,8 @@ Follow these steps:
 
     ```
     python manage.py migrate  # DB create
-    python mcs/wsgi.py rqworker default # start wsgi server
+    celery -A mcs worker &
+    python mcs/wsgi.py# start wsgi server
     ```
 
 7. Open browser, go to http://127.0.0.1:8080/auth/register and complete
