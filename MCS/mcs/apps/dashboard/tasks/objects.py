@@ -1,4 +1,5 @@
 from __future__ import absolute_import, unicode_literals
+
 import copy
 import gc
 
@@ -7,6 +8,7 @@ from django.contrib import messages
 
 from dashboard import exceptions
 from dashboard.models import File
+
 from mcs.celery_tasks import app
 from mcs.wsgi import RINGS
 
@@ -22,7 +24,7 @@ def upload_object(cloud, content, file):
                        provider=cloud.provider)
     # Create container named = username if it doesnt exist
     container = file.owner.username
-
+    print 'A'
     try:
         return connector.upload_object(container, file.path.strip('/'),
                                        contents=content.read(),
