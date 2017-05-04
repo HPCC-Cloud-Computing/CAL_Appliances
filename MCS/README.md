@@ -27,7 +27,7 @@ Follow these steps:
     docker run -p 3306:3306 --name mcs-db -e \
     MYSQL_ROOT_PASSWORD=<mysql_password> -e MYSQL_DATABASE=mcs -d mysql:latest
 
-    docker run --name mcs-redis -d redis redis-server --requirepass "<redis_password>"
+    docker run -p 6379:6379 --name mcs-redis -d redis redis-server
     ```
 
 5. Go to mcs/settings/local.py, and fill your container's ip and password.
@@ -36,8 +36,8 @@ Follow these steps:
 
     ```
     python manage.py migrate  # DB create
-    celery -A mcs worker &
-    python mcs/wsgi.py# start wsgi server
+    celery -A mcs worker -l info
+    python mcs/wsgi.py # start wsgi server
     ```
 
 7. Open browser, go to http://127.0.0.1:8080/auth/register and complete
