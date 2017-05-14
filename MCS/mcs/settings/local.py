@@ -11,12 +11,12 @@ DATABASES = {
     }
 }
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
+CELERY_BROKER_URL = 'redis://25.63.30.172:6379/0'
+CELERY_RESULT_BACKEND = 'redis://25.63.30.172:6379/1'
 CELERY_ACCEPT_CONTENT = ['application/x-python-serialize']
 CELERY_TASK_SERIALIZER = 'pickle'
 CELERY_RESULT_SERIALIZER = 'pickle'
-# CELERY_TIMEZONE = 'Asia/Ho_Chi_Minh'
+CELERY_TIMEZONE = 'Asia/Ho_Chi_Minh'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
