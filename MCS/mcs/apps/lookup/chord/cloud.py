@@ -13,6 +13,7 @@ class Cloud(object):
         self.status = 'OK'
         self.username = username
         self.provider = Provider(type, config)
+        self.num_of_refs = 0
 
     def set_used_rate(self):
         """Set used rate = used/quota"""

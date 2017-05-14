@@ -4,22 +4,27 @@ import logging
 import dill
 import os
 from calplus.client import Client
+from django.contrib import messages
 
 from lookup.chord.cloud import Cloud
 
 LOG = logging.getLogger(__name__)
 
 
-def load_cloud_configs(username, json_data):
+def load_cloud_configs(request, username, json_data):
     """Load cloud configs from json"""
-    cloud_configs = json.load(json_data)
-    clouds = list()
-    for cloud_name in cloud_configs.keys():
-        cloud = Cloud(username, cloud_name,
-                      cloud_configs[cloud_name]['type'],
-                      cloud_configs[cloud_name]['address'],
-                      cloud_configs[cloud_name]['config'])
-        clouds.append(cloud)
+    try:
+        cloud_configs = json.load(json_data)
+        clouds = list()
+        for cloud_name in cloud_configs.keys():
+            cloud = Cloud(username, cloud_name,
+                          cloud_configs[cloud_name]['type'],
+                          cloud_configs[cloud_name]['address'],
+                          cloud_configs[cloud_name]['config'])
+            clouds.append(cloud)
+    except ValueError:
+        messages.error(request, 'Your config is not valid!')
+        clouds = None
     return clouds
 
 

@@ -12,6 +12,9 @@ urlpatterns = [
     url(r'^clouds/$',
         clouds.list_clouds,
         name='clouds'),
+    url(r'^clouds/update_cloud/',
+        clouds.update_cloud,
+        name='update_cloud'),
     url(r'^files/$',
         files.list_files,
         name='files'),
@@ -31,5 +34,5 @@ urlpatterns = [
         TemplateView.as_view(template_name='dashboard/settings.html'),
         name='settings'),
     url(r'^user/$',
-        user.update_user, name='user')
+        user.update_user, name='user'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,3 +1,4 @@
+import gc
 import os
 from django.conf import settings
 from django.contrib import messages
@@ -32,13 +33,14 @@ def _get_folder(request, folder_id=None, urls={}):
         folder: folder get by id
         url:
     """
+    username = request.user.username
     if not folder_id:
         folder_id = request.GET.get('folder_id')
     if not folder_id:
         folder_id = request.POST.get('folder_id')
     if folder_id:
         try:
-            folder = File.objects.get(id=folder_id)
+            folder = File.objects.filter(owner__username=username).get(id=folder_id)
             url = reverse(urls['afolder'],
                           kwargs={'folder_id': folder_id})
         except File.DoesNotExist as e:
@@ -46,7 +48,7 @@ def _get_folder(request, folder_id=None, urls={}):
     else:
         # Check if root doesn't exist, create it
         try:
-            folder = File.objects.get(name='root')
+            folder = File.objects.filter(owner__username=username).get(name='root')
         except File.DoesNotExist:
             # TODO: When we have User, set `owner` field
             # folder = File.objects.create(name='root',
@@ -126,8 +128,9 @@ def create_folder(request, folder_id=None):
 def delete_files(request):
     # TODO: In the case, user doesn't choose anything
     #       Throw alert.
-    files = File.objects.filter(
-        id__in=request.POST.getlist('checked_file'))
+    username = request.user.username
+    files = File.objects.filter(owner__username=username). \
+        filter(id__in=request.POST.getlist('checked_file'))
     # Delete the files -> Done
     for file in files:
         objects.delete_file(request, file)
@@ -166,6 +169,7 @@ def upload_file(request, folder_id=None):
                 new_file_content = ContentFile(request.FILES['content'].read())
                 new_file.save()
                 objects.upload_file(request, new_file, new_file_content)
+                gc.collect()
                 # Remove saved file
                 try:
                     os.remove(settings.MEDIA_ROOT + '/' + new_file.name)
@@ -187,7 +191,9 @@ def upload_file(request, folder_id=None):
 @login_required(login_url='/auth/login/')
 def download_file(request):
     """Download file - Get file as object from cloud"""
-    file = File.objects.get(id=request.POST.get('download_file'))
+    username = request.user.username
+    file = File.objects.filter(owner__username=username). \
+        get(id=request.POST.get('download_file'))
     file_content = objects.download_file(file)
     if file_content:
         messages.info(request, 'Download file %s successfully!' % file.name)

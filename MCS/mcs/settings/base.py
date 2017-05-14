@@ -132,8 +132,9 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-FINGER_TABLE_SIZE = 5
+FINGER_TABLE_SIZE = 4
 RING_SIZE = 2 ** FINGER_TABLE_SIZE
+REPLICA_NUM = 3
 
 # .local.py overrides all the common settings.
 try:
