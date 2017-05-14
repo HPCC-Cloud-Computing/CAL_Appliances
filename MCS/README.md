@@ -21,7 +21,7 @@ Follow these steps:
     pip install -r requirements.txt
     ```
 
-4. Start docker container for database and redis connection.
+4. Start docker container for database and redis connection. (Optional)
 
     ```
     docker run -p 3306:3306 --name mcs-db -e \
@@ -36,7 +36,7 @@ Follow these steps:
 
     ```
     python manage.py migrate  # DB create
-    celery -A mcs worker -l info
+    celery -A mcs worker -P eventlet -c 1000 -l info
     python mcs/wsgi.py # start wsgi server
     ```
 
