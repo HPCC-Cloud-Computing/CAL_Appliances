@@ -47,6 +47,8 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'mcs.middleware.MemoryWithPsutilMiddleware',
+    # 'mcs.middleware.MemoryWithPymplerMiddleware',
 ]
 
 ROOT_URLCONF = 'mcs.urls'
