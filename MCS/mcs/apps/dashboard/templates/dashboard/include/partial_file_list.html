@@ -48,7 +48,11 @@
             <form id="download-form" action="{% url 'download_file' %}" method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="download_file" value="{{ file.id }}">
-                <button type="submit" id="download_btn" class="btn btn-success" data-url="{% url 'download_file' %}"><span class="ti-download"></span></button>
+                {% if file.status == 4 %}
+                    <button type="submit" id="download_btn" class="btn btn-success" data-url="{% url 'download_file' %}"><span class="ti-download"></span></button>
+                {% else %}
+                    <button type="submit" class="btn btn-success" disabled><span class="ti-download"></span></button>
+                {% endif %}
             </form>
         </div>
     </td>
