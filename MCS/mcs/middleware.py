@@ -1,4 +1,3 @@
-import logging
 import os
 import sys
 
@@ -7,7 +6,6 @@ from pympler import muppy
 from pympler import summary
 from pympler.asizeof import asizeof
 
-LOG = logging.getLogger(__name__)
 THRESHOLD = 2 * 1024 * 1024
 
 
@@ -17,10 +15,10 @@ class MemoryWithPsutilMiddleware(object):
 
     def process_response(self, request, response):
         mem = psutil.Process(os.getpid()).memory_info()
-        diff = mem.rss - request._mem.rss
-        if diff > THRESHOLD:
-            print >> sys.stderr, 'MEMORY USAGE %r' % ((diff, request.path),)
-            LOG.info('MEMORY USAGE %r' % ((diff, request.path),))
+        if hasattr(request, '_mem'):
+            diff = mem.rss - request._mem.rss
+            if diff > THRESHOLD:
+                print >> sys.stderr, 'MEMORY USAGE %r' % ((diff, request.path),)
         return response
 
 
