@@ -19,16 +19,16 @@ def init_ring(request):
     username = request.user.username
     pickle_name = hashlib.md5(username).hexdigest()
     pickle_path = settings.MEDIA_ROOT + '/configs/' + pickle_name + '.pickle'
-    # Check if pickle file exists, load ring from it.
-    if os.path.exists(pickle_path):
-        try:
-            ring = utils.load(pickle_path)
-            RINGS[username] = ring
-            messages.info(request, 'Ring is loaded')
-            return redirect('home')
-        except Exception as e:
-            messages.error(request, 'Error when load ring: %s' % str(e))
-
+    if username not in RINGS:
+        # Check if pickle file exists, load ring from it.
+        if os.path.exists(pickle_path):
+            try:
+                ring = utils.load(pickle_path)
+                RINGS[username] = ring
+            except Exception as e:
+                messages.error(request, 'Error when load ring: %s' % str(e))
+    messages.info(request, 'Ring is loaded')
+    return redirect('home')
     if request.method == 'POST':
         form = forms.UploadCloudConfigsForm(request.POST, request.FILES)
         if form.is_valid():
