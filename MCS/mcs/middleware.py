@@ -1,3 +1,4 @@
+import csv
 import os
 import sys
 
@@ -17,8 +18,12 @@ class MemoryWithPsutilMiddleware(object):
         mem = psutil.Process(os.getpid()).memory_info()
         if hasattr(request, '_mem'):
             diff = mem.rss - request._mem.rss
-            if diff > THRESHOLD:
-                print >> sys.stderr, 'MEMORY USAGE %r' % ((diff, request.path),)
+            with open('mem_log.csv', 'ab') as csv_file:
+                writer = csv.writer(csv_file, delimiter=',')
+                writer.writerow([str(diff), request.path])
+            # if diff > THRESHOLD:
+            #    print >> sys.stderr, 'MEMORY USAGE %r' %\
+            #     ((diff, request.path),)
         return response
 
 
@@ -28,8 +33,9 @@ def output_function(o):
 
 class MemoryWithPymplerMiddleware(object):
     """
-	Measure memory taken by requested view, and response
-	"""
+    Measure memory taken by requested view, and response
+    """
+
     def __init__(self):
         self.start_objects = None
 

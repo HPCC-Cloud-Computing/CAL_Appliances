@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'celery',
+    'django_dowser',
 ]
 
 PROJECT_APPS = [
