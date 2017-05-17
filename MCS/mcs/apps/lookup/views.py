@@ -24,14 +24,15 @@ def init_ring(request):
     # Check if pickle file exists, load ring from it.
     if os.path.exists(pickle_path):
         try:
-            ring = utils.load(pickle_path)
-            RINGS[username] = ring
-            print >>sys.stdout, 'Load: RINGS - %s MB' % str(
-                asizeof.asizeof(RINGS) / 1048576.0)
-            with open('/tmp/mem_log.csv', 'ab') as csv_file:
-                writer = csv.writer(csv_file, delimiter=',')
-                writer.writerow([RINGS.keys(),
-                                 str(asizeof.asizeof(RINGS) / 1048576.0)])
+            if username not in RINGS:
+                ring = utils.load(pickle_path)
+                RINGS[username] = ring
+                print >>sys.stdout, 'Load: RINGS - %s MB' % str(
+                    asizeof.asizeof(RINGS) / 1048576.0)
+                with open('/tmp/mem_log.csv', 'ab') as csv_file:
+                    writer = csv.writer(csv_file, delimiter=',')
+                    writer.writerow([RINGS.keys(),
+                                    str(asizeof.asizeof(RINGS) / 1048576.0)])
             messages.info(request, 'Ring is loaded')
             return redirect('home')
         except Exception as e:
