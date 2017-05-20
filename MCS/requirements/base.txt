@@ -18,4 +18,8 @@ psutil
 
 pympler
 
+locust
+
+pyzmq
+
 -e git+https://github.com/ntk148v/CAL.git#egg=calplus
