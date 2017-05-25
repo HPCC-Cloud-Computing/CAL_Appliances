@@ -24,7 +24,8 @@ def show_home(request):
         total_quota += cloud.quota
         total_used += cloud.used
         number_of_cloud += 1
-    total_files = File.objects.filter(owner=request.user).count()
+    # Count number of files (ignore root folder).
+    total_files = File.objects.filter(owner=request.user).exclude(name='root').count()
     total_used = dashboard_utils.sizeof_fmt(total_used)
     total_quota = dashboard_utils.sizeof_fmt(total_quota)
     messages.info(request, 'Get metric about your system successfully.')

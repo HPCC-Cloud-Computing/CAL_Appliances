@@ -1,10 +1,10 @@
 from __future__ import absolute_import, unicode_literals
 
-import copy
 import gc
-
+import os
 from calplus.client import Client
 from django.contrib import messages
+from django.conf import settings
 
 from dashboard import exceptions
 from dashboard.models import File
@@ -12,24 +12,34 @@ from dashboard.models import File
 from mcs.celery_tasks import app
 from mcs.wsgi import RINGS
 
+COUNT = 0
+
 
 @app.task
-def upload_object(cloud, content, file):
+def upload_object(cloud, file):
     """Upload object to cloud node with absolute_name
     :param cloud: object of model Cloud.
-    :param content: content of file (Stream).
     :param file: object of model File.
     """
     connector = Client(version='1.0.0', resource='object_storage',
                        provider=cloud.provider)
     # Create container named = username if it doesnt exist
     container = file.owner.username
-    print 'A'
     try:
-        return connector.upload_object(container, file.path.strip('/'),
-                                       contents=content.read(),
-                                       content_length=content.size,
-                                       metadata={'status': 'UPDATED'})
+        with open(settings.MEDIA_ROOT + '/' + file.name) as content:
+            global COUNT
+            COUNT += 1
+            connector.upload_object(container, file.path.strip('/'),
+                                    contents=content.read(),
+                                    content_length=file.size,
+                                    metadata={'status': 'UPDATED'})
+            # Remove saved file
+            try:
+                if COUNT == 3:
+                    os.remove(settings.MEDIA_ROOT + '/' + file.name)
+                    COUNT = 0
+            except OSError:
+                pass
     except exceptions.UploadObjectError:
         return None
     finally:
@@ -48,8 +58,8 @@ def upload_file(request, file, content):
     update_status_file(request, file.path, File.NOT_AVAILABLE)
     for cloud in node.clouds:
         # Put task to queue 'default'
-        _content = copy.deepcopy(content)
-        upload_object.delay(cloud, _content, file)
+        # _content = copy.deepcopy(content)
+        upload_object.delay(cloud, file)
 
 
 def download_file(file):
