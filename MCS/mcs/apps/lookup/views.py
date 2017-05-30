@@ -27,8 +27,8 @@ def init_ring(request):
                 RINGS[username] = ring
             except Exception as e:
                 messages.error(request, 'Error when load ring: %s' % str(e))
-    messages.info(request, 'Ring is loaded')
-    return redirect('home')
+        messages.info(request, 'Ring is loaded')
+        return redirect('home')
     if request.method == 'POST':
         form = forms.UploadCloudConfigsForm(request.POST, request.FILES)
         if form.is_valid():
