@@ -3,7 +3,11 @@
 <tr>
     <td>
         <div class="checkbox">
-          <input type="checkbox" name="checked_file" value="{{ file.id }}" disabled>
+            {% if file.children.all|length > 0 %}
+            <input type="checkbox" name="checked_file" value="{{ file.id }}" disabled>
+            {% else %}
+            <input type="checkbox" name="checked_file" value="{{ file.id }}">
+            {% endif %}
         </div>
     </td>
     <td>
@@ -48,7 +52,7 @@
             <form id="download-form" action="{% url 'download_file' %}" method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="download_file" value="{{ file.id }}">
-                {% if file.status == 4 %}
+                {% if file.status == 3 or file.status == 1 %}
                     <button type="submit" id="download_btn" class="btn btn-success" data-url="{% url 'download_file' %}"><span class="ti-download"></span></button>
                 {% else %}
                     <button type="submit" class="btn btn-success" disabled><span class="ti-download"></span></button>

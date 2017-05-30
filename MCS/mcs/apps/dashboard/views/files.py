@@ -133,6 +133,8 @@ def delete_files(request):
         filter(id__in=request.POST.getlist('checked_file'))
     # Delete the files -> Done
     for file in files:
+        if file.is_folder:
+            continue
         objects.delete_file(request, file)
     files.delete()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
