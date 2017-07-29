@@ -75,6 +75,7 @@ Trong mô hình mới của bài toán MCOS, thầy Minh yêu cầu xác định
     - Loại hình lưu trữ (SSD/HDD)
     - Dung lượng
 - Chi phí duy trì/sử dụng Cloud Server ($/GB/Hour)
+- Trạng thái của Cloud Server: Active/Deactive (Thầy Minh bổ sung)
 
 ### 3. Xác định lại các yêu cầu của người dùng đối với hệ thống lưu trữ Multi-Cloud Object Storage
 
@@ -108,3 +109,7 @@ hoặc
 ![MCOS-use-case-2-example.png](./images/MCOS-use-case-2-example.png)
 
 ## Xây dựng Mô hình toán học cho bài toán xây dựng hệ thống MCOS
+
+## Các vấn đề
+
+- Liệu Amazone S3 đã giải quyết vấn đề hiện tại mà báo cáo đã đặt ra hay chưa ?
