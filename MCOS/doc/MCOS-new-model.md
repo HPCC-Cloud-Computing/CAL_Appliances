@@ -108,8 +108,4 @@ hoặc
 
 ![MCOS-use-case-2-example.png](./images/MCOS-use-case-2-example.png)
 
-## Xây dựng Mô hình toán học cho bài toán xây dựng hệ thống MCOS
-
-## Các vấn đề
-
-- Liệu Amazone S3 đã giải quyết vấn đề hiện tại mà báo cáo đã đặt ra hay chưa ?
+Ý tưởng: Phân cụm các Cloud Serer đang có trên hệ thống.
