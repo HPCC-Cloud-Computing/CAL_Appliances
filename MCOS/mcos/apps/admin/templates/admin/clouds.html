@@ -1,0 +1,57 @@
+{% extends 'user_dashboard/base.html' %}
+{% block brand %}
+<a class="navbar-brand" href="#">Cloud Servers Monitoring</a>
+{% endblock %}
+{% block main %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="header">
+                <h4 class="title">Cloud Servers</h4>
+            </div>
+            <div class="content table-responsive table-full-width">
+                <table class="table table-striped">
+                    <thead>
+                    <th>NAME</th>
+                    <th>IP ADDRESS</th>
+                    <th>TYPE</th>
+                    <th>USED</th>
+                    <th>STATUS</th>
+                    <th>ACTION</th>
+                    </thead>
+                    <tbody>
+                    {% for cloud in clouds %}
+                    <tr>
+                        <td>{{ cloud.name }}</td>
+                        <td>{{ cloud.address }}</td>
+                        <td>{{ cloud.type }}</td>
+                        <td id="{{ cloud.name }}-rate">{{ cloud.used_rate }}</td>
+                        <td id="{{ cloud.name }}-status">{{ cloud.status }}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary" onclick="update_content('{{ cloud.name }}');">
+                                <i class="ti-reload"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function update_content(cloud_name) {
+        $.ajax({
+            url: "{% url 'update_cloud' %}",
+            type: "GET",
+            data: {cloud_name: cloud_name},
+
+            success: function (response) {
+                $('#' + cloud_name + '-rate').html(response.rate);
+                $('#' + cloud_name + '-status').html(response.status);
+            }
+        });
+    };
+</script>
+{% endblock %}

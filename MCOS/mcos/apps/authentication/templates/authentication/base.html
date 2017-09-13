@@ -1,0 +1,467 @@
+{% load static %}
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, maximum-scale=1">
+    {% block title %}{% endblock %}
+    <link rel="icon" href="{% static 'authentication/img/hpcc_logo.png' %}"
+          type="image/png">
+    <link href="{% static 'authentication/css/bootstrap.css' %}"
+          rel="stylesheet" type="text/css">
+    <link href="{% static 'authentication/css/style.css' %}" rel="stylesheet"
+          type="text/css">
+    <link href="{% static 'authentication/css/linecons.css' %}"
+          rel="stylesheet" type="text/css">
+    <link href="{% static 'authentication/css/font-awesome.css' %}"
+          rel="stylesheet" type="text/css">
+    <link href="{% static 'authentication/css/responsive.css' %}"
+          rel="stylesheet" type="text/css">
+    <link href="{% static 'authentication/css/animate.css' %}"
+          rel="stylesheet" type="text/css">
+    <link href="{% static 'authentication/css/index.css' %}" rel="stylesheet"
+          type="text/css">
+    <link href='http://fonts.googleapis.com/css?family=Lato:400,900,700,700italic,400italic,300italic,300,100italic,100,900italic'
+          rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Dosis:400,500,700,800,600,300,200'
+          rel='stylesheet' type='text/css'>
+
+    <!--[if IE]><style type="text/css">.pie {behavior:url(PIE.htc);}</style>
+    <![endif]-->
+
+    <script type="text/javascript"
+            src="{% static 'authentication/js/jquery.1.8.3.min.js' %}"></script>
+    <script type="text/javascript"
+            src="{% static 'authentication/js/bootstrap.js' %}"></script>
+    <script type="text/javascript"
+            src="{% static 'authentication/js/jquery-scrolltofixed.js' %}"></script>
+    <script type="text/javascript"
+            src="{% static 'authentication/js/jquery.easing.1.3.js' %}"></script>
+    <script type="text/javascript"
+            src="{% static 'authentication/js/jquery.isotope.js' %}"></script>
+    <script type="text/javascript"
+            src="{% static 'authentication/js/wow.js' %}"></script>
+    <script type="text/javascript"
+            src="{% static 'authentication/js/classie.js' %}"></script>
+    <!--[if lt IE 9]>
+    <script src="js/respond-1.1.0.min.js"></script>
+    <script src="js/html5shiv.js"></script>
+    <script src="js/html5element.js"></script>
+<![endif]-->
+
+    <script type="text/javascript">
+        $(document).ready(function (e) {
+            $('.res-nav_click').click(function () {
+                $('ul.toggle').slideToggle(600)
+            });
+
+            $(document).ready(function () {
+                $(window).bind('scroll', function () {
+                    if ($(window).scrollTop() > 0) {
+                        $('#header_outer').addClass('fixed');
+                    }
+                    else {
+                        $('#header_outer').removeClass('fixed');
+                    }
+                });
+            });
+        });
+        function resizeText() {
+            var preferredWidth = 767;
+            var displayWidth = window.innerWidth;
+            var percentage = displayWidth / preferredWidth;
+            var fontsizetitle = 25;
+            var newFontSizeTitle = Math.floor(fontsizetitle * percentage);
+            $(".divclass").css("font-size", newFontSizeTitle)
+        }
+    </script>
+</head>
+<body>
+<div class="col-md-4"
+     style="z-index: 1002; position: absolute;top:55px;right:50px;">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.extra_tags }} alert-dismissable">
+                <a href="#" class="close" data-dismiss="alert"
+                   aria-label="close">×</a>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+{#<div class="row">#}
+{#    <button id="demo-1" class="btn btn-primary">Success Message With#}
+{#        Timer#}
+{#    </button>#}
+{#    <button id="demo-2" class="btn btn-primary">Info Message + Top Right#}
+{#    </button>#}
+{#    <button id="demo-3" class="btn btn-primary">Warning Message + Top Left#}
+{#        + Custom Icons#}
+{#    </button>#}
+{#</div>#}
+<!--Header_section-->
+<header id="header_outer">
+    <div class="container">
+        <div class="header_section">
+            <div class="logo">
+                <a href="{% url 'admin:index' %}">
+                    <img id="header-section-logo"
+                         src="{% static 'authentication/img/hpcc_logo.png' %}"
+                         alt="">
+                </a>
+            </div>
+            <div class="col-md-6" id="header-section-text">
+                {#                HPCC Object Storage Cloud#}
+                HPCC <i class="fa fa-cloud" aria-hidden="true"></i> - Login
+                Portal
+            </div>
+            <nav class="nav" id="nav">
+                <ul class="toggle">
+                    <li>
+                        <a href="https://github.com/HPCC-Cloud-Computing/CAL_Appliances/"><i
+                                class="fa-github"></i>
+                        </a>
+                    </li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="{% url 'admin:index' %}">
+                        Return to <i class="fa fa-home" aria-hidden="true"></i></a>
+                    </li>
+
+                </ul>
+                <ul class="">
+                    <li>
+                        <a href="https://github.com/HPCC-Cloud-Computing/CAL_Appliances/"><i
+                                class="fa-github"></i>
+                        </a>
+                    </li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="{% url 'admin:index' %}">
+                        Return to <i class="fa fa-home" aria-hidden="true"></i></a>
+                    </li>
+
+                </ul>
+            </nav>
+            <a class="res-nav_click animated wobble wow"
+               href="javascript:void(0)"><i class="fa-bars"></i></a>
+        </div>
+    </div>
+</header>
+
+
+<!--Header_section-->
+<section id="top_content" class="top_cont_outer">
+    <div class="top_cont_inner">
+        <div class="container">
+            <div class="top_content">
+                <div class="row">
+                    {% block main %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="footer_section" id="contact">
+    <div class="container">
+        <section class="main-section contact" id="contact">
+            <div class="contact_section">
+                <h2>Contact Us</h2>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="contact_block">
+                            <div class="contact_block_icon rollIn animated wow">
+                                <span><i class="fa-home"></i></span></div>
+                            <span> HPCC Center - Ta Quang Buu Library,<br>
+                                Ha Noi University Of Science And Technology
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="contact_block">
+                            <div class="contact_block_icon icon2 rollIn animated wow">
+                                <span><i class="fa-phone"></i></span></div>
+                            <span> +84 - 01644317741</span></div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="contact_block">
+                            <div class="contact_block_icon icon3 rollIn animated wow">
+                                <span><i class="fa-envelope"></i></span>
+                            </div>
+                            <span>
+                                <a href="mailto:haminhcongbkhn@gmail.com"> haminhcongbkhn@gmail.com</a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-6 wow fadeInLeft">
+                    <div class="contact-info-box address clearfix">
+                        <h3>Don’t be shy. Say hello!</h3>
+                        <p>
+                            If you want to support, please fill an email and
+                            send to
+                            us.
+                        </p>
+                        <p>
+                            All response about this project are welcome.
+                        </p>
+                    </div>
+                    <ul class="social-link">
+                        <li class="twitter animated bounceIn wow delay-02s"><a
+                                href="javascript:void(0)"><i
+                                class="fa-twitter"></i></a></li>
+                        <li class="facebook animated bounceIn wow delay-03s"><a
+                                href="javascript:void(0)"><i
+                                class="fa-facebook"></i></a></li>
+                        <li class="pinterest animated bounceIn wow delay-04s">
+                            <a href="javascript:void(0)"><i
+                                    class="fa-pinterest"></i></a></li>
+                        <li class="gplus animated bounceIn wow delay-05s"><a
+                                href="javascript:void(0)"><i
+                                class="fa-google-plus"></i></a></li>
+                        <li class="dribbble animated bounceIn wow delay-06s"><a
+                                href="javascript:void(0)"><i
+                                class="fa-dribbble"></i></a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-6 wow fadeInUp delay-06s">
+                    <div class="form">
+                        <input class="input-text animated wow flipInY delay-02s"
+                               type="text" name="" value="Your Name *"
+                               onFocus="if(this.value==this.defaultValue)this.value='';"
+                               onBlur="if(this.value=='')this.value=this.defaultValue;">
+                        <input class="input-text animated wow flipInY delay-04s"
+                               type="text" name="" value="Your E-mail *"
+                               onFocus="if(this.value==this.defaultValue)this.value='';"
+                               onBlur="if(this.value=='')this.value=this.defaultValue;">
+                        <textarea
+                                class="input-text text-area animated wow flipInY delay-06s"
+                                cols="0" rows="0"
+                                onFocus="if(this.value==this.defaultValue)this.value='';"
+                                onBlur="if(this.value=='')this.value=this.defaultValue;">Your Message *</textarea>
+                        <input class="input-btn animated wow flipInY delay-08s"
+                               type="submit" value="send message">
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <div class="container">
+        <div class="footer_bottom"><span>Copyright © 2017 Butterfly Theme By <a
+                href="http://w3goods.com">W3Goods</a> - Designed By HPCC Cloud Team, All Rights Reserved. </span>
+        </div>
+    </div>
+</footer>
+<script type="text/javascript">
+    $(document).ready(function (e) {
+        $('#header_outer').scrollToFixed();
+        $('.res-nav_click').click(function () {
+            $('.main-nav').slideToggle();
+            return false
+
+        });
+
+    });
+</script>
+<script>
+    wow = new WOW(
+        {
+            animateClass: 'animated',
+            offset: 100
+        }
+    );
+    wow.init();
+    document.getElementById('').onclick = function () {
+        var section = document.createElement('section');
+        section.className = 'wow fadeInDown';
+        section.className = 'wow shake';
+        section.className = 'wow zoomIn';
+        section.className = 'wow lightSpeedIn';
+        this.parentNode.insertBefore(section, this);
+    };
+</script>
+<script type="text/javascript">
+    $(window).load(function () {
+
+        $('a').bind('click', function (event) {
+            var $anchor = $(this);
+
+            $('html, body').stop().animate({
+                scrollTop: $($anchor.attr('href')).offset().top - 61
+            }, 1500, 'easeInOutExpo');
+            /*
+             if you don't want to use the easing effects:
+             $('html, body').stop().animate({
+             scrollTop: $($anchor.attr('href')).offset().top
+             }, 1000);
+             */
+            event.preventDefault();
+        });
+    })
+</script>
+
+<!--<script type="text/javascript">
+
+$(window).load(function(){
+
+
+  var $container = $('.portfolioContainer'),
+      $body = $('body'),
+      colW = 350,
+      columns = null;
+
+
+  $container.isotope({
+    // disable window resizing
+    resizable: true,
+    masonry: {
+      columnWidth: colW
+    }
+  });
+
+  $(window).smartresize(function(){
+    // check if columns has changed
+    var currentColumns = Math.floor( ( $body.width() -30 ) / colW );
+    if ( currentColumns !== columns ) {
+      // set new column count
+      columns = currentColumns;
+      // apply width to container manually, then trigger relayout
+      $container.width( columns * colW )
+        .isotope('reLayout');
+    }
+
+  }).smartresize(); // trigger resize to set container width
+  $('.portfolioFilter a').click(function(){
+        $('.portfolioFilter .current').removeClass('current');
+        $(this).addClass('current');
+
+        var selector = $(this).attr('data-filter');
+        $container.isotope({
+
+            filter: selector,
+         });
+         return false;
+    });
+
+});
+
+</script>
+
+
+-->
+
+<script type="text/javascript">
+
+
+    jQuery(document).ready(function ($) {
+// Portfolio Isotope
+        var container = $('#portfolio-wrap');
+
+
+        container.isotope({
+            animationEngine: 'best-available',
+            animationOptions: {
+                duration: 200,
+                queue: false
+            },
+            layoutMode: 'fitRows'
+        });
+
+        $('#filters a').click(function () {
+            $('#filters a').removeClass('active');
+            $(this).addClass('active');
+            var selector = $(this).attr('data-filter');
+            container.isotope({filter: selector});
+            setProjects();
+            return false;
+        });
+
+
+        function splitColumns() {
+            var winWidth = $(window).width(),
+                columnNumb = 1;
+
+
+            if (winWidth > 1024) {
+                columnNumb = 4;
+            } else if (winWidth > 900) {
+                columnNumb = 2;
+            } else if (winWidth > 479) {
+                columnNumb = 2;
+            } else if (winWidth < 479) {
+                columnNumb = 1;
+            }
+
+            return columnNumb;
+        }
+
+        function setColumns() {
+            var winWidth = $(window).width(),
+                columnNumb = splitColumns(),
+                postWidth = Math.floor(winWidth / columnNumb);
+
+            container.find('.portfolio-item').each(function () {
+                $(this).css({
+                    width: postWidth + 'px'
+                });
+            });
+        }
+
+        function setProjects() {
+            setColumns();
+            container.isotope('reLayout');
+        }
+
+        container.imagesLoaded(function () {
+            setColumns();
+        });
+
+
+        $(window).bind('resize', function () {
+            setProjects();
+        });
+
+    });
+    $(window).load(function () {
+        jQuery('#all').click();
+        return false;
+    });
+
+    {#    alertMessageConfig.setAlertMessageBox("#box-alert-message-wrapper");#}
+    {#    var messageType = $("#box-alert-message-wrapper").data('message-type');#}
+    {#    var messageTitle = $("#box-alert-message-wrapper").data('message-title');#}
+    {#    var messageContent = $("#box-alert-message-wrapper").data('message-content');#}
+    {#    if (messageType) {#}
+    {#        $.alert_message(messageContent,#}
+    {#            {title: messageTitle, type: messageType});#}
+    {#    }#}
+    {#    $("#demo-1").click(function () {#}
+    {#        $.alert_message("Auto Close After: ", {#}
+    {#            withTime: true,#}
+    {#            type: 'success',#}
+    {#            title: 'Success Message',#}
+    {#                icon: 'glyphicon glyphicon-heart',#}
+    {#        });#}
+    {#    });#}
+    {#    $("#demo-2").click(function () {#}
+    {#        $.alert_message("This is an info message 1231 1231 213" +#}
+    {#            " 123 231 231 3123 123 123 123 213 23 23 23 1", {#}
+    {#            title: 'Info Message',#}
+    {#            type: 'info'#}
+    {#        });#}
+    {#    });#}
+    {#    $("#demo-3").click(function () {#}
+    {#        $.alert_message("This is a warning message", {#}
+    {#            title: 'Warning Message',#}
+    {#            type: 'warning',#}
+    {#            icon: 'glyphicon glyphicon-heart'#}
+    {#        });#}
+    {#    });#}
+</script>
+{% block extra_script %}{% endblock %}
+
+
+</body>
+</html>

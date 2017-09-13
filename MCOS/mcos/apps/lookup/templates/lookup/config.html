@@ -1,0 +1,20 @@
+{% extends 'lookup/base.html' %}
+{% block main %}
+    <form class="cloud-config-form" method="post"
+          enctype="multipart/form-data">
+        {% csrf_token %}
+        <label>Choose your config file</label>
+        <p class="message">Note: Check <a
+                href="{{ MEDIA_URL }}configs/sample-clouds.json" download>sample
+            file</a></p>
+        {% load static %}
+        <p class="message">Note: PDF check assert <a
+                href="{% static 'block_io.pdf' %}" download>sample
+            file</a></p>
+
+        <br>
+        <input type="file" name="cloud_configs">
+        <br>
+        <button type="submit">submit</button>
+    </form>
+{% endblock %}

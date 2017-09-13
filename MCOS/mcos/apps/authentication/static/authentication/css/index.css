@@ -1,0 +1,182 @@
+#header-section-logo {
+    max-height: 50px;
+}
+#login-form .form-error ul, #register-form .form-error ul{
+    padding-left: 2px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+#register-form .form-group{
+    margin-bottom: 5px;
+}
+.form {
+    margin: 0 10px 0 10px;
+}
+
+.login-section {
+    min-height: 600px;
+}
+
+/*.top_left_cont {*/
+/*padding-top: 60px;*/
+/*padding-bottom: 230px;*/
+/*}*/
+
+#login-form {
+    padding-bottom: 230px;
+
+}
+#login-form-footer{
+    margin-top: 30px;
+}
+
+#register-form {
+    padding-bottom: 100px;
+
+}
+.top_cont_inner {
+    background: none;
+    /*background-size: cover;*/
+}
+
+.top_cont_outer {
+    background: #efefef;
+    position: relative;
+}
+
+#login-url-btn, #sign-in-btn, #register-btn {
+    display: block;
+    font-family: 'Dosis', sans-serif;
+    width: 100%;
+    height: 50px;
+    line-height: 36px;
+    letter-spacing: 0px;
+    border-radius: 3px;
+    font-size: 16px;
+    text-transform: uppercase;
+    font-weight: 600;
+    border: 0px;
+    transition: all 0.3s ease-in-out;
+    -moz-transition: all 0.3s ease-in-out;
+    -webkit-transition: all 0.3s ease-in-out;
+}
+
+/*#register-btn {*/
+/*text-align: center;*/
+/*vertical-align: middle;*/
+/*line-height: 50px;*/
+/*}*/
+
+/*#sign-in-btn:hover, #register-btn:hover {*/
+/*background: #fff;*/
+/*color: #222;*/
+/*}*/
+
+#login-form h2 {
+    color: #494949;
+    margin-top: 10px;
+    margin-bottom: 60px;
+}
+.top_content{
+    padding-top: 25px;
+}
+#register-form h2 {
+    color: #494949;
+    margin-top: 10px;
+    margin-bottom: 40px;
+}
+
+#header-section-text {
+    padding-left: 10px;
+    margin-top: 8px;
+    font-size: 150%;
+}
+
+#header_outer {
+    background: #ffffff;
+    padding: 10px 0px;
+}
+
+#nav {
+    margin-top: 15px;
+}
+
+#dashboard-detail .work_section, #options-detail .work_section, #data-protection-detail .work_section {
+    padding: 45px 0 20px;
+}
+
+#register-login .work_section {
+    padding: 45px 0 20px;
+}
+
+#register-login h2 {
+    margin: 10px 0 10px 0;
+}
+
+#register-login h3 {
+    margin-bottom: 40px;
+}
+
+#register-login {
+    margin-top: 100px;
+    min-height: 600px;
+}
+
+#dashboard-detail h2, #options-detail h2, #data-protection-detail h2 {
+    margin: 15px 0 15px 0;
+
+}
+
+#service {
+    padding-top: 43px;
+}
+
+#service h2 {
+    margin: 15px 0 45px 0;
+}
+
+#dashboard-detail, #options-detail, #data-protection-detail {
+    padding-top: 20px;
+}
+
+#dashboard-detail, #data-protection-detail {
+    background: #f9f9f9;
+    /*position:relative;*/
+}
+
+.row-large {
+    margin-left: -25px;
+    margin-right: -25px;
+
+}
+
+#register-form .input-text {
+    /*height: 50px;*/
+    /*min-width: 70px;*/
+}
+
+.btn-primary {
+    color: #ffffff;
+    background-color: #428bca;
+    border-color: #357ebd;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary.active,
+.open .dropdown-toggle.btn-primary {
+    color: #ffffff;
+    background-color: #3276b1;
+    border-color: #285e8e;
+}
+
+.btn-primary:active,
+.btn-primary.active,
+.open .dropdown-toggle.btn-primary {
+    background-image: none;
+}
+
+/*#register-form .input-btn{*/
+/*background-color: #0000CC;*/
+/*}*/

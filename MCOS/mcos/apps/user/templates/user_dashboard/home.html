@@ -1,0 +1,115 @@
+{% extends 'user_dashboard/base.html' %}
+{% block brand %}
+<a class="navbar-brand" href="#">Home</a>
+{% endblock %}
+{% block main %}
+<div class="row">
+    <div class="col-md-12">
+        <h3>Welcome, {{ user.username }}!</h3>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col-lg-3 col-sm-6">
+        <div class="card">
+            <div class="content">
+                <div class="row">
+                    <div class="col-xs-5">
+                        <div class="icon-big icon-warning text-center">
+                            <i class="ti-server"></i>
+                        </div>
+                    </div>
+                    <div class="col-xs-7">
+                        <div class="numbers">
+                            <p>Capacity</p>
+                            {{ total_quota }}
+                        </div>
+                    </div>
+                </div>
+                <div class="footer">
+                    <hr/>
+                    <div class="stats">
+                        <!-- <i class="ti-reload"></i> Updated now -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="card">
+            <div class="content">
+                <div class="row">
+                    <div class="col-xs-5">
+                        <div class="icon-big icon-danger text-center">
+                            <i class="ti-pie-chart"></i>
+                        </div>
+                    </div>
+                    <div class="col-xs-7">
+                        <div class="numbers">
+                            <p>Usage</p>
+                            {{ total_used }}
+                        </div>
+                    </div>
+                </div>
+                <div class="footer">
+                    <hr/>
+                    <div class="stats">
+                        <!-- <i class="ti-reload"></i> Updated now -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="card">
+            <div class="content">
+                <div class="row">
+                    <div class="col-xs-5">
+                        <div class="icon-big icon-success text-center">
+                            <i class="ti-cloud"></i>
+                        </div>
+                    </div>
+                    <div class="col-xs-7">
+                        <div class="numbers">
+                            <p>Clouds</p>
+                            {{ number_of_cloud }}
+                        </div>
+                    </div>
+                </div>
+                <div class="footer">
+                    <hr/>
+                    <div class="stats">
+                        <!-- <i class="ti-reload"></i> Updated now -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="card">
+            <div class="content">
+                <div class="row">
+                    <div class="col-xs-5">
+                        <div class="icon-big icon-info text-center">
+                            <i class="ti-files"></i>
+                        </div>
+                    </div>
+                    <div class="col-xs-7">
+                        <div class="numbers">
+                            <p>Files</p>
+                            {{ total_files }}
+                        </div>
+                    </div>
+                </div>
+                <div class="footer">
+                    <hr/>
+                    <div class="stats">
+                        <!-- <i class="ti-reload"></i> Updated now -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

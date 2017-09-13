@@ -1,0 +1,158 @@
+{% extends 'authentication/base.html' %}
+{% block title %}
+    <title>Register new account</title>
+{% endblock %}
+
+
+
+{% block main %}
+    {% load custom_filters %}
+    <div class="col-lg-3 col-sm-3">
+    </div>
+    <div id="register-form"
+         class=" col-lg-6 col-sm-6 wow fadeInUp delay-02s">
+        <h2>Register New Account</h2>
+        <form method="post" action="{% url 'auth:register' %}"
+              class="form-horizontal">
+            {% csrf_token %}
+            <div class="form-group">
+                <div class="row">
+                    <label class="control-label col-md-4"
+                           for="{{ user_form.user_name.id_for_label }}">
+                        {{ user_form.user_name.label }}
+                    </label>
+                    <div class="col-md-8">
+                        {{ user_form.user_name|addclass:"form-control" }}
+                    </div>
+                </div>
+                <div class="row form-error">
+                    <div class="col-md-offset-4 col-md-8 text-danger">
+                        {{ user_form.user_name.errors }}
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <label class="control-label col-md-4"
+                           for="{{ user_form.email.id_for_label }}">
+                        {{ user_form.email.label }}
+                    </label>
+                    <div class="col-md-8">
+                        {{ user_form.email|addclass:"form-control" }}
+                    </div>
+                </div>
+                <div class="row form-error">
+                    <div class="col-md-offset-4 col-md-8 text-danger">
+                        {{ user_form.email.errors }}
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <label class="control-label col-md-4"
+                           for="{{ user_form.password.id_for_label }}">
+                        {{ user_form.password.label }}
+                    </label>
+                    <div class="col-md-8">
+                        {{ user_form.password|addclass:"form-control" }}
+                    </div>
+                </div>
+                <div class="row form-error">
+                    <div class="col-md-offset-4 col-md-8 text-danger">
+                        {{ user_form.password.errors }}
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <label class="control-label col-md-4"
+                           for="{{ user_form.retype_password.id_for_label }}">
+                        {{ user_form.retype_password.label }}
+                    </label>
+                    <div class="col-md-8">
+                        {{ user_form.retype_password|addclass:"form-control" }}
+                    </div>
+                </div>
+                <div class="row form-error">
+                    <div class="col-md-offset-4 col-md-8 text-danger">
+                        {{ user_form.retype_password.errors }}
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <label class="control-label col-md-4"
+                           for="{{ user_profile_form.company.id_for_label }}">
+                        {{ user_profile_form.company.label }}
+                    </label>
+                    <div class="col-md-8">
+                        {{ user_profile_form.company|addclass:"form-control" }}
+                    </div>
+                </div>
+                <div class="row form-error">
+                    <div class="col-md-offset-4 col-md-8 text-danger">
+                        {{ user_profile_form.company.errors }}
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-4 col-sm-8">
+                    <div class="checkbox">
+                        <label><input id="user-agree-terms-check-box"
+                                      type="checkbox">
+                            I agree to HPCC Cloud Terms
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-4 col-sm-4">
+                    <button id="register-btn"
+                            class="btn btn-primary"
+                            type="submit">Register
+                    </button>
+
+                </div>
+                <div class="col-sm-4">
+                    <a href="{% url 'auth:login' %}" id="login-url-btn"
+                       class="btn btn-primary">
+                        Back to login page
+                    </a>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+{% endblock %}
+
+<!--Top_content-->
+
+
+<!--Block Script-->
+{% block extra_script %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            {#            console.log($("#register-btn"));#}
+            $("#register-btn").attr("disabled", true);
+
+            $("#user-agree-terms-check-box").change(function () {
+                if (this.checked) {
+                    $("#register-btn").removeAttr("disabled", false);
+                } else {
+                    $("#register-btn").attr("disabled", true);
+
+                }
+            });
+        });
+
+
+    </script>
+
+
+{% endblock %}
+<!--End Block Script-->
