@@ -7,10 +7,24 @@ from . import views
 
 urls = \
     [
-        url(r'^node_list_info/$',
-            views.node_list_info, name='node_list_info'),
-        url(r'^test_add_new_node/$',
-            views.test_add_new_node, name='test_add_new_node'),
+        url(r'^cluster_list/$',
+            views.get_cluster_list, name='cluster_list'),
+        url(r'^remote_connect_to_system/',
+            views.remote_connect_to_system,
+            name='remote_connect_to_system'),
+        url(r'^get_add_cluster_permission/',
+            views.get_add_cluster_permission,
+            name='get_add_cluster_permission'),
+        url(r'^add_new_cluster/',
+            views.add_new_cluster,
+            name='add_new_cluster'),
+        url(r'^release_add_cluster_perm/',
+            views.release_add_cluster_perm,
+            name='release_add_cluster_perm')
+
+
+        # url(r'^cluster_list_secured/$',
+        #     views.get, name='cluster_list_secured'),
         # url(r'^dashboard/$',
         #     views.dashboard, name='dashboard'),
         # url(r'^home/$',

@@ -26,7 +26,10 @@
     <link href='http://fonts.googleapis.com/css?family=Dosis:400,500,700,800,600,300,200'
           rel='stylesheet' type='text/css'>
 
-    <!--[if IE]><style type="text/css">.pie {behavior:url(PIE.htc);}</style>
+    <!--[if IE]>
+    <style type="text/css">.pie {
+        behavior: url(PIE.htc);
+    }</style>
     <![endif]-->
 
     <script type="text/javascript"
@@ -47,7 +50,7 @@
     <script src="js/respond-1.1.0.min.js"></script>
     <script src="js/html5shiv.js"></script>
     <script src="js/html5element.js"></script>
-<![endif]-->
+    <![endif]-->
 
     <script type="text/javascript">
         $(document).ready(function (e) {
@@ -80,39 +83,51 @@
 <div class="col-md-4"
      style="z-index: 1002; position: absolute;top:55px;right:50px;">
     {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.extra_tags }} alert-dismissable">
-                <a href="#" class="close" data-dismiss="alert"
-                   aria-label="close">×</a>
-                {{ message }}
-            </div>
-        {% endfor %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.extra_tags }} alert-dismissable">
+        <a href="#" class="close" data-dismiss="alert"
+           aria-label="close">×</a>
+        {{ message }}
+    </div>
+    {% endfor %}
     {% endif %}
 </div>
 
-{#<div class="row">#}
-{#    <button id="demo-1" class="btn btn-primary">Success Message With#}
-{#        Timer#}
-{#    </button>#}
-{#    <button id="demo-2" class="btn btn-primary">Info Message + Top Right#}
-{#    </button>#}
-{#    <button id="demo-3" class="btn btn-primary">Warning Message + Top Left#}
-{#        + Custom Icons#}
-{#    </button>#}
-{#</div>#}
+<!--{#-->
+<!--<div class="row">#}-->
+    <!--{#-->
+    <!--<button id="demo-1" class="btn btn-primary">Success Message With#}-->
+        <!--{# Timer#}-->
+        <!--{#-->
+    <!--</button>-->
+    <!--#}-->
+    <!--{#-->
+    <!--<button id="demo-2" class="btn btn-primary">Info Message + Top Right#}-->
+        <!--{#-->
+    <!--</button>-->
+    <!--#}-->
+    <!--{#-->
+    <!--<button id="demo-3" class="btn btn-primary">Warning Message + Top Left#}-->
+        <!--{# + Custom Icons#}-->
+        <!--{#-->
+    <!--</button>-->
+    <!--#}-->
+    <!--{#-->
+<!--</div>-->
+<!--#}-->
 <!--Header_section-->
 <header id="header_outer">
     <div class="container">
         <div class="header_section">
             <div class="logo">
-                <a href="{% url 'admin:index' %}">
+                <a href="{% url 'admin:dashboard:index' %}">
                     <img id="header-section-logo"
                          src="{% static 'authentication/img/hpcc_logo.png' %}"
                          alt="">
                 </a>
             </div>
             <div class="col-md-6" id="header-section-text">
-                {#                HPCC Object Storage Cloud#}
+                {# HPCC Object Storage Cloud#}
                 HPCC <i class="fa fa-cloud" aria-hidden="true"></i> - Login
                 Portal
             </div>
@@ -124,7 +139,7 @@
                         </a>
                     </li>
                     <li><a href="#contact">Contact</a></li>
-                    <li><a href="{% url 'admin:index' %}">
+                    <li><a href="{% url 'admin:dashboard:index' %}">
                         Return to <i class="fa fa-home" aria-hidden="true"></i></a>
                     </li>
 
@@ -136,7 +151,7 @@
                         </a>
                     </li>
                     <li><a href="#contact">Contact</a></li>
-                    <li><a href="{% url 'admin:index' %}">
+                    <li><a href="{% url 'admin:dashboard:index' %}">
                         Return to <i class="fa fa-home" aria-hidden="true"></i></a>
                     </li>
 
@@ -162,7 +177,7 @@
     </div>
 </section>
 
-<footer class="footer_section" id="contact">
+<footer class="footer_section" id="footer-contact">
     <div class="container">
         <section class="main-section contact" id="contact">
             <div class="contact_section">
@@ -429,36 +444,36 @@ $(window).load(function(){
         return false;
     });
 
-    {#    alertMessageConfig.setAlertMessageBox("#box-alert-message-wrapper");#}
-    {#    var messageType = $("#box-alert-message-wrapper").data('message-type');#}
-    {#    var messageTitle = $("#box-alert-message-wrapper").data('message-title');#}
-    {#    var messageContent = $("#box-alert-message-wrapper").data('message-content');#}
-    {#    if (messageType) {#}
-    {#        $.alert_message(messageContent,#}
-    {#            {title: messageTitle, type: messageType});#}
-    {#    }#}
-    {#    $("#demo-1").click(function () {#}
-    {#        $.alert_message("Auto Close After: ", {#}
-    {#            withTime: true,#}
-    {#            type: 'success',#}
-    {#            title: 'Success Message',#}
-    {#                icon: 'glyphicon glyphicon-heart',#}
-    {#        });#}
-    {#    });#}
-    {#    $("#demo-2").click(function () {#}
-    {#        $.alert_message("This is an info message 1231 1231 213" +#}
-    {#            " 123 231 231 3123 123 123 123 213 23 23 23 1", {#}
-    {#            title: 'Info Message',#}
-    {#            type: 'info'#}
-    {#        });#}
-    {#    });#}
-    {#    $("#demo-3").click(function () {#}
-    {#        $.alert_message("This is a warning message", {#}
-    {#            title: 'Warning Message',#}
-    {#            type: 'warning',#}
-    {#            icon: 'glyphicon glyphicon-heart'#}
-    {#        });#}
-    {#    });#}
+    //    {#    alertMessageConfig.setAlertMessageBox("#box-alert-message-wrapper");#}
+    //    {#    var messageType = $("#box-alert-message-wrapper").data('message-type');#}
+    //    {#    var messageTitle = $("#box-alert-message-wrapper").data('message-title');#}
+    //    {#    var messageContent = $("#box-alert-message-wrapper").data('message-content');#}
+    //    {#    if (messageType) {#}
+    //    {#        $.alert_message(messageContent,#}
+    //    {#            {title: messageTitle, type: messageType});#}
+    //    {#    }#}
+    //    {#    $("#demo-1").click(function () {#}
+    //    {#        $.alert_message("Auto Close After: ", {#}
+    //    {#            withTime: true,#}
+    //    {#            type: 'success',#}
+    //    {#            title: 'Success Message',#}
+    //    {#                icon: 'glyphicon glyphicon-heart',#}
+    //    {#        });#}
+    //    {#    });#}
+    //    {#    $("#demo-2").click(function () {#}
+    //    {#        $.alert_message("This is an info message 1231 1231 213" +#}
+    //    {#            " 123 231 231 3123 123 123 123 213 23 23 23 1", {#}
+    //    {#            title: 'Info Message',#}
+    //    {#            type: 'info'#}
+    //    {#        });#}
+    //    {#    });#}
+    //    {#    $("#demo-3").click(function () {#}
+    //    {#        $.alert_message("This is a warning message", {#}
+    //    {#            title: 'Warning Message',#}
+    //    {#            type: 'warning',#}
+    //    {#            icon: 'glyphicon glyphicon-heart'#}
+    //    {#        });#}
+    //    {#    });#}
 </script>
 {% block extra_script %}{% endblock %}
 

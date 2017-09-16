@@ -10,10 +10,14 @@ mysql-python
 
 celery
 
+requests
+
 Pillow<3.5.0
 
 eventlet
+
 django-role-permissions
 
 django-adminlte2
+
 -e git+https://github.com/ntk148v/CAL.git#egg=calplus

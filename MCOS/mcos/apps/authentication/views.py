@@ -1,8 +1,10 @@
 # from django.views.generic import TemplateView
 # from django.shortcuts import redirect
+import json
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.views.decorators.http import require_POST
+from django.http import JsonResponse, HttpResponse
 # from django.urls import reverse
 from django.db.models import Q
 from django.shortcuts import *
@@ -34,13 +36,39 @@ def login_user(request):
                 Q(username=user_name_email) | Q(email=user_name_email)).first()
             # if user is admin
             login(request, user)
-            return redirect(reverse('admin:index'))
+            return redirect(reverse('admin:dashboard:index'))
             # if user is normal user
         else:
             messages.error(request, 'Invalid user name, email or password.',
                            extra_tags='danger')  # <-
             return render(request, 'authentication/login.html',
-                          context={'login_form': login_form, })
+                          context={'login_form': login_form, }, status=403)
+
+
+def api_login(request):
+    if request.method == "GET":
+        login_form = LoginForm()
+        return render(request, 'authentication/login.html',
+                      context={'login_form': login_form, })
+
+    if request.method == "POST":
+        login_form = LoginForm(request.POST)
+        if login_form.is_valid():
+            user_name_email = login_form.cleaned_data['user_name_email']
+            user = User.objects.filter(
+                Q(username=user_name_email) | Q(email=user_name_email)).first()
+            # if user is admin
+            login(request, user)
+            login_result = {'is_authenticate': 'true'}
+            return HttpResponse(json.dumps(login_result),
+                                content_type="application/json", status=200)
+            # if user is normal user
+        else:
+            login_result = {'is_authenticate': 'false',
+                            'reason': 'invalid username or password'}
+
+            return HttpResponse(json.dumps(login_result),
+                                content_type="application/json", status=403)
 
 
 @transaction.atomic

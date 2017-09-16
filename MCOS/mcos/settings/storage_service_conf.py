@@ -1,14 +1,8 @@
-# if current node is the first node of system, set to it connect to itself
-# else, fill this option by list of IP of nearest node of it.
-# CONNECT_SERVER = ['192.168.50.1:8000']
-CONNECT_SERVER = 'localhost'
-
 # CONFIGURATION FOR OBJECT STORAGE SERVICE WHICH WILL BE MANAGED BY THIS
 # MCOS SERVICE
 TEST_CONTAINER_NAME = 'mcos_test_container'
 TEST_OBJECT_NAME = 'mcos_test_object'
 TEST_FILE_PATH = './mcos/media/configs/sample_file.txt'
-MCOS_SERVICE_NAME = 'us-west'
 STORAGE_SERVICE_CONFIG = {
     "type": "swift",  # valid type: amazon_s3, swift, ceph
     # 'access_info': {

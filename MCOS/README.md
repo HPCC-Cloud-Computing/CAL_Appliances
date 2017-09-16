@@ -18,6 +18,7 @@ Follow these steps:
 3. Install requirements:
 
     ```bash
+    sudo apt-get install libmysqlclient-dev
     pip install -r requirements.txt
     ```
 
@@ -30,7 +31,8 @@ Follow these steps:
     <!-- docker run -p 6379:6379 --name mcos-redis -d redis redis-server -->
     ```
 
-5. Go to mcos/settings/local.py, and fill your container's ip and password.
+5. Go to files ````mcos/settings/local.py```` and ```mcos/settings/mcos_conf.py```,
+   and modify your local config
 
 6. Run migrate databse and wsgi server.
 
