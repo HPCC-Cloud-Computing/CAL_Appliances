@@ -1,0 +1,34 @@
+docker run -p 3306:3306 --name mcos-db -e \
+MYSQL_ROOT_PASSWORD=secret -e MYSQL_DATABASE=mcos -d mysql:latest
+docker run --name myadmin -d --link mcos-db:db -p 8080:80 phpmyadmin/phpmyadmin
+
+docker run -p 3301:3306 --name mcos-db-1 -e \
+MYSQL_ROOT_PASSWORD=secret -e MYSQL_DATABASE=mcos -d mysql:latest
+docker run --name myadmin-1 -d --link mcos-db-1:db -p 8081:80 phpmyadmin/phpmyadmin
+
+
+docker run -p 3302:3306 --name mcos-db-2 -e \
+MYSQL_ROOT_PASSWORD=secret -e MYSQL_DATABASE=mcos -d mysql:latest
+docker run --name myadmin-2 -d --link mcos-db-2:db -p 8082:80 phpmyadmin/phpmyadmin
+
+
+docker run -p 3303:3306 --name mcos-db-3 -e \
+MYSQL_ROOT_PASSWORD=secret -e MYSQL_DATABASE=mcos -d mysql:latest
+docker run --name myadmin-3 -d --link mcos-db-3:db -p 8083:80 phpmyadmin/phpmyadmin
+
+docker run -p 3304:3306 --name mcos-db-4 -e \
+MYSQL_ROOT_PASSWORD=secret -e MYSQL_DATABASE=mcos -d mysql:latest
+docker run --name myadmin-4 -d --link mcos-db-4:db -p 8084:80 phpmyadmin/phpmyadmin
+
+
+docker rm -f myadmin-1
+docker rm -f mcos-db-1
+
+docker rm -f myadmin-2
+docker rm -f mcos-db-2
+
+docker rm -f myadmin-3
+docker rm -f mcos-db-3
+
+docker rm -f myadmin-4
+docker rm -f mcos-db-4

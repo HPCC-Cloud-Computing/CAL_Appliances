@@ -1,6 +1,9 @@
 import os
 from calplus.client import Client
 from calplus.provider import Provider
+from mcos.settings.storage_service_conf import STORAGE_SERVICE_CONFIG, \
+    TEST_CONTAINER_NAME, TEST_OBJECT_NAME, TEST_FILE_PATH, \
+    STORAGE_CONTAINER_NAME
 
 
 class CreateServiceConnectorError(Exception):
@@ -55,7 +58,28 @@ def create_service_connector(service_type, access_information):
         else:
             raise CreateServiceConnectorError('Invalid object service config,'
                                               ' check config again.')
-    except Exception:
+    except Exception as e:
+        print e.message
         raise CreateServiceConnectorError(
             'Cannot create object storage service connector,'
             ' check config again.')
+
+
+def check_container_is_exist(storage_service_connector, container_name):
+    container_exist = False
+    if STORAGE_SERVICE_CONFIG['type'] == 'swift':
+        container_list = storage_service_connector.driver. \
+            list_containers()
+        for container_info in container_list:
+            if container_info['name'] == container_name:
+                container_exist = True
+    elif STORAGE_SERVICE_CONFIG['type'] == 'amazon_s3':
+        container_list = storage_service_connector.driver. \
+            list_containers()['Buckets']
+        for container_info in container_list:
+            if container_info['Name'] == container_name:
+                container_exist = True
+    else:
+        raise CheckStorageServiceError("Not support storage service type: " +
+                                       STORAGE_SERVICE_CONFIG['type'])
+    return container_exist

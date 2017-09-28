@@ -1,8 +1,10 @@
 # CONFIGURATION FOR OBJECT STORAGE SERVICE WHICH WILL BE MANAGED BY THIS
 # MCOS SERVICE
-TEST_CONTAINER_NAME = 'mcos_test_container'
+TEST_CONTAINER_NAME = 'mcos.test.container'
 TEST_OBJECT_NAME = 'mcos_test_object'
 TEST_FILE_PATH = './mcos/media/configs/sample_file.txt'
+
+STORAGE_CONTAINER_NAME = 'mcos_storage_container_name'
 STORAGE_SERVICE_CONFIG = {
     "type": "swift",  # valid type: amazon_s3, swift, ceph
     # 'access_info': {

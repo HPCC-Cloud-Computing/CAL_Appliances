@@ -1,6 +1,7 @@
 # from django.views.generic import TemplateView
 # from django.shortcuts import redirect
 import json
+import django
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.views.decorators.http import require_POST
@@ -48,8 +49,8 @@ def login_user(request):
 def api_login(request):
     if request.method == "GET":
         login_form = LoginForm()
-        return render(request, 'authentication/login.html',
-                      context={'login_form': login_form, })
+        return JsonResponse(
+            {'csrftoken': django.middleware.csrf.get_token(request)})
 
     if request.method == "POST":
         login_form = LoginForm(request.POST)

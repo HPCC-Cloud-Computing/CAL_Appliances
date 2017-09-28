@@ -1,0 +1,63 @@
+{% extends 'adminlte/base.html' %}
+{% load staticfiles %}
+{% block extra_head %}
+
+    <link href="{% static 'admin/dashboard/css/base.css' %}"
+          rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block bodyclass %}
+    {#    skin-black-light fixed#}
+    skin-black-light
+{% endblock %}
+{% block nav_header %}
+    {% include 'admin/dashboard/lib/_main_header.html' %}
+{% endblock %}
+{% block nav_sidebar %}
+    {% include 'admin/dashboard/lib/_main_sidebar.html' %}
+{% endblock %}
+{% block content_wrapper %}
+    <div class="content-wrapper">
+        {% block content_header %}
+            {#            <section class="content-header">#}
+            {#                <h1>#}
+            {#                    {% block page_name %}{% endblock %}#}
+            {#                    {% block no_description %}#}
+            {#                        <small>#}
+            {#                            {% block page_description %}{% endblock %}</small>#}
+            {#                    {% endblock %}#}
+            {#                </h1>#}
+            {#                {% block breadcrumbs %}#}
+            {#                    Breadcrumb implementation left to developers#}
+            {#                {% endblock %}#}
+            {#            </section>#}
+        {% endblock %}
+
+        {% block content_outer %}
+            <section class="content">
+                {% block messages %}
+                    {% include 'adminlte/lib/_messages.html' %}
+                {% endblock %}
+
+                {% block content_block_wrap %}
+                    {% block content %}{% endblock %}
+                {% endblock %}
+            </section>
+        {% endblock %}
+
+    </div>
+{% endblock content_wrapper %}
+{% block javascript %}
+    <script type="text/javascript"
+            src="{% static 'admin/dashboard/js/jquery.slimscroll.js' %}"></script>
+    <script src="{% static "jquery/dist/jquery.min.js" %}"></script>
+    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+    <!-- Resolve conflict in jQuery UI with Bootstrap -->
+    <script>
+        $.widget.bridge('uibutton', $.ui.button);
+    </script>
+    <script src="{% static "bootstrap/dist/js/bootstrap.min.js" %} "></script>
+    <script src="{% static "admin-lte/dist/js/app.min.js" %}"></script>
+    {% block user_javascript %}
+    {% endblock %}
+{% endblock %}

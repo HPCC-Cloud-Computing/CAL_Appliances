@@ -1,0 +1,64 @@
+#main-header-title {
+    color: #888888;
+    /*padding-left: 20px;*/
+    font-weight: 900;
+    font-size: 25px;
+    line-height: 70px;
+    text-align: center;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+#header-title-content {
+    font-weight: 400;
+    padding-left: 20px;
+    color: #888888;
+    /*padding-left: 20px;*/
+    font-weight: 900;
+    font-size: 15px;
+    line-height: 70px;
+    text-align: center;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    padding-right: 20px;
+}
+#main-header-title > #header-page-name{
+    padding-left: 20px;
+}
+#main-header-title > #header-title-logo {
+    width: 230px;
+    border-right: 1px solid #eee;
+    border-left-width: 0;
+}
+
+#main-header-title > div {
+    display: inline-block;
+}
+
+#nav-header-right-panel {
+    margin-right: 10px;
+    height: 70px;
+}
+
+.main-header .navbar {
+    margin-left: 0;
+
+}
+
+.main-sidebar, .left-side {
+    padding-top: 70px;
+}
+
+#nav-header-right-panel > .navbar-nav > li > a {
+    line-height: 30px;
+
+    padding-top: 20px;
+    padding-bottom: 20px;
+
+    /*padding: 10px 20px;*/
+}
+.fixed .content-wrapper, .fixed .right-side {
+	padding-top: 70px;
+}
+
+.content{
+    padding-top: 15px;
+}

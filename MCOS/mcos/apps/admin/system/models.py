@@ -1,8 +1,7 @@
 from __future__ import unicode_literals
 import json
 import uuid
-
-from django.contrib.auth.models import User
+from django.utils import timezone
 from django.db import models
 
 
@@ -46,7 +45,7 @@ class ObjectServiceInfo(models.Model):
     def convert_sv_type_id(service_type_id):
         if service_type_id == 1:
             return 'swift'
-        elif servcie_type_id == 2:
+        elif service_type_id == 2:
             return 'amazon_s3'
         elif service_type_id == 3:
             return 'ceph'
@@ -78,7 +77,7 @@ class ObjectServiceInfo(models.Model):
         return object_storage_service_info
 
     def to_dict(self):
-        service_info_dict={
+        service_info_dict = {
             'id': str(self.id),
             'service_type': ObjectServiceInfo.convert_sv_type_id(
                 self.service_type),
@@ -103,13 +102,11 @@ class SystemCluster(models.Model):
     # DISCONNECTED
     ACTIVE = 1
     SHUTOFF = 2
-    DISCONNECTED = 3
-    CLOUD_SERVICE_DISCONNECTED = 4
+    ERROR = 3
     STATUS = (
         (ACTIVE, 'ACTIVE'),
         (SHUTOFF, 'SHUTOFF'),
-        (DISCONNECTED, 'DISCONNECTED'),
-        (CLOUD_SERVICE_DISCONNECTED, 'CLOUD_SERVICE_DISCONNECTED')
+        (ERROR, 'ERROR'),
     )
     # uuid
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -124,6 +121,7 @@ class SystemCluster(models.Model):
                                         related_name='system_cluster')
     # cluster status
     status = models.IntegerField(choices=STATUS, default=ACTIVE)
+    last_update = models.DateTimeField('last_update', default=timezone.now)
 
     def to_dict(self):
         cluster_info_dict = {
@@ -132,7 +130,8 @@ class SystemCluster(models.Model):
             'address_ip': self.address_ip,
             'address_port': self.address_port,
             'status': self.status,
-            'service_info':self.service_info.to_dict()
+            'service_info': self.service_info.to_dict(),
+            'last_update': str(self.last_update)
         }
         return cluster_info_dict
 

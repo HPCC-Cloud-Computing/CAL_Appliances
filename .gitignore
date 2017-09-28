@@ -91,3 +91,9 @@ ENV/
 .vscode/*
 .idea/*
 MCS/.idea/*
+MCOS_1/
+MCOS_2/
+MCOS_3/
+MCOS_4/
+mcos_venv/
+backup/

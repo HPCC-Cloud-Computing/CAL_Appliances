@@ -8,13 +8,16 @@ from . import views
 urls = \
     [
         url(r'^$',
-            views.index, name='index'),
-        url(r'^dashboard/$',
-            views.dashboard, name='dashboard'),
+            views.dashboard_overview, name='dashboard_overview'),
+        url(r'^cluster_management/$',
+            views.cluster_management, name='cluster_management'),
         url(r'^home/$',
             views.test_user_role, name='home'),
+        url(r'^clusters_tbl_api/$', views.clusters_tbl_api,
+            name='clusters_tbl_api')
 
     ]
 
-urlpatterns = urls + static(settings.MEDIA_URL,
-                            document_root=settings.MEDIA_ROOT)
+urlpatterns = urls
+# urlpatterns = urls + static(settings.MEDIA_URL,
+#                             document_root=settings.MEDIA_ROOT)

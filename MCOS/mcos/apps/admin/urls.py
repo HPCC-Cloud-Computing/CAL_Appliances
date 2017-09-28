@@ -5,12 +5,15 @@ from django.conf import settings
 
 from .dashboard import urls as dashboard_urls
 from .system import urls as system_urls
+import views
 
 urls = [
+    url(r'^$', views.index, name='index'),
     url(r'^dashboard/', include(dashboard_urls.urlpatterns,
                                 namespace='dashboard')),
     url(r'^system/', include(system_urls.urlpatterns,
                              namespace='system')),
 ]
-urlpatterns = urls + static(settings.MEDIA_URL,
-                            document_root=settings.MEDIA_ROOT)
+urlpatterns = urls
+# urlpatterns = urls + static(settings.MEDIA_URL,
+#                             document_root=settings.MEDIA_ROOT)

@@ -30,7 +30,6 @@ INSTALLED_APPS = [
     'celery',
     # 'rolepermissions',
     # The general purpose templates
-    'django_adminlte',
     # Optional: Skin for the admin interface
     # 'django_adminlte_theme',
     # Any apps which need to have their templates overridden by adminlte
@@ -39,6 +38,7 @@ INSTALLED_APPS = [
 
 PROJECT_APPS = [
     'mcos.apps.authentication',
+    'django_adminlte',
     'mcos.apps.admin',
     # 'mcos.apps.user_dashboard',
     # 'mcos.apps.lookup',
@@ -79,13 +79,13 @@ DATABASES = {
 
 LANGUAGE_CODE = 'en-gb'
 
-TIME_ZONE = 'Asia/Ho_Chi_Minh'
-
 USE_I18N = False
 
 USE_L10N = True
 
 USE_TZ = True
+
+TIME_ZONE = 'Asia/Ho_Chi_Minh'
 
 
 # Static files (CSS, JavaScript, Images)
@@ -96,8 +96,13 @@ STATIC_URL = '/static/'
 # Additional locations of static files
 
 STATICFILES_DIRS = (
-    root('assets'),
+    root('static'),
 )
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
+
 # print (root('assets'))
 
 TEMPLATES = [
