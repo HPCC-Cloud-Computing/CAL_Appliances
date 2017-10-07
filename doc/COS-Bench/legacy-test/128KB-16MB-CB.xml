@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<workload name="128KB-Read" description="sample benchmark for swift">
+<workload name="128K-16MB-Test-CB" description="Combine benchmark for swift">
 
   <storage type="swift" />
   
