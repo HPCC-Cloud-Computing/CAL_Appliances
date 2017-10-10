@@ -97,14 +97,6 @@ def set_lock(lock_name, lock_value=DEFAULT_LOCK_VALUE):
     else:
         return False
 
-#
-# def check_lock(lock_name):
-#     memcache_client = memcache.Client([(MEMCACHED_IP, MEMCACHED_PORT)])
-#     if memcache_client.get(lock_name) is None:
-#         return False
-#     else:
-#         return True
-
 
 def get_shared_value(key_name):
     memcache_client = memcache.Client([(MEMCACHED_IP, MEMCACHED_PORT)])

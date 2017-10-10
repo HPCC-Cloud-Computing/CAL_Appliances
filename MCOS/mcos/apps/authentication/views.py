@@ -41,7 +41,8 @@ def login_user(request):
                     return redirect(next_url)
                 else:
                     if auth_client.has_role('admin'):
-                        return redirect(reverse('admin:dashboard'))
+                        return redirect(
+                            reverse('admin:dashboard:dashboard_overview'))
                     else:
                         return redirect(reverse('user:dashboard'))
             except ClientException as e:

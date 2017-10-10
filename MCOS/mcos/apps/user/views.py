@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render
 from django.http import HttpResponse
-from django_adminlte_test.apps.authentication.auth_plugins.decorators import \
+from mcos.apps.authentication.auth_plugins.decorators import \
     login_required
 
 

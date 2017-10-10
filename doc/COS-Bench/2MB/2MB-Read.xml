@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<workload name="2MB-Combine" description="sample benchmark for swift">
+<workload name="2MB-Read" description="sample benchmark for swift">
 
   <storage type="swift" />
   
@@ -28,7 +28,7 @@
     </workstage>
     <workstage name="main-2MBread">
       <work name="main" workers="32" runtime="450">
-        <operation type="read" ratio="100" config="containers=u(1,32);objects=u(150,750)" />
+        <operation type="read" ratio="100" config="containers=u(1,32);objects=u(150,850)" />
       </work>
     </workstage>
     <workstage name="cleanup-2MBread">
@@ -37,45 +37,6 @@
     <workstage name="dispose-2MBread">
       <work type="dispose" workers="1" config="containers=r(1,32)" />
     </workstage>
-
-
-    <workstage name="init-2MBwrite">
-      <work type="init" workers="1" config="containers=r(1,32)" />
-    </workstage>
-    <workstage name="main-2MBwrite">
-      <work name="main" workers="32" runtime="450">
-        <operation type="write" ratio="100" config="containers=u(1,32);objects=u(1,400);sizes=c(2)MB" />
-      </work>
-    </workstage>
-    <workstage name="cleanup-2MBwrite">
-      <work type="cleanup" workers="1" config="containers=r(1,32);objects=r(1,400)" />
-    </workstage>
-    <workstage name="dispose-2MBwrite">
-      <work type="dispose" workers="1" config="containers=r(1,32)" />
-    </workstage>
-
-
-    <workstage name="init-2MB80R20W">
-      <work type="init" workers="1" config="containers=r(1,32)" />
-    </workstage>
-    <workstage name="prepare-2MB80R20W">
-      <work type="prepare" workers="32" config="containers=r(1,32);objects=r(1,600);sizes=c(2)MB" />
-    </workstage>
-    <workstage name="main-2MB80R20W">
-      <work name="main" workers="16" runtime="450">
-        <operation type="read" ratio="80" config="containers=u(1,32);objects=u(1,600)" />
-        <operation type="write" ratio="20" config="containers=u(1,32);objects=u(601,800);sizes=c(2)MB" />
-      </work>
-    </workstage>
-    <workstage name="cleanup-2MB80R20W">
-      <work type="cleanup" workers="1" config="containers=r(1,32);objects=r(1,800)" />
-    </workstage>
-    <workstage name="dispose-2MB80R20W">
-      <work type="dispose" workers="1" config="containers=r(1,32)" />
-    </workstage>
-
-
-
   </workflow>
 
 </workload>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<workload name="2MB-Write" description="sample benchmark for swift">
+
+  <storage type="swift" />
+  
+  <!-- Storage policies feature: http://docs.openstack.org/developer/swift/overview_architecture.html
+	<storage type="swift" config="policy=gold" />
+  -->
+  
+  <!-- MODIFY ME -->
+  <!-- <auth type="swauth" config="username=admin:admin;password=bkcloud;auth_url=http://192.168.80.40:8080/auth/v1.0" /> -->
+
+  <!-- <auth type="keystone" config="username=admin;password=bkcloud;tenant_name=admin;auth_url=http://192.168.80.40:5000/v2.0;service=swift service" />  -->
+ <!-- <auth type="keystone"  config="username=admin;password=bkcloud;tenant_name=admin;auth_url=http://192.168.80.40:5000/v2.0;service=swift service;region=RegionOne" />  -->
+<auth type="keystone" config="username=admin;password=bkcloud;tenant_name=admin;auth_url=http://controller:5000/v2.0;service=swift;region=RegionOne" />
+  <!-- bypass authentication, directly feed auth token  
+  <storage type="swift" config="token=AUTH_xxx;storage_url=http://192.168.10.1:8080/auth/v1.0" />	
+  -->
+	
+  <workflow>
+
+    <workstage name="init-2MBwrite">
+      <work type="init" workers="1" config="containers=r(1,32)" />
+    </workstage>
+    <workstage name="main-2MBwrite">
+      <work name="main" workers="32" runtime="450">
+        <operation type="write" ratio="100" config="containers=u(1,32);objects=u(1,400);sizes=c(2)MB" />
+      </work>
+    </workstage>
+    <workstage name="cleanup-2MBwrite">
+      <work type="cleanup" workers="1" config="containers=r(1,32);objects=r(1,400)" />
+    </workstage>
+    <workstage name="dispose-2MBwrite">
+      <work type="dispose" workers="1" config="containers=r(1,32)" />
+    </workstage>
+
+  </workflow>
+
+</workload>
+
+
+
+

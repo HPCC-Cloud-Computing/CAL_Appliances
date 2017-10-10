@@ -27,7 +27,7 @@ MAX_GREEN_THREADS = 25
 # RINGS = RingDict()
 
 path.insert(0, os.getcwd())
-print os.getcwd()
+print (os.getcwd())
 
 parser = OptionParser()
 parser.add_option(
@@ -77,7 +77,7 @@ def setup_system_and_start_servers():
 
 def run_wsgi_app(eventlet, wsgi, app, port):
     """Run a wsgi compatible app using eventlet"""
-    print "starting eventlet server on port %i" % port
+    print("starting eventlet server on port %i" % port)
     wsgi.server(
         eventlet.listen(('', port)),
         app,

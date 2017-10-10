@@ -40,7 +40,7 @@ PROJECT_APPS = [
     'django_adminlte',
     'mcos.apps.authentication',
     'mcos.apps.admin',
-    # 'mcos.apps.user',
+    'mcos.apps.user',
     'mcos.apps.handle_exceptions'
 
     # 'mcos.apps.user_dashboard',

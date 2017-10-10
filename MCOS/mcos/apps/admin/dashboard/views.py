@@ -1,10 +1,10 @@
 from __future__ import absolute_import
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
 from mcos.settings.mcos_conf import MCOS_CLUSTER_NAME
 from ..system.models import SystemCluster
+from mcos.apps.authentication.auth_plugins.decorators import login_required
 
 
 # from ...lookup import utils as lookup_utils
@@ -20,13 +20,13 @@ def set_context(view_context=None):
     return context
 
 
-# @login_required(login_url='/auth/login/')
-# @permission_required('authentication.admin_role', raise_exception=True)
+@login_required(role='admin')
 def dashboard_overview(request):
     return render(request, 'admin/dashboard/index.html',
                   set_context())
 
 
+@login_required(role='admin')
 def cluster_management(request):
     return render(request, 'admin/dashboard/cluster_management.html',
                   set_context())
@@ -40,7 +40,5 @@ def clusters_tbl_api(request):
     return JsonResponse({'cluster_list': cluster_dict_list})
 
 
-@login_required(login_url='/auth/login/')
-@permission_required('authentication.user_role', raise_exception=True)
 def test_user_role(request):
     return render(request, 'admin_dashboard/home.html', {})
