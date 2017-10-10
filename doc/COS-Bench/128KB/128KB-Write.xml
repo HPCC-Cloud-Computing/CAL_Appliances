@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<workload name="10MB-Write" description="sample benchmark for swift">
+<workload name="128KB-Write" description="sample benchmark for swift">
 
   <storage type="swift" />
   
@@ -19,21 +19,20 @@
 	
   <workflow>
 
-    <workstage name="init-10MBwrite">
+    <workstage name="init-128KBwrite">
       <work type="init" workers="1" config="containers=r(1,32)" />
     </workstage>
-    <workstage name="main-10MBwrite">
+    <workstage name="main-128KBwrite">
       <work name="main" workers="10" runtime="450">
-        <operation type="write" ratio="100" config="containers=u(1,32);objects=u(1,300);sizes=c(10)MB" />
+        <operation type="write" ratio="100" config="containers=u(1,32);objects=u(1,2000);sizes=c(128)KB" />
       </work>
     </workstage>
-    <workstage name="cleanup-10MBwrite">
-      <work type="cleanup" workers="1" config="containers=r(1,32);objects=r(1,300)" />
+    <workstage name="cleanup-128KBwrite">
+      <work type="cleanup" workers="1" config="containers=r(1,32);objects=r(1,2000)" />
     </workstage>
-    <workstage name="dispose-10MBwrite">
+    <workstage name="dispose-128KBwrite">
       <work type="dispose" workers="1" config="containers=r(1,32)" />
     </workstage>
-
 
   </workflow>
 

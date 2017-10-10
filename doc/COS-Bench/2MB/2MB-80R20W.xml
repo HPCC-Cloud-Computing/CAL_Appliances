@@ -24,7 +24,7 @@
       <work type="init" workers="1" config="containers=r(1,32)" />
     </workstage>
     <workstage name="prepare-2MB80R20W">
-      <work type="prepare" workers="32" config="containers=r(1,32);objects=r(1,6000);sizes=c(2)MB" />
+      <work type="prepare" workers="32" config="containers=r(1,32);objects=r(1,600);sizes=c(2)MB" />
     </workstage>
     <workstage name="main-2MB80R20W">
       <work name="main" workers="16" runtime="450">

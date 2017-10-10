@@ -19,7 +19,6 @@
 	
   <workflow>
 
-
      <workstage name="init-2MBread">
       <work type="init" workers="1" config="containers=r(1,32)" />
     </workstage>
@@ -37,6 +36,7 @@
     <workstage name="dispose-2MBread">
       <work type="dispose" workers="1" config="containers=r(1,32)" />
     </workstage>
+
   </workflow>
 
 </workload>

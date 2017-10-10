@@ -28,7 +28,7 @@
     </workstage>
     <workstage name="main-2MBread">
       <work name="main" workers="32" runtime="450">
-        <operation type="read" ratio="100" config="containers=u(1,32);objects=u(150,750)" />
+        <operation type="read" ratio="100" config="containers=u(1,32);objects=u(150,850)" />
       </work>
     </workstage>
     <workstage name="cleanup-2MBread">

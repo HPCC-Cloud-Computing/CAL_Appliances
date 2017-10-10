@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<workload name="128KB-Combine" description="sample benchmark for swift">
+<workload name="128KB-Read" description="sample benchmark for swift">
 
   <storage type="swift" />
   
@@ -19,7 +19,6 @@
 	
   <workflow>
 
-
     <workstage name="init-128KBread">
       <work type="init" workers="1" config="containers=r(1,32)" />
     </workstage>
@@ -37,44 +36,6 @@
     <workstage name="dispose-128KBread">
       <work type="dispose" workers="1" config="containers=r(1,32)" />
     </workstage>
-
-
-    <workstage name="init-128KBwrite">
-      <work type="init" workers="1" config="containers=r(1,32)" />
-    </workstage>
-    <workstage name="main-128KBwrite">
-      <work name="main" workers="10" runtime="450">
-        <operation type="write" ratio="100" config="containers=u(1,32);objects=u(1,2000);sizes=c(128)KB" />
-      </work>
-    </workstage>
-    <workstage name="cleanup-128KBwrite">
-      <work type="cleanup" workers="1" config="containers=r(1,32);objects=r(1,2000)" />
-    </workstage>
-    <workstage name="dispose-128KBwrite">
-      <work type="dispose" workers="1" config="containers=r(1,32)" />
-    </workstage>
-
-
-    <workstage name="init-128KB80R20W">
-      <work type="init" workers="1" config="containers=r(1,32)" />
-    </workstage>
-    <workstage name="prepare-128KB80R20W">
-      <work type="prepare" workers="10" config="containers=r(1,32);objects=r(1,3000);sizes=c(128)KB" />
-    </workstage>
-    <workstage name="main-128KB80R20W">
-      <work name="main" workers="20" runtime="450">
-        <operation type="read" ratio="80" config="containers=u(1,32);objects=u(300,2500)" />
-        <operation type="write" ratio="20" config="containers=u(1,32);objects=u(3001,4000);sizes=c(128)KB" />
-      </work>
-    </workstage>
-    <workstage name="cleanup-128KB80R20W">
-      <work type="cleanup" workers="1" config="containers=r(1,32);objects=r(1,4000)" />
-    </workstage>
-    <workstage name="dispose-128KB80R20W">
-      <work type="dispose" workers="1" config="containers=r(1,32)" />
-    </workstage>
-
-
 
   </workflow>
 
