@@ -5,6 +5,7 @@ import json
 import socket
 import uuid
 import requests
+import memcache
 from sys import path
 from optparse import OptionParser
 from os.path import abspath, dirname
@@ -17,6 +18,8 @@ from mcos.settings.storage_service_conf import STORAGE_SERVICE_CONFIG, \
     STORAGE_CONTAINER_NAME
 from mcos.settings.mcos_conf import MCOS_IP, MCOS_PORT, CONNECT_SERVER, \
     MCOS_CLUSTER_NAME
+from mcos.settings import MEMCACHED_IP, MEMCACHED_PORT
+from mcos.apps.authentication.auth_plugins.keystone_auth import KeyStoneClient
 
 SITE_ROOT = dirname(dirname(abspath(__file__)))
 
@@ -39,12 +42,13 @@ class CheckStorageServiceError(Exception):
 def connect_to_system(db_setting_modules, SYSTEM_INFO):
     try:
         setup_django_db_context(db_setting_modules)
+
         from mcos.apps.admin.system.models import SystemCluster
         from mcos.apps.admin.system.models import ObjectServiceInfo
-
         service_type = STORAGE_SERVICE_CONFIG['type']
         auth_info = STORAGE_SERVICE_CONFIG['auth_info']
         service_specs = STORAGE_SERVICE_CONFIG['specifications']
+        memcache_client = memcache.Client([(MEMCACHED_IP, MEMCACHED_PORT)])
         try:
             check_service_connection(service_type, auth_info)
             check_storage_service_specs(service_specs)
@@ -54,22 +58,27 @@ def connect_to_system(db_setting_modules, SYSTEM_INFO):
 
         if len(SystemCluster.objects.filter(
                 name=MCOS_CLUSTER_NAME).all()) == 0:
-            if CONNECT_SERVER == 'localhost':
-                cluster_id = local_setup(SystemCluster, ObjectServiceInfo)
+            if set_lock('cluster_setup_pid') is True:
+                if CONNECT_SERVER == 'localhost':
+                    cluster_id = local_setup(SystemCluster, ObjectServiceInfo)
+                else:
+                    cluster_id = remote_setup(CONNECT_SERVER, SystemCluster,
+                                              ObjectServiceInfo)
+                release_lock('cluster_setup_pid')
+                memcache_client.set('current_cluster_id', cluster_id)
             else:
-                cluster_id = remote_setup(CONNECT_SERVER, SystemCluster,
-                                          ObjectServiceInfo)
-
-            SYSTEM_INFO['current_cluster_id'] = cluster_id
+                raise SystemConnectionError(
+                    "Failed to setup cluster, another process is hold setup"
+                    "cluster lock. Try again later.")
         else:
             current_cluster = SystemCluster.objects.filter(
                 name=MCOS_CLUSTER_NAME).first()
-            SYSTEM_INFO['current_cluster_id'] = str(current_cluster.id)
+            memcache_client.set('current_cluster_id', str(current_cluster.id))
     except ProgrammingError:
         raise SystemConnectionError(
             "Failed to setup database, check config again.")
     except Exception as e:
-        print e.message
+        print(e.message)
         raise SystemConnectionError(e.message)
 
 
@@ -114,25 +123,6 @@ def local_setup(SystemCluster, ObjectServiceInfo):
     return str(current_cluster_info.id)
 
 
-def login_cluster(session, cluster_url, user_name, password):
-    try:
-        login_url = cluster_url + "auth/api_login/"
-        csrftoken = session.get(login_url).json()['csrftoken']
-        login_resp = session.post(login_url,
-                                  data={'csrfmiddlewaretoken': csrftoken,
-                                        'user_name_email': user_name,
-                                        'password': password},
-                                  timeout=20)
-        # check if login is success or not
-        if login_resp.status_code == 200:
-            return True
-        else:
-            return False
-    except Exception as e:
-        print e.message
-        return False
-
-
 def add_cluster_info_to_database(cluster_info_dict, SystemCluster,
                                  ObjectServiceInfo):
     cluster_service = ObjectServiceInfo.create_service_info_data(
@@ -157,9 +147,6 @@ def remote_setup(connect_server, SystemCluster, ObjectServiceInfo):
     service_type = STORAGE_SERVICE_CONFIG['type']
     auth_info = STORAGE_SERVICE_CONFIG['auth_info']
     service_specs = STORAGE_SERVICE_CONFIG['specifications']
-    # second, connect to remote server in config file
-    # to try to add this cluster to system
-    # last, retrieve cluster list from remote server and add this to database
     cluster_id = str(uuid.uuid4())
     cluster_name = MCOS_CLUSTER_NAME
     address_ip = MCOS_IP
@@ -170,66 +157,61 @@ def remote_setup(connect_server, SystemCluster, ObjectServiceInfo):
         'specifications': service_specs,
         'auth_info': auth_info,
     })
-    # send request to remote cluster
     try:
-        session = requests.Session()
         cluster_url = "http://" + connect_server + "/"
-        is_login = login_cluster(session, cluster_url, 'admin', 'bkcloud')
-        if is_login:
-            try:
-                retry_connect = True
-                while retry_connect:
-                    remote_connect_to_system_url = \
-                        cluster_url + "admin/system/remote_connect_to_system/"
-                    csrftoken = session.cookies['csrftoken']
-                    resp = session.post(
-                        remote_connect_to_system_url,
-                        data={
-                            'csrfmiddlewaretoken': csrftoken,
-                            'cluster_id': cluster_id,
-                            # 'cluster_id': '77c2e72f7a9d42c6894c6b3caac06197',
-                            'cluster_name': cluster_name,
-                            'cluster_ip': address_ip,
-                            'cluster_port': address_port,
-                            'service_info': service_info
-                        },
-                        timeout=125
-                    )
-                    status_code = resp.status_code
-                    if status_code == 200:
-                        resp_data = resp.json()
-                        if resp_data['is_connected_to_system'] == 'true':
-                            cluster_list = resp_data['cluster_list']
-                            for cluster_info in cluster_list:
-                                # add cluster_info to database
-                                add_cluster_info_to_database(cluster_info,
-                                                             SystemCluster,
-                                                             ObjectServiceInfo)
-                            return cluster_id
-                        else:
-                            # resp_data['is_connected_to_system'] == 'false'
-                            raise SystemConnectionError(
-                                "Failed to remote setup. "
-                                "Reason: System Reject remote setup"
-                                "at this time or an error has been occur. "
-                                "Try again later.")
+        get_csrf_token_url = cluster_url + \
+                             'admin/system/get_csrf_token'
+        remote_connect_to_system_url = \
+            cluster_url + "admin/system/remote_connect_to_system/"
+        mcos_admin_token = \
+            KeyStoneClient.create_admin_client().session.get_token()
+        session = requests.Session()
+        try:
+            retry_connect = True
+            while retry_connect:
+                req_headers = {'X-Auth-Token': mcos_admin_token}
+                csrftoken = session.get(
+                    url=get_csrf_token_url,
+                    headers=req_headers
+                ).json()['csrftoken']
+                system_connect_resp = session.post(
+                    remote_connect_to_system_url,
+                    headers=req_headers,
+                    data={
+                        'csrfmiddlewaretoken': csrftoken,
+                        'cluster_id': cluster_id,
+                        'cluster_name': cluster_name,
+                        'cluster_ip': address_ip,
+                        'cluster_port': address_port,
+                        'service_info': service_info
+                    },
+                    timeout=125
+                )
+                status_code = system_connect_resp.status_code
+                if status_code == 200:
+                    resp_data = system_connect_resp.json()
+                    if resp_data['is_connected_to_system'] == 'true':
+                        cluster_list = resp_data['cluster_list']
+                        for cluster_info in cluster_list:
+                            add_cluster_info_to_database(cluster_info,
+                                                         SystemCluster,
+                                                         ObjectServiceInfo)
+                        return cluster_id
                     else:
                         raise SystemConnectionError(
-                            "An Error has been occurred. "
-                            "Cannot setup remote setup for "
-                            "this cluster.")
-            except Exception as e:
-                print e.message
-                raise SystemConnectionError("An Error has been occurred. "
-                                            "Cannot setup remote setup for "
-                                            "this cluster.")
-        else:
-            raise SystemConnectionError("An Error has been occurred. "
-                                        "Cannot login to remote server for "
-                                        "remote setup this cluster.")
+                            "Failed to remote setup. "
+                            "Reason: System Reject remote setup")
+                else:
+                    raise SystemConnectionError(
+                        "An Error has been occurred when remote setup.")
+        except Exception as e:
+            print(e.message)
+            raise SystemConnectionError(
+                "An Error has been occurred when remote setup.")
+
         session.close()
     except Exception as e:
-        print e.message
+        print(e.message)
         raise SystemConnectionError("An Error has been occurred. "
                                     "Cannot connect to remote server for "
                                     "remote setup this cluster.")
@@ -286,7 +268,7 @@ def check_service_connection(service_type, access_info):
         service_connector.delete_container(TEST_CONTAINER_NAME)
         print('Checking service connection complete. No problem found.')
     except Exception as e:
-        print e.message
+        print(e.message)
         raise CheckStorageServiceError("Storage Service Checking Failed.")
 
 
@@ -337,5 +319,5 @@ def create_storage_container(service_type, access_info):
                     " Cannot Create Container.")
         print("Storage container is created.")
     except Exception as e:
-        print e.message
+        print(e.message)
         raise CheckStorageServiceError("Failed to create storage container.")

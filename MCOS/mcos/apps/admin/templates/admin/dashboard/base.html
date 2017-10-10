@@ -4,6 +4,8 @@
 
     <link href="{% static 'admin/dashboard/css/base.css' %}"
           rel="stylesheet" type="text/css">
+    <link href="{% static 'admin/dashboard/css/jquery.dataTables.min.css' %}"
+          rel="stylesheet" type="text/css">
 {% endblock %}
 
 {% block bodyclass %}
@@ -51,13 +53,15 @@
     <script type="text/javascript"
             src="{% static 'admin/dashboard/js/jquery.slimscroll.js' %}"></script>
     <script src="{% static "jquery/dist/jquery.min.js" %}"></script>
-    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+    <script src="{% static "admin/dashboard/js/jquery-ui.min.js" %}"></script>
     <!-- Resolve conflict in jQuery UI with Bootstrap -->
     <script>
         $.widget.bridge('uibutton', $.ui.button);
     </script>
     <script src="{% static "bootstrap/dist/js/bootstrap.min.js" %} "></script>
     <script src="{% static "admin-lte/dist/js/app.min.js" %}"></script>
+    <script src="{% static "admin/dashboard/js/jquery.dataTables.min.js" %}"></script>
+
     {% block user_javascript %}
     {% endblock %}
 {% endblock %}

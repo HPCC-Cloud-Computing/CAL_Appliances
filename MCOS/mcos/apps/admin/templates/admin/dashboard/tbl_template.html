@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Hệ thống quản lý chứng chỉ PGS</title>
+    <meta charset="UTF-8">
+    <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no'
+          name='viewport'>
+
+    <link href="/static/adminlte/js/plugins/datatables/dataTables.bootstrap.min.css?adminlte=2.3.3"
+          rel="stylesheet" type="text/css">
+
+    <link href="/static/adminlte/js/plugins/select2/select2.min.css?adminlte=2.3.3"
+          rel="stylesheet" type="text/css">
+
+
+    <!-- bootstrap -->
+    <link href="/static/adminlte/css/bootstrap.min.css?adminlte=2.3.3"
+          rel="stylesheet" type="text/css"/>
+    <!-- Toastr Notifications -->
+    <link href="/static/adminlte/css/toastr.min.css?adminlte=2.3.3"
+          rel="stylesheet"/>
+    <!-- font Awesome -->
+    <link href="/static/adminlte/css/font-awesome.min.css?adminlte=2.3.3"
+          rel="stylesheet" type="text/css"/>
+    <!-- Ionicons -->
+    <link href="/static/adminlte/css/ionicons.min.css?adminlte=2.3.3"
+          rel="stylesheet" type="text/css"/>
+    <!-- jvectormap -->
+    <link href="/static/adminlte/js/plugins/jvectormap/jquery-jvectormap-1.2.2.css?adminlte=2.3.3"
+          rel="stylesheet" type="text/css">
+    <!-- Theme style -->
+    <link href="/static/adminlte/css/AdminLTE.min.css?adminlte=2.3.3"
+          rel="stylesheet" type="text/css"/>
+    <!-- Skin  -->
+    <link href="/static/adminlte/css/skins/_all-skins.min.css?adminlte=2.3.3"
+          rel="stylesheet" type="text/css"/>
+    <!-- Pace -->
+    <link href="/static/adminlte/js/plugins/pace/pace.min.css?adminlte=2.3.3"
+          rel="stylesheet" type="text/css">
+    <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+
+</head>
+
+<body class="skin-green sidebar-mini">
+
+<noscript>
+
+
+</noscript>
+
+
+<div class="wrapper">
+    <header class="main-header">
+
+        <a href="/vi" class="logo">
+            <span class="logo-mini"><strong>PGS</strong></span>
+            <span class="logo-lg">PGS<strong> Cert Manager</strong></span>
+        </a>
+
+
+        <!-- Header Navbar: style can be found in header.less -->
+        <nav class="navbar navbar-static-top" role="navigation">
+
+            <!-- Sidebar toggle button-->
+            <a href="#" class="sidebar-toggle" data-toggle="offcanvas"
+               role="button">
+                <span class="sr-only">Kích hoạt trang điều phối</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+            <div class="navbar-custom-menu">
+                <ul class="nav navbar-nav">
+
+                    <!-- Notifications: style can be found in dropdown.less -->
+                    <li class="warning dropdown notifications-menu">
+                        <a href="#" class="dropdown-toggle"
+                           data-toggle="dropdown">
+                            <i class="fa fa-warning"></i>
+                            <span class="label label-warning">0</span>
+                        </a>
+                        <ul class="dropdown-menu"
+                            style="width: 200px;height: 79px;">
+                            <li class="header"><b>0</b> chứng chỉ sắp hết hạn!
+                            </li>
+                            <li>
+                                <!-- inner menu: contains the actual data -->
+                                <ul class="menu">
+                                    <li>
+                                        <a href="/vi/bao-cao/canh-bao">
+                                            <i class="fa fa-warning danger"></i>
+                                            Xem chi tiết!
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <!-- Language choosing -->
+                    <li class="dropdown notifications-menu">
+                        <a href="#" class="dropdown-toggle"
+                           data-toggle="dropdown">
+                            <i class="fa fa-globe"></i>
+                            <span class="label label-danger">vi</span>
+                        </a>
+                        <ul class="dropdown-menu"
+                            style="width: 140px;height: 120px;">
+                            <li class="header">Đổi ngôn ngữ.</li>
+                            <li>
+                                <!-- inner menu: contains the actual data -->
+                                <ul class="menu">
+                                    <li>
+                                        <a href="/vi/chung-chi-nhom">
+                                            <i class="fa fa-circle"></i>
+                                            Tiếng Việt
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/en/certificates-group">
+                                            <i class="fa fa-circle"></i>
+                                            Tiếng Anh
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+
+
+                    <!-- User Account: style can be found in dropdown.less -->
+                    <li class="dropdown user user-menu">
+                        <a href="#" class="dropdown-toggle"
+                           data-toggle="dropdown">
+                            <i class="glyphicon glyphicon-user"></i>
+                            <span> <i
+                                    class="caret"></i></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <!-- User image -->
+                            <li class="user-header bg-light-blue">
+                                <img src="/static/img/pgs-160x160.jpg"
+                                     class="img-circle"
+                                     alt="User Image"/>
+                                <p>
+                                    Regional Admin
+                                </p>
+                            </li>
+                            <!-- Menu Footer-->
+                            <li class="user-footer">
+                                <div class="pull-left">
+                                    <a href="#"
+                                       class="btn btn-default btn-flat">Hồ sơ
+                                        cá nhân</a>
+                                </div>
+                                <div class="pull-right">
+                                    <a href="/auth/logout"
+                                       class="btn btn-default btn-flat">Đăng
+                                        xuất</a>
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </div>
+        </nav>
+
+    </header>
+
+    <aside class="main-sidebar">
+        <section class="sidebar">
+            <!-- sidebar: style can be found in sidebar.less -->
+            <!-- sidebar menu: : style can be found in sidebar.less -->
+
+            <div class="user-panel">
+                <div class="pull-left image">
+                    <img src="/static/img/pgs-160x160.jpg" alt="User Image"
+                         class="img-circle">
+                </div>
+                <div class="pull-left info">
+                    <p>Regional Admin</p>
+                    <a href="#">
+                        <i class="fa fa-circle text-success"></i>
+                        Online
+                    </a>
+                </div>
+            </div>
+
+            <!-- search form -->
+            <form action="#" method="get" class="sidebar-form">
+                <div class="input-group">
+                    <input type="text" name="q" class="form-control"
+                           placeholder=Tìm kiếm...>
+                    <span class="input-group-btn">
+                <button type="submit" name="search" id="search-btn"
+                        class="btn btn-flat"><i class="fa fa-search"></i>
+                </button>
+              </span>
+                </div>
+            </form>
+            <!-- /.search form -->
+            <ul class="sidebar-menu">
+                <li class="header">DANH MỤC QUẢN LÝ PGS</li>
+                <li class="node">
+                    <a href="/vi">
+                        <i class="fa fa-dashboard"></i> <span>Tổng quan</span>
+                    </a>
+                </li>
+
+                <li class="treeview active">
+                    <a href="/vi/chung-chi">
+                        <i class="fa fa-balance-scale"></i>
+                        <span>Chứng chỉ</span>
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li class="active">
+                            <a href="/vi/chung-chi-nhom">
+                                <i class="fa fa-group"></i>
+                                Cấp cho nhóm
+                            </a>
+                        </li>
+                        <li class="node">
+                            <a href="/vi/chung-chi-nong-dan">
+                                <i class="fa fa-child"></i>
+                                Cấp cho cá nhân
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="node">
+                    <a href="/vi/nong-dan">
+                        <i class="fa fa-child"></i> <span>Nông dân</span>
+                    </a>
+                </li>
+                <li class="node">
+                    <a href="/vi/nhom">
+                        <i class="fa fa-group"></i> <span>Nhóm</span>
+                    </a>
+                </li>
+
+                <li class="node">
+                    <a href="/vi/lien-nhom">
+                        <i class="fa fa-home"></i> <span>Liên nhóm</span>
+                    </a>
+                </li>
+
+                <li class="alarm node">
+                    <a href="/vi/bao-cao/canh-bao">
+                        <i class="fa fa-warning"></i>
+                        Cảnh báo
+                        <span class="pull-right-container">
+                      <small class="label pull-right bg-yellow">0</small>
+                    </span>
+                    </a>
+                </li>
+
+
+                <li class="header">KHU VỰC QUẢN TRỊ</li>
+                <li class="treeview node">
+                    <a href="/vi/quan-tri">
+                        <i class="fa fa-key"></i>
+                        <span>Danh mục quản trị</span>
+                        <i class="fa fa-angle-left pull-right"></i>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li class="node">
+                            <a href="/vi/quan-tri/nguoi-dung">
+                                <i class="fa fa-user"></i>
+                                Người dùng hệ thống
+                            </a>
+                        </li>
+                        <li class="node">
+                            <a href="/vi/quan-tri/vung">
+                                <i class="fa fa-map"></i>
+                                Quản lý vùng PGS
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+
+            </ul>
+            <!-- /.sidebar -->
+        </section>
+    </aside>
+
+    <div class="content-wrapper">
+
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <h1>
+                Chứng nhận PGS
+                <small>Quản lý chứng nhận PGS</small>
+            </h1>
+            <ol class="breadcrumb">
+                <li><a href="/vi"><i
+                        class="fa fa-dashboard"></i> Trang chủ</a></li>
+                <li class="active"><a href="/vi/chung-chi"><i
+                        class="fa fa-balance-scale"></i>Chứng chỉ</a></li>
+            </ol>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+
+            <button type="button" class="btn addBtn btn-default "
+                    data-toggle="modal"
+                    data-target="#modal-add"
+
+            >
+                <span class="fa fa-plus"></span>
+                Tạo mới
+            </button>
+
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="box">
+                        <div class="box-header">
+                            <h3 class="box-title">Chứng nhận PGS</h3>
+                        </div>
+                        <!-- /.box-header -->
+                        <div class="box-body table-responsive">
+                            <table id="pgs_data"
+                                   class="table table-bordered table-hover">
+                                <thead>
+                                <tr>
+                                    <th>Mã</th>
+
+                                    <th>Cấp cho nhóm
+
+                                    <th>Diện tích/Số lượng</th>
+                                    <th>Tổng thành viên</th>
+                                    <th>Quyết định</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thanh tra</th>
+                                    <th>Ngày thanh tra</th>
+                                    <th>Ngày hết hạn</th>
+
+                                    <th>Thao tác</th>
+
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                            </table>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                    <!-- /.box -->
+                </div>
+                <!-- /.col -->
+            </div>
+            <!-- /.row -->
+            <div class="modal modal fade" id="modal-add"
+                 style="display: none">
+                <!-- .modal -->
+                <div class="modal-dialog ">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close"
+                                    data-dismiss="modal"
+                                    aria-label="Close">
+                                <span aria-hidden="true">×</span></button>
+                            <h4 class="modal-title">Tạo mới</h4>
+                        </div>
+                        <div class="modal-body">
+
+
+                            <form action="" method="post"
+                                  class="form" role="form">
+                                <input id="id" name="id" type="hidden"
+                                       value="">
+                                <input id="csrf_token" name="csrf_token"
+                                       type="hidden"
+                                       value="IjJmZThjN2ExMWZlNDU0MGIxZWZhZDgyOWZkYzk0YmRkOGY2N2Y1ZWIi.DK5V7A.ZdF90Vme80ZP1BXPlxaRj_tknK0">
+
+
+                                <div class="form-group  required"><label
+                                        class="control-label"
+                                        for="certificate_code">Mã chứng
+                                    chỉ</label>
+
+                                    <input class="form-control"
+                                           id="certificate_code"
+                                           name="certificate_code"
+                                           placeholder="Mã chứng chỉ" required
+                                           type="text" value="">
+
+                                </div>
+
+
+                                <div class="form-group  required"><label
+                                        class="control-label" for="group_area">Diện
+                                    tích</label>
+
+                                    <input class="form-control" id="group_area"
+                                           name="group_area"
+                                           placeholder="Diện tích" required
+                                           type="text" value="">
+
+                                </div>
+
+
+                                <div class="form-group  required"><label
+                                        class="control-label"
+                                        for="member_count">Tổng thành
+                                    viên</label>
+
+                                    <input class="form-control"
+                                           id="member_count"
+                                           name="member_count"
+                                           placeholder="Tổng thành viên"
+                                           required type="text" value="">
+
+                                </div>
+
+
+                                <div class="form-group "><label
+                                        class="control-label"
+                                        for="certificate_start_date">Ngày thanh
+                                    tra</label>
+
+                                    <input class="form-control"
+                                           id="certificate_start_date"
+                                           name="certificate_start_date"
+                                           placeholder="Ngày thanh tra"
+                                           type="date" value="">
+
+                                </div>
+
+
+                                <div class="form-group  required"><label
+                                        class="control-label"
+                                        for="gov_certificate_id">Quyết
+                                    định</label>
+
+                                    <input class="form-control"
+                                           id="gov_certificate_id"
+                                           name="gov_certificate_id"
+                                           placeholder="Quyết định" required
+                                           type="text" value="">
+
+                                </div>
+
+
+                                <div class="form-group "><label
+                                        class="control-label"
+                                        for="certificate_expiry_date">Ngày hết
+                                    hạn chứng chỉ</label>
+
+                                    <input class="form-control"
+                                           id="certificate_expiry_date"
+                                           name="certificate_expiry_date"
+                                           placeholder="Ngày hết hạn chứng chỉ"
+                                           type="date" value="">
+
+                                </div>
+
+
+                                <div class="form-group  required"><label
+                                        class="control-label" for="status">Trạng
+                                    thái</label>
+
+                                    <select class="form-control pgs_select"
+                                            id="status" name="status" required>
+                                        <option value="1">Phê duyệt</option>
+                                        <option value="2">Từ chối</option>
+                                        <option value="4">Phê chuẩn - no cc
+                                        </option>
+                                        <option value="3">Đang chuyển đổi
+                                        </option>
+                                    </select>
+
+                                </div>
+
+
+                                <div class="form-group  required"><label
+                                        class="control-label"
+                                        for="re_verify_status">Trạng thái thanh
+                                    tra</label>
+
+                                    <select class="form-control pgs_select"
+                                            id="re_verify_status"
+                                            name="re_verify_status" required>
+                                        <option value="1">Chưa kiểm tra
+                                        </option>
+                                        <option value="3">Thu hồi</option>
+                                        <option value="5">Phạt</option>
+                                        <option value="2">Hợp lệ</option>
+                                        <option value="4">Cảnh cáo</option>
+                                    </select>
+
+                                </div>
+
+
+                                <div class="form-group  required"><label
+                                        class="control-label"
+                                        for="load_now-farmer">Cho nông
+                                    dân</label>
+
+                                    <select class="form-control pgs_select"
+                                            id="load_now-farmer"
+                                            name="owner_farmer_id"
+                                            required></select>
+
+                                </div>
+
+
+                                <div class="form-group  required"><label
+                                        class="control-label"
+                                        for="load_now-group">Cho nhóm</label>
+
+                                    <select class="form-control pgs_select"
+                                            id="load_now-group"
+                                            name="owner_group_id"
+                                            required></select>
+
+                                </div>
+
+
+                                <input class="btn btn-default pgs_submit"
+                                       id="submit" name="submit" type="submit"
+                                       value="Lưu thông tin">
+
+
+                            </form>
+
+                        </div>
+
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+            <div class="modal modal fade" id="modal-edit"
+                 style="display: none">
+                <!-- .modal -->
+                <div class="modal-dialog ">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close"
+                                    data-dismiss="modal"
+                                    aria-label="Close">
+                                <span aria-hidden="true">×</span></button>
+                            <h4 class="modal-title">Cập nhật dữ liệu</h4>
+                        </div>
+                        <div class="modal-body">
+
+
+                            <form action="" method="post"
+                                  class="form" role="form">
+                                <input id="id" name="id" type="hidden"
+                                       value="">
+                                <input id="csrf_token" name="csrf_token"
+                                       type="hidden"
+                                       value="IjJmZThjN2ExMWZlNDU0MGIxZWZhZDgyOWZkYzk0YmRkOGY2N2Y1ZWIi.DK5V7A.ZdF90Vme80ZP1BXPlxaRj_tknK0">
+
+
+                                <div class="form-group  required"><label
+                                        class="control-label"
+                                        for="certificate_code">Mã chứng
+                                    chỉ</label>
+
+                                    <input class="form-control"
+                                           id="certificate_code"
+                                           name="certificate_code"
+                                           placeholder="Mã chứng chỉ" required
+                                           type="text" value="">
+
+                                </div>
+
+
+                                <div class="form-group  required"><label
+                                        class="control-label" for="group_area">Diện
+                                    tích</label>
+
+                                    <input class="form-control" id="group_area"
+                                           name="group_area"
+                                           placeholder="Diện tích" required
+                                           type="text" value="">
+
+                                </div>
+
+
+                                <div class="form-group  required"><label
+                                        class="control-label"
+                                        for="member_count">Tổng thành
+                                    viên</label>
+
+                                    <input class="form-control"
+                                           id="member_count"
+                                           name="member_count"
+                                           placeholder="Tổng thành viên"
+                                           required type="text" value="">
+
+                                </div>
+
+
+                                <div class="form-group "><label
+                                        class="control-label"
+                                        for="certificate_start_date">Ngày thanh
+                                    tra</label>
+
+                                    <input class="form-control"
+                                           id="certificate_start_date"
+                                           name="certificate_start_date"
+                                           placeholder="Ngày thanh tra"
+                                           type="date" value="">
+
+                                </div>
+
+
+                                <div class="form-group  required"><label
+                                        class="control-label"
+                                        for="gov_certificate_id">Quyết
+                                    định</label>
+
+                                    <input class="form-control"
+                                           id="gov_certificate_id"
+                                           name="gov_certificate_id"
+                                           placeholder="Quyết định" required
+                                           type="text" value="">
+
+                                </div>
+
+
+                                <div class="form-group "><label
+                                        class="control-label"
+                                        for="certificate_expiry_date">Ngày hết
+                                    hạn chứng chỉ</label>
+
+                                    <input class="form-control"
+                                           id="certificate_expiry_date"
+                                           name="certificate_expiry_date"
+                                           placeholder="Ngày hết hạn chứng chỉ"
+                                           type="date" value="">
+
+                                </div>
+
+
+                                <div class="form-group  required"><label
+                                        class="control-label" for="status">Trạng
+                                    thái</label>
+
+                                    <select class="form-control pgs_select"
+                                            id="status" name="status" required>
+                                        <option value="1">Phê duyệt</option>
+                                        <option value="2">Từ chối</option>
+                                        <option value="4">Phê chuẩn - no cc
+                                        </option>
+                                        <option value="3">Đang chuyển đổi
+                                        </option>
+                                    </select>
+
+                                </div>
+
+
+                                <div class="form-group  required"><label
+                                        class="control-label"
+                                        for="re_verify_status">Trạng thái thanh
+                                    tra</label>
+
+                                    <select class="form-control pgs_select"
+                                            id="re_verify_status"
+                                            name="re_verify_status" required>
+                                        <option value="1">Chưa kiểm tra
+                                        </option>
+                                        <option value="3">Thu hồi</option>
+                                        <option value="5">Phạt</option>
+                                        <option value="2">Hợp lệ</option>
+                                        <option value="4">Cảnh cáo</option>
+                                    </select>
+
+                                </div>
+
+
+                                <div class="form-group  required"><label
+                                        class="control-label"
+                                        for="load_now-farmer">Cho nông
+                                    dân</label>
+
+                                    <select class="form-control pgs_select"
+                                            id="load_now-farmer"
+                                            name="owner_farmer_id"
+                                            required></select>
+
+                                </div>
+
+
+                                <div class="form-group  required"><label
+                                        class="control-label"
+                                        for="load_now-group">Cho nhóm</label>
+
+                                    <select class="form-control pgs_select"
+                                            id="load_now-group"
+                                            name="owner_group_id"
+                                            required></select>
+
+                                </div>
+
+
+                                <input class="btn btn-default pgs_submit"
+                                       id="submit" name="submit" type="submit"
+                                       value="Lưu thông tin">
+
+
+                            </form>
+
+                        </div>
+
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+            <div class="modal modal-danger fade" id="modal-delete"
+                 style="display: none">
+                <!-- .modal -->
+                <div class="modal-dialog ">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close"
+                                    data-dismiss="modal"
+                                    aria-label="Close">
+                                <span aria-hidden="true">×</span></button>
+                            <h4 class="modal-title">Xác nhận xoá dữ liệu</h4>
+                        </div>
+                        <div class="modal-body">
+
+                            Bạn có thực sự muốn xoá dữ liệu này không?
+
+                            <form action="" method="post"
+                                  class="form" role="form">
+                                <input id="id" name="id" type="hidden"
+                                       value="">
+                                <input id="csrf_token" name="csrf_token"
+                                       type="hidden"
+                                       value="IjJmZThjN2ExMWZlNDU0MGIxZWZhZDgyOWZkYzk0YmRkOGY2N2Y1ZWIi.DK5V7A.ZdF90Vme80ZP1BXPlxaRj_tknK0">
+
+
+                                <div class="form-group "><label
+                                        class="control-label"
+                                        for="modify_info">Lý do</label>
+
+                                    <textarea class="form-control"
+                                              id="modify_info"
+                                              name="modify_info"
+                                              placeholder="Mô tả nguyên nhân xoá dữ liệu"></textarea>
+
+                                </div>
+
+
+                                <input class="btn btn-default pgs_submit"
+                                       id="pgs_del_submit" name="submit_del"
+                                       type="submit" value="Xoá dữ liệu!">
+
+
+                            </form>
+
+                        </div>
+
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+        </section><!-- /.content -->
+    </div>
+    <footer class="main-footer">
+        <div class="pull-right hidden-xs">
+
+            <b>Version</b> 2.3.11
+
+        </div>
+        <strong>Copyright © 2017</strong> All rights
+        reserved.
+    </footer>
+</div>
+
+
+<!-- jQuery -->
+<!--<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>-->
+<script src="/static/adminlte/js/plugins/jQuery/jquery-2.2.3.min.js?adminlte=2.3.3"></script>
+<!-- jQuery UI 1.11.4 -->
+<!--<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>-->
+<script src="/static/adminlte/js/plugins/jQueryUI/jquery-ui.min.js?adminlte=2.3.3"></script>
+<!-- Bootstrap -->
+<script src="/static/adminlte/js/bootstrap.min.js?adminlte=2.3.3"></script>
+<!-- Toastr Notifications -->
+<!--<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>-->
+<script src="/static/adminlte/js/plugins/toastr.min.js?adminlte=2.3.3"></script>
+<!-- PACE -->
+<script src="/static/adminlte/js/plugins/pace/pace.js?adminlte=2.3.3"></script>
+<!-- Slimscroll -->
+<script src="/static/adminlte/js/plugins/slimScroll/jquery.slimscroll.min.js?adminlte=2.3.3"></script>
+<!-- Fastclick -->
+<script src="/static/adminlte/js/plugins/fastclick/fastclick.min.js?adminlte=2.3.3"></script>
+<!-- AdminLTE App -->
+<script src="/static/adminlte/js/AdminLTE/app.min.js?adminlte=2.3.3"></script>
+<!-- Sparkline -->
+<script src="/static/adminlte/js/plugins/sparkline/jquery.sparkline.min.js?adminlte=2.3.3"></script>
+<!-- jvectormap -->
+<script src="/static/adminlte/js/plugins/jvectormap/jquery-jvectormap-1.2.2.min.js?adminlte=2.3.3"></script>
+<script src="/static/adminlte/js/plugins/jvectormap/jquery-jvectormap-world-mill-en.js?adminlte=2.3.3"></script>
+<!-- ChartJS 1.0.1 -->
+<script src="/static/adminlte/js/plugins/chartjs/Chart.min.js?adminlte=2.3.3"></script>
+<script>
+    /* turning flask flash messages into js popup notifications */
+    window.popupMessages = [];
+</script>
+<!-- Local application JS -->
+<script src="/static/adminlte/js/app.js?adminlte=2.3.3"></script>
+<script>
+    $.get('/certificate/nearly_expired', function (res, status, req) {
+        if (req.getResponseHeader('Content-Type') == 'application/json') {
+            count = req.getResponseHeader('X-Total-Count');
+            $("li.warning").find('span.label-warning').html(count);
+            $("li.warning").find('b').html(count);
+            $("li.alarm").find('small.label').html(count);
+        }
+    })
+</script>
+<!-- DataTables with select2 enabled -->
+
+
+<script src="/static/adminlte/js/plugins/datatables/jquery.dataTables.js?adminlte=2.3.3"></script>
+<script src="/static/adminlte/js/plugins/datatables/dataTables.bootstrap.min.js?adminlte=2.3.3"></script>
+<script src="/static/adminlte/js/plugins/datatables/extensions/Buttons/js/dataTables.buttons.min.js?adminlte=2.3.3"></script>
+<script src="/static/adminlte/js/plugins/datatables/extensions/Buttons/js/buttons.bootstrap.min.js?adminlte=2.3.3"></script>
+<script src="/static/adminlte/js/plugins/datatables/extensions/Buttons/js/buttons.print.min.js?adminlte=2.3.3"></script>
+<script src="/static/adminlte/js/plugins/datatables/extensions/Buttons/js/buttons.html5.min.js?adminlte=2.3.3"></script>
+<script src="/static/adminlte/js/plugins/datatables/extensions/Buttons/js/jszip.min.js?adminlte=2.3.3"></script>
+<script src="/static/adminlte/js/plugins/datatables/extensions/Buttons/js/pdfmake.min.js?adminlte=2.3.3"></script>
+<script src="/static/adminlte/js/plugins/datatables/extensions/Buttons/js/vfs_fonts.js?adminlte=2.3.3"></script>
+
+<script src="/static/adminlte/js/plugins/select2/select2.min.js?adminlte=2.3.3"></script>
+
+<!-- page script -->
+<script>
+    $(function () {
+        function create_dataTable() {
+            var table = $('#pgs_data').DataTable({
+
+
+                "serverSide": true,
+                "ajax": function (data, callback, settings) {
+                    var sort_column_name = data.columns[data.order[0].column].data;
+                    var direction = data.order[0].dir == 'asc' ? true : false
+                    var where_params = {}
+
+                    where_params = {"_deleted_at": null}
+
+                    var sort_params = {}
+                    sort_params[sort_column_name] = direction;
+                    if (data.search.value) {
+                        for (idx in data.columns) {
+                            if (data.columns[idx].searchable &&
+                                data.columns[idx].data != "_deleted_at" &&
+                                data.columns[idx].data != "group_area" &&
+                                data.columns[idx].data != "member_count" &&
+                                data.columns[idx].data != "certificate_start_date" &&
+                                data.columns[idx].data != "certificate_expiry_date") {
+                                where_params[data.columns[idx].data] = {};
+                                where_params[data.columns[idx].data]["$contains"] = data.search.value;
+                            }
+                        }
+                    }
+                    ;
+                    $.get('/certificate/groups', {
+                            per_page: data.length,
+                            page: data.start / data.length + 1,
+                            where: JSON.stringify(where_params),
+                            sort: JSON.stringify(sort_params)
+                        },
+                        function (res, status, req) {
+                            callback({
+                                recordsTotal: req.getResponseHeader('X-Total-Count'),
+                                recordsFiltered: req.getResponseHeader('X-Total-Count'),
+                                data: res
+                            });
+                        });
+                },
+
+                "columns": [
+                    {
+                        "data": "certificate_code",
+                        "orderable": true,
+                        "searchable": true,
+                        "render": function (data, type, row) {
+                            return "<a>" + (data ? data : '') + "</a>"
+                        }
+                    },
+                    {
+                        "data": "owner_group.name",
+                        "orderable": false,
+                        "searchable": false,
+                        "render": function (data, type, row) {
+                            return "<b>" + (data ? data : '') + "</b>"
+                        }
+                    },
+                    {
+                        "data": "group_area",
+                        "orderable": true,
+                        "searchable": true,
+                        "render": function (data, type, row) {
+                            return "<b>" + (data ? data : '') + "</b>"
+                        }
+                    },
+                    {
+                        "data": "member_count",
+                        "orderable": true,
+                        "searchable": true,
+                    },
+                    {
+                        "data": "gov_certificate_id",
+                        "orderable": true,
+                        "searchable": true,
+                    },
+                    {
+                        "data": "status",
+                        "orderable": true,
+                        "searchable": true,
+                        "render": function (data, type, row) {
+                            return "" + (data == 1 ? "<div class=\"form-group has-success\"><label class=\"control-label\"><i class=\"fa fa-check-circle-o\"></i> Phê chuẩn</label></div>" : data == 2 ? "<div class=\"form-group has-error\"><label class=\"control-label\"><i class=\"fa fa-times-circle-o\"></i> Từ chối</label></div>" : data == 3 ? "<div class=\"form-group has-warning\"><label class=\"control-label\"><i class=\"fa fa-warning\"></i> Đang chuyển đổi</label></div>" : "<div class=\"form-group has-success\"><label class=\"control-label\"><i class=\"fa fa-check-circle-o\"></i>Phê chuẩn - no cc</label></div>") + ""
+                        }
+                    },
+                    {
+                        "data": "re_verify_status",
+                        "orderable": true,
+                        "searchable": true,
+                        "render": function (data, type, row) {
+                            return "" + (data == 1 ? "<div class=\"form-group has-warning\"><label class=\"control-label\"><i class=\"fa fa-warning\"></i> Chưa thanh tra</label></div>" : data == 2 ? "<div class=\"form-group has-success\"><label class=\"control-label\"><i class=\"fa fa-check-circle-o\"></i> Duy trì</label></div>" : data == 3 ? "<div class=\"form-group has-error\"><label class=\"control-label\"><i class=\"fa fa-times-circle-o\"></i> Thu hồi</label></div>" : data == 4 ? "<div class=\"form-group has-warning\"><label class=\"control-label\"><i class=\"fa fa-warning\"></i> Cảnh cáo</label></div>" : "<div class=\"form-group has-error\"><label class=\"control-label\"><i class=\"fa fa-times-circle-o\"></i> Phạt</label></div>") + ""
+                        }
+                    },
+                    {
+                        "data": "certificate_start_date",
+                        "orderable": true,
+                        "searchable": true,
+                    },
+                    {
+                        "data": "certificate_expiry_date",
+                        "orderable": true,
+                        "searchable": true,
+                    },
+                    {
+                        "orderable": false, "searchable": false,
+                        "render": function (data, type, row) {
+                            data_attr = ''
+                            row_attr = Object.keys(row)
+                            for (idx in row_attr) {
+                                if (row_attr[idx].startsWith('_') == false) {
+                                    value = row[row_attr[idx]]
+                                    data_attr += 'data-' + row_attr[idx].replace(/[$]/g, '') + '="' + value + '" '
+                                }
+                            }
+                            return "<button type=\"button\" class=\"btn editBtn btn-xs btn-info\"" +
+                                "data-toggle=\"modal\" data-target=\"#modal-edit\"" +
+                                data_attr +
+                                ">" +
+                                "<i class=\"fa fa-edit\"></i></button>" +
+                                " " +
+
+                                "<button type=\"button\" class=\"btn btn-xs delBtn btn-danger\"" +
+                                "data-toggle=\"modal\" data-target=\"#modal-delete\"" +
+                                data_attr +
+                                ">" +
+                                "<i class=\"fa fa-trash\"></i></button>"
+                        }
+                    },
+                ],
+
+                "language": {
+                    "url": "/static/vi.json"
+                },
+                buttons: [
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="fa fa-file-excel-o"></i>',
+                        titleAttr: 'Excel',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+                        }
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fa fa-file-pdf-o"></i>',
+                        titleAttr: 'PDF',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fa fa-print"></i>',
+                        titleAttr: 'Print',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+                        }
+                    }
+                ],
+                "processing": true,
+                "paging": true,
+                "pagingType": "full_numbers",
+                "lengthChange": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": true,
+
+                "drawCallback": function (settings) {
+                    $('.editBtn').on('click', function (event) {
+
+                        var data = $(this).data()
+                        var modal = $('#modal-edit')
+
+                        function call_ajax(url, resource, id_resource, element_id, default_value) {
+                            $.ajax({
+                                type: "get",
+                                url: url,
+                                data: 'where={"' + resource + '": ' +
+                                '{"$ref": "/' + resource + '/' + id_resource + '"} }',
+                                success: function (data, text) {
+                                    var select2_data = [];
+                                    for (var i = 0; i < data.length; i++) {
+                                        select2_data[i] = {
+                                            id: data[i]['$id'],
+                                            text: data[i].type + " " + data[i].name
+                                        }
+                                    }
+                                    modal.find('#' + element_id).select2({
+                                        width: '100%',
+                                        data: select2_data
+                                    })
+                                        .val(default_value).trigger('change.select2');
+                                },
+                                error: function (request, status, error) {
+                                    console.log(request);
+                                    console.log(error);
+                                    alert(request.responseText);
+                                }
+                            });
+                        }
+
+                        var s2 = $('.pgs_multi_select')
+                        var multi_select_data = []
+                        for (var key in data) {
+                            var target = modal.find('#' + key)
+                            var get_resource = key.split('_id');
+                            if (!target.length && get_resource.length > 1) {
+                                target = modal.find('#load_now-' + get_resource[0]);
+                            }
+                            value = ''
+                            if (data[key] != 'None') {
+                                value = data[key]
+                            }
+                            if (target.is('select')) {
+                                target.val(data[key]).trigger('change.select2')
+                            } else {
+                                modal.find('#' + key).val(value)
+                            }
+                            if (key.startsWith('multiSelect')) {
+                                multi_select_data.push(data[key])
+                            }
+                        }
+                        if (s2.length > 0 && multi_select_data.length > 0) {
+                            s2.val(multi_select_data).trigger("change")
+                        }
+
+                        var op = modal.find('#old_pass')
+                        if (op.length > 0) {
+                            op.parent().removeClass('hidden')
+                            modal.find('#password').prop('required', false)
+                            modal.find('#password').parent().removeClass('required')
+                            modal.find('#confirm').prop('required', false)
+                            modal.find('#confirm').parent().removeClass('required')
+                        }
+
+                        if (data['province_id'] && data['district_id']) {
+                            modal.find('#district_id').empty();
+                            call_ajax('/district', 'province', data['province_id'],
+                                'district_id', data['district_id']);
+                        }
+
+                        if (data['district_id'] && data['ward_id']) {
+                            modal.find('#ward_id').empty();
+                            call_ajax('/ward', 'district', data['district_id'],
+                                'ward_id', data['ward_id']);
+                        }
+
+
+                    })
+                    $('.addBtn').on('click', function (event) {
+                        var modal_add = $('#modal-add')
+                        modal_add.find('#id').val('')
+                        var op = modal_add.find('#old_pass')
+                        if (op.length > 0) {
+                            op.parent().addClass('hidden')
+                            modal_add.find('#password').prop('required', true)
+                            modal_add.find('#password').parent().addClass('required')
+                            modal_add.find('#confirm').prop('required', true)
+                            modal_add.find('#confirm').parent().addClass('required')
+                        }
+                    })
+                    $('.delBtn').on('click', function (event) {
+                        var data = $(this).data()
+                        var modal_del = $('#modal-delete')
+                        modal_del.find('#id').val(data['id'])
+                    })
+                    $('#pgs_del_submit').removeClass('btn-primary')
+                        .addClass('btn-warning')
+
+
+                },
+                "initComplete": function (settings, json) {
+                    $('.addBtn').appendTo('#pgs_data_filter');
+                    $('.addBtn').css("margin-left", "5px");
+
+                    table.buttons().container().appendTo('#pgs_data_filter');
+                    $('.dt-buttons').css("margin-left", "5px")
+
+                    $('#pgs_data_filter label').append('<select class="form-control input-sm" id="search_type"' +
+                        'style="display: inline-block; width: auto;">' +
+                        '<option value="none_delete">Hiện tại</option>' +
+                        '<option value="deleted">Đã xóa</option>' +
+                        '</select>'
+                    )
+
+                    $('#search_type').change(function () {
+                        var search_type = $('#search_type').val();
+                        if (search_type == "deleted") {
+                            table.destroy();
+                            $('#pgs_data').empty();
+                            var columns = [
+                                {
+                                    "data": "certificate_code",
+                                    "orderable": true,
+                                    "searchable": true,
+                                    "title": "Mã",
+                                    "render": function (data, type, row) {
+                                        return "<a>" + (data ? data : '') + "</a>"
+                                    }
+                                },
+
+                                {
+                                    "data": "owner_group.name",
+                                    "orderable": false,
+                                    "searchable": false,
+                                    "title": "Cấp cho nhóm",
+                                    "render": function (data, type, row) {
+                                        return "<b>" + (data ? data : '') + "</b>"
+                                    }
+                                },
+
+                                {
+                                    "data": "group_area",
+                                    "orderable": true,
+                                    "searchable": true,
+                                    "title": "Diện tích/Số lượng",
+                                    "render": function (data, type, row) {
+                                        return "<b>" + (data ? data : '') + "</b>"
+                                    }
+                                },
+
+                                {
+                                    "data": "member_count",
+                                    "orderable": true,
+                                    "searchable": true,
+                                    "title": "Tổng thành viên",
+                                },
+
+                                {
+                                    "data": "gov_certificate_id",
+                                    "orderable": true,
+                                    "searchable": true,
+                                    "title": "Quyết định",
+                                },
+
+                                {
+                                    "data": "status",
+                                    "orderable": true,
+                                    "searchable": true,
+                                    "title": "Trạng thái",
+                                    "render": function (data, type, row) {
+                                        return "" + (data == 1 ? "<div class=\"form-group has-success\"><label class=\"control-label\"><i class=\"fa fa-check-circle-o\"></i> Phê chuẩn</label></div>" : data == 2 ? "<div class=\"form-group has-error\"><label class=\"control-label\"><i class=\"fa fa-times-circle-o\"></i> Từ chối</label></div>" : data == 3 ? "<div class=\"form-group has-warning\"><label class=\"control-label\"><i class=\"fa fa-warning\"></i> Đang chuyển đổi</label></div>" : "<div class=\"form-group has-success\"><label class=\"control-label\"><i class=\"fa fa-check-circle-o\"></i>Phê chuẩn - no cc</label></div>") + ""
+                                    }
+                                },
+
+                                {
+                                    "data": "re_verify_status",
+                                    "orderable": true,
+                                    "searchable": true,
+                                    "title": "Thanh tra",
+                                    "render": function (data, type, row) {
+                                        return "" + (
+                                                data == 1 ? "<div class=\"form-group has-warning\"><label class=\"control-label\"><i class=\"fa fa-warning\"></i> Chưa thanh tra</label></div>" :
+                                                    data == 2 ? "<div class=\"form-group has-success\"><label class=\"control-label\"><i class=\"fa fa-check-circle-o\"></i> Duy trì</label></div>" :
+                                                        data == 3 ? "<div class=\"form-group has-error\"><label class=\"control-label\"><i class=\"fa fa-times-circle-o\"></i> Thu hồi</label></div>" :
+                                                            data == 4 ? "<div class=\"form-group has-warning\"><label class=\"control-label\"><i class=\"fa fa-warning\"></i> Cảnh cáo</label></div>" :
+                                                                "<div class=\"form-group has-error\"><label class=\"control-label\"><i class=\"fa fa-times-circle-o\"></i> Phạt</label></div>") + ""
+                                    }
+                                },
+
+                                {
+                                    "data": "certificate_start_date",
+                                    "orderable": true,
+                                    "searchable": true,
+                                    "title": "Ngày thanh tra",
+                                },
+
+                                {
+                                    "data": "certificate_expiry_date",
+                                    "orderable": true,
+                                    "searchable": true,
+                                    "title": "Ngày hết hạn",
+                                },
+
+                                {
+                                    "data": "_deleted_at",
+                                    "title": "Thời điểm xóa",
+                                    "searchable": "true"
+                                },
+                                {
+                                    "data": "_modify_info",
+                                    "title": "Lý do",
+                                    "searchable": "true"
+                                },
+                            ];
+                            table = $('#pgs_data').DataTable({
+
+                                "serverSide": true,
+                                "ajax": function (data, callback, settings) {
+                                    var sort_column_name = data.columns[data.order[0].column].data;
+                                    var direction = data.order[0].dir == 'asc' ? true : false
+                                    var where_params = {}
+
+                                    var sort_params = {}
+                                    sort_params[sort_column_name] = direction;
+                                    if (data.search.value) {
+                                        for (idx in data.columns) {
+                                            if (data.columns[idx].searchable &&
+                                                data.columns[idx].data != "_deleted_at" &&
+                                                data.columns[idx].data != "group_area" &&
+                                                data.columns[idx].data != "member_count" &&
+                                                data.columns[idx].data != "certificate_start_date" &&
+                                                data.columns[idx].data != "certificate_expiry_date") {
+                                                where_params[data.columns[idx].data] = {};
+                                                where_params[data.columns[idx].data]["$contains"] = data.search.value;
+                                            }
+                                        }
+                                    }
+                                    ;
+                                    $.get('/certificate/groups/deleted', {
+                                            per_page: data.length,
+                                            page: data.start / data.length + 1,
+                                            where: JSON.stringify(where_params),
+                                            sort: JSON.stringify(sort_params)
+                                        },
+                                        function (res, status, req) {
+                                            callback({
+                                                recordsTotal: req.getResponseHeader('X-Total-Count'),
+                                                recordsFiltered: req.getResponseHeader('X-Total-Count'),
+                                                data: res
+                                            });
+                                        });
+                                },
+
+
+                                "language": {
+                                    "url": "/static/vi.json"
+                                },
+                                buttons: [
+                                    {
+                                        extend: 'excelHtml5',
+                                        text: '<i class="fa fa-file-excel-o"></i>',
+                                        titleAttr: 'Excel',
+                                        exportOptions: {
+                                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+                                        }
+                                    },
+                                    {
+                                        extend: 'pdfHtml5',
+                                        text: '<i class="fa fa-file-pdf-o"></i>',
+                                        titleAttr: 'PDF',
+                                        exportOptions: {
+                                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+                                        }
+                                    },
+                                    {
+                                        extend: 'print',
+                                        text: '<i class="fa fa-print"></i>',
+                                        titleAttr: 'Print',
+                                        exportOptions: {
+                                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+                                        }
+                                    }
+                                ],
+                                "processing": true,
+                                "paging": true,
+                                "pagingType": "full_numbers",
+                                "lengthChange": true,
+                                "searching": true,
+                                "ordering": true,
+                                "info": true,
+                                "autoWidth": true,
+
+                                columns: columns,
+                                "initComplete": function (settings, json) {
+
+                                    table.buttons().container().appendTo('#pgs_data_filter');
+                                    $('.dt-buttons').css("margin-left", "5px")
+
+                                    $('#pgs_data_filter label').append('<select class="form-control input-sm" id="search_type"' +
+                                        'style="display: inline-block; width: auto;">' +
+                                        '<option value="none_delete">Hiện tại</option>' +
+                                        '<option value="deleted">Đã xóa</option>' +
+                                        '</select>'
+                                    )
+
+                                    var search_type_element = $("#search_type");
+                                    search_type_element.val('deleted');
+                                    search_type_element.change(function () {
+                                        var search_type = search_type_element.val();
+                                        if (search_type == "none_delete") {
+                                            table.destroy();
+                                            $('#pgs_data').empty();
+                                            table = create_dataTable();
+                                        }
+                                    });
+                                }
+                            })
+                        }
+                    });
+                },
+            })
+            return table;
+        }
+
+        var table = create_dataTable();
+
+
+        if (certificate / groups == 'certificate/groups') {
+            $('#load_now-farmer').parent().remove();
+        } else if (certificate / groups == 'certificate/farmers') {
+            $('#load_now-group').parent().remove();
+        }
+
+
+        $(".pgs_select").select2({width: '100%'});
+        var select2_elements = $('select')
+
+        function select2_ajax(i, h, resource) {
+            $.ajax({
+                type: "get",
+                url: "/" + resource + "/select2",
+                success: function (data) {
+                    var temp_arr = []
+                    for (var j in data) {
+                        temp_arr[j] = {
+                            id: data[j]['$id']
+                        }
+                        if (resource == 'province') {
+                            temp_arr[j]['text'] = data[j].type + " " + data[j].name
+                        } else {
+                            temp_arr[j]['text'] = data[j].name
+                        }
+                    }
+                    $(select2_elements[i]).select2({
+                        width: '100%',
+                        data: temp_arr
+                    });
+                    $(select2_elements[i + h]).select2({
+                        width: '100%',
+                        data: temp_arr
+                    });
+                },
+                error: function (request, status, error) {
+                    console.log(request);
+                    console.log(error);
+                    alert(request.responseText);
+                }
+            });
+        }
+
+        if (select2_elements.length) {
+            var h = select2_elements.length / 2;
+            for (var i = 0; i < h; i++) {
+                var element_id = select2_elements[i].getAttribute('id');
+                if (element_id.startsWith('load_now')) {
+                    var resource = element_id.split('-')[1]
+                    if (resource == 'province') {
+                        if (!0) {
+                            select2_ajax(i, h, resource);
+                        }
+                    } else {
+                        select2_ajax(i, h, resource);
+                    }
+                }
+            }
+        }
+
+
+        $('.pgs_submit').removeClass('btn-default')
+            .addClass('btn-primary pull-right')
+            .before("<hr />")
+        $('.pgs_submit').parent()
+            .append('<button type="button" class="pgs_dismiss_modal btn btn-default"' +
+                'data-dismiss="modal">Cancel</button>');
+
+
+    });
+</script>
+
+
+</body>
+</html>

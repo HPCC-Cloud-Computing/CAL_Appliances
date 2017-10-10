@@ -37,9 +37,12 @@ INSTALLED_APPS = [
 ]
 
 PROJECT_APPS = [
-    'mcos.apps.authentication',
     'django_adminlte',
+    'mcos.apps.authentication',
     'mcos.apps.admin',
+    # 'mcos.apps.user',
+    'mcos.apps.handle_exceptions'
+
     # 'mcos.apps.user_dashboard',
     # 'mcos.apps.lookup',
 ]

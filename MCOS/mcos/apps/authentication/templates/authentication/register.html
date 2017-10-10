@@ -18,80 +18,49 @@
             <div class="form-group">
                 <div class="row">
                     <label class="control-label col-md-4"
-                           for="{{ user_form.user_name.id_for_label }}">
-                        {{ user_form.user_name.label }}
+                           for="{{ register_form.user_name.id_for_label }}">
+                        {{ register_form.user_name.label }}
                     </label>
                     <div class="col-md-8">
-                        {{ user_form.user_name|addclass:"form-control" }}
+                        {{ register_form.user_name|addclass:"form-control" }}
                     </div>
                 </div>
                 <div class="row form-error">
                     <div class="col-md-offset-4 col-md-8 text-danger">
-                        {{ user_form.user_name.errors }}
+                        {{ register_form.user_name.errors }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <label class="control-label col-md-4"
+                           for="{{ register_form.password.id_for_label }}">
+                        {{ register_form.password.label }}
+                    </label>
+                    <div class="col-md-8">
+                        {{ register_form.password|addclass:"form-control" }}
+                    </div>
+                </div>
+                <div class="row form-error">
+                    <div class="col-md-offset-4 col-md-8 text-danger">
+                        {{ register_form.password.errors }}
                     </div>
                 </div>
             </div>
             <div class="form-group">
                 <div class="row">
                     <label class="control-label col-md-4"
-                           for="{{ user_form.email.id_for_label }}">
-                        {{ user_form.email.label }}
+                           for="{{ register_form.retype_password.id_for_label }}">
+                        {{ register_form.retype_password.label }}
                     </label>
                     <div class="col-md-8">
-                        {{ user_form.email|addclass:"form-control" }}
+                        {{ register_form.retype_password|addclass:"form-control" }}
                     </div>
                 </div>
                 <div class="row form-error">
                     <div class="col-md-offset-4 col-md-8 text-danger">
-                        {{ user_form.email.errors }}
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="row">
-                    <label class="control-label col-md-4"
-                           for="{{ user_form.password.id_for_label }}">
-                        {{ user_form.password.label }}
-                    </label>
-                    <div class="col-md-8">
-                        {{ user_form.password|addclass:"form-control" }}
-                    </div>
-                </div>
-                <div class="row form-error">
-                    <div class="col-md-offset-4 col-md-8 text-danger">
-                        {{ user_form.password.errors }}
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="row">
-                    <label class="control-label col-md-4"
-                           for="{{ user_form.retype_password.id_for_label }}">
-                        {{ user_form.retype_password.label }}
-                    </label>
-                    <div class="col-md-8">
-                        {{ user_form.retype_password|addclass:"form-control" }}
-                    </div>
-                </div>
-                <div class="row form-error">
-                    <div class="col-md-offset-4 col-md-8 text-danger">
-                        {{ user_form.retype_password.errors }}
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="row">
-                    <label class="control-label col-md-4"
-                           for="{{ user_profile_form.company.id_for_label }}">
-                        {{ user_profile_form.company.label }}
-                    </label>
-                    <div class="col-md-8">
-                        {{ user_profile_form.company|addclass:"form-control" }}
-                    </div>
-                </div>
-                <div class="row form-error">
-                    <div class="col-md-offset-4 col-md-8 text-danger">
-                        {{ user_profile_form.company.errors }}
+                        {{ register_form.retype_password.errors }}
                     </div>
                 </div>
             </div>

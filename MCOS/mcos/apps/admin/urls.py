@@ -17,3 +17,13 @@ urls = [
 urlpatterns = urls
 # urlpatterns = urls + static(settings.MEDIA_URL,
 #                             document_root=settings.MEDIA_ROOT)
+
+
+def my_login_required(function):
+    def wrapper(request, *args, **kw):
+        user=request.user
+        if not (user.id and request.session.get('code_success')):
+            return HttpResponseRedirect('/splash/')
+        else:
+            return function(request, *args, **kw)
+    return wrapper

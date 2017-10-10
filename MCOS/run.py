@@ -11,7 +11,6 @@ from os.path import abspath, dirname
 import os
 import signal
 path.insert(0, os.getcwd())
-print os.getcwd()
 from mcos.sub_processes import manage as sub_procs_manage
 
 

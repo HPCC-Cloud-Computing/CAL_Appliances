@@ -7,8 +7,8 @@ from . import views
 
 urls = \
     [
-        url(r'^cluster_list/$',
-            views.get_cluster_list, name='cluster_list'),
+        url(r'^get_csrf_token', views.get_csrf_token, name='get_csrf_token'),
+        url(r'^cluster_list/$',views.get_cluster_list, name='cluster_list'),
         url(r'^remote_connect_to_system/',
             views.remote_connect_to_system,
             name='remote_connect_to_system'),
@@ -21,7 +21,6 @@ urls = \
         url(r'^release_add_cluster_perm/',
             views.release_add_cluster_perm,
             name='release_add_cluster_perm')
-
 
         # url(r'^cluster_list_secured/$',
         #     views.get, name='cluster_list_secured'),

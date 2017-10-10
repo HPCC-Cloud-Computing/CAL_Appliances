@@ -1,0 +1,101 @@
+{% extends 'user_dashboard/base.html' %}
+{% block brand %}
+<a class="navbar-brand" href="#">User Profile</a>
+{% endblock %}
+{% block main %}
+<div class="row">   
+    {% load static %}
+    <form id="user-update-form" action="{% url 'user' %}" method="POST" enctype="multipart/form-data">
+        <div class="col-lg-4 col-md-7">
+            <div class="card card-user">
+                <div class="image"></div>
+                    <div class="content">
+                        <div class="author">
+                          <img class="avatar border-white" src="{{ MEDIA_ROOT }}{{ user.profile.image.url }}" alt="..."/>
+                          <div class="avatar-upload text-center form-group" style="position: relative">
+                              <label class="btn btn-warning btn-fill">Upload new profile picture</label>
+                              <input type="file" name="image" style="position: absolute; opacity: 0; top: 0; left: 0; right: 0; bottom: 0">
+                          </div>
+                          <h4 class="title">{{ user.get_full_name }}<br/>
+                             <a href="#"><small>@{{ user.username }}</small></a>
+                          </h4>
+                        </div>
+                        <p class="description text-center">
+                            {{ user.profile.bio }}
+                        </p>
+                    </div>
+            </div>
+        </div>
+        <div class="col-lg-8 col-md-7">
+            <div class="card">
+                <div class="header">
+                    <h4 class="title">Edit Profile</h4>
+                </div>
+                <div class="content">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>First name</label>
+                                <input type="text" class="form-control border-input" placeholder="Your firstname" value="{{ user.first_name }}" name="firstname">
+                            </div>
+                        </div>
+                         <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Last name</label>
+                                <input type="text" class="form-control border-input" placeholder="Your lastname" value="{{ user.last_name }}" name="lastname">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" class="form-control border-input" placeholder="Your email" value="{{ user.email }}" name="email">
+                            </div>
+                        </div>
+                         <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Password</label>
+                                <input type="password" class="form-control border-input" placeholder="Your password" value="{{ user.password }}" name="password">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Company</label>
+                                <input type="text" class="form-control border-input" placeholder="Your company" value="{{ user.profile.company }}" name="company">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Localtion</label>
+                                <input type="text" class="form-control border-input" placeholder="Your address" value="{{ user.profile.localtion }}" name="location">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Bio</label>
+                                <textarea rows="5" class="form-control border-input" placeholder="Here can be your description" value="{{ user.profile.bio }}" name="bio"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-info btn-fill btn-wd">Update Profile</button>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </form>
+ <!--    <form action="{% url 'user' %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+        {{ user_form.as_p }}
+        {{ profile_form.as_p }}
+        <button type="submit">Submit</button>
+    </form> -->
+</div>
+{% endblock %}

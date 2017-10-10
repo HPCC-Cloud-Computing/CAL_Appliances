@@ -23,28 +23,29 @@ from mcos.apps.admin.system.models import SystemCluster
 @app.task(ignore_result=True)
 def update_cluster_status(cluster_id, cluster_status, update_timestamp):
     try:
-        print "input info"
-        print cluster_id
-        print cluster_status
-        print update_timestamp
-        print "end input info"
-        msg_sender_cluster = SystemCluster.objects.filter(
-            id=cluster_id).first()
+        # print "input info"
+        # print cluster_id
+        # print cluster_status
+        # print update_timestamp
+        # print "end input info"
         current_time = timezone.now()
         update_time = pytz.utc.localize(
             timezone.datetime.fromtimestamp(update_timestamp))
         cluster_expiry_time = current_time - timezone.timedelta(
             seconds=PERIODIC_CHECK_STATUS_TIME)
-        print cluster_expiry_time
-        print update_time
-        print current_time
-        print msg_sender_cluster.last_update
-        # only check message in valid time interval
-        if update_time >= cluster_expiry_time and \
-                update_time >= msg_sender_cluster.last_update:
-            msg_sender_cluster.status = cluster_status
-            msg_sender_cluster.last_update= update_time
-            msg_sender_cluster.save()
+        if update_time >= cluster_expiry_time:
+            msg_sender_cluster = SystemCluster.objects.filter(
+                id=cluster_id).first()
+
+            # print cluster_expiry_time
+            # print update_time
+            # print current_time
+            # print msg_sender_cluster.last_update
+            # only check message in valid time interval
+            if update_time >= msg_sender_cluster.last_update:
+                msg_sender_cluster.status = cluster_status
+                msg_sender_cluster.last_update = update_time
+                msg_sender_cluster.save()
     except Exception as e:
         print e
 

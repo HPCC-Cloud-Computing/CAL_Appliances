@@ -1,0 +1,112 @@
+{% extends 'admin/dashboard/base.html' %}
+{% load static %}
+
+{% block title %}
+    HPCC Cloud Admin Portal - Cluster {{ cluster_name }}
+{% endblock %}
+{% block nav_header %}
+    {% include 'admin/dashboard/include/_cluster_management_header.html' %}
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Clusters</h3>
+
+                    <div class="box-tools">
+                        <div class="input-group input-group-sm"
+                             style="width: 150px;">
+                            <input name="table_search"
+                                   class="form-control pull-right"
+                                   placeholder="Search" type="text">
+
+                            <div class="input-group-btn">
+                                <button type="submit" class="btn btn-default">
+                                    <i class="fa fa-search"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body table-responsive no-padding">
+                    <table class="table table-hover" id="clusters-table"
+                           data-cluster-list-api="{% url 'admin:dashboard:clusters_tbl_api' %}">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Address</th>
+                            <th>Storage Type</th>
+                            <th>Status</th>
+                            <th>Last Update</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+        </div>
+    </div>
+{% endblock %}
+
+{% block user_javascript %}
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+                        function updateClusterTable() {
+                            let tblElement = $("#clusters-table");
+                            let clustersTableBody = tblElement.find("tbody");
+                            clustersTableBody.html("");
+                            let clusterListApi = tblElement.data("cluster-list-api");
+                            $.ajax({
+                                method: "GET",
+                                url: clusterListApi
+                            })
+                                .done(function (clusters_data) {
+                                    let cluster_list = clusters_data.cluster_list;
+                                    for (let i = 0; i < cluster_list.length; i++) {
+                                        let cluster = cluster_list[i];
+                                        if (cluster.status == 1) {
+                                            cluster.status = 'ACTIVE';
+                                            cluster.status_class = 'label label-primary'
+                                        } else if (cluster.status == 2) {
+                                            cluster.status = 'SHUTOFF';
+                                            cluster.status_class = 'label label-warning'
+                                        }
+                                        let cluster_row = $("<tr></tr>");
+                                        cluster_row.append($("<td></td>").html(cluster.id));
+                                        cluster_row.append($("<td></td>").html(cluster.name));
+                                        cluster_row.append($("<td></td>").html(
+                                            cluster.address_ip + cluster.address_port));
+                                        cluster_row.append($("<td></td>").html(
+                                            cluster.service_info.service_type));
+                                        let status_td = $("<td></td>");
+                                        let status_span = $("<span></span>")
+                                            .attr("class", cluster.status_class)
+                                            .html(cluster.status);
+                                        status_td.append(status_span);
+                                        cluster_row.append(status_td);
+                                        cluster_row.append($("<td></td>").html(
+                                            cluster.last_update));
+                                        cluster_row.append($("<td></td>").html("1234"));
+
+
+                                        clustersTableBody.append(cluster_row);
+                                    }
+
+                                });
+                        }
+{#            function updateClusterTable() {#}
+{#            };#}
+            updateClusterTable();
+            setInterval(updateClusterTable, 10000);
+        });
+    </script>
+{% endblock %}

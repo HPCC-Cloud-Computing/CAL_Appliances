@@ -8,7 +8,8 @@ from django.utils import timezone
 from os.path import abspath, dirname
 from kombu import Exchange, Queue
 
-from mcos.settings.mcos_conf import MCOS_CLUSTER_NAME
+from mcos.settings.mcos_conf import MCOS_CLUSTER_NAME, MESSAGE_QUEUE_IP
+
 # print MCOS_CLUSTER_NAME
 # ^^^ The above is required if you want to import from the celery
 # library.  If you don't have this then `from celery.schedules import`
@@ -17,7 +18,7 @@ from mcos.settings.mcos_conf import MCOS_CLUSTER_NAME
 
 # Celery settings
 
-broker_url = 'amqp://mcos:bkcloud@localhost'
+broker_url = 'amqp://mcos:bkcloud@' + MESSAGE_QUEUE_IP
 
 #: Only add pickle to this list if your broker is secured
 #: from unwanted access (see userguide/security.html)
@@ -29,7 +30,7 @@ task_routes = {
     'mcos_celery_server.tasks.update_cluster_status':
         {'queue': 'update_cluster_status_' + MCOS_CLUSTER_NAME,
          'exchange': 'mcos_exchange',
-         'routing_key': 'update_cluster_status',}
+         'routing_key': 'update_cluster_status', }
 }
 
 task_queues = (

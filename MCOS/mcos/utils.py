@@ -1,9 +1,13 @@
 import os
+import memcache
 from calplus.client import Client
 from calplus.provider import Provider
+from mcos.settings import MEMCACHED_IP, MEMCACHED_PORT
 from mcos.settings.storage_service_conf import STORAGE_SERVICE_CONFIG, \
     TEST_CONTAINER_NAME, TEST_OBJECT_NAME, TEST_FILE_PATH, \
     STORAGE_CONTAINER_NAME
+
+DEFAULT_LOCK_VALUE = str(os.getpid())
 
 
 class CreateServiceConnectorError(Exception):
@@ -59,7 +63,7 @@ def create_service_connector(service_type, access_information):
             raise CreateServiceConnectorError('Invalid object service config,'
                                               ' check config again.')
     except Exception as e:
-        print e.message
+        print(e.message)
         raise CreateServiceConnectorError(
             'Cannot create object storage service connector,'
             ' check config again.')
@@ -83,3 +87,30 @@ def check_container_is_exist(storage_service_connector, container_name):
         raise CheckStorageServiceError("Not support storage service type: " +
                                        STORAGE_SERVICE_CONFIG['type'])
     return container_exist
+
+
+def set_lock(lock_name, lock_value=DEFAULT_LOCK_VALUE):
+    memcache_client = memcache.Client([(MEMCACHED_IP, MEMCACHED_PORT)])
+    if memcache_client.get(lock_name) is None:
+        memcache_client.set(lock_name, lock_value)
+        return lock_value == memcache_client.get(lock_name)
+    else:
+        return False
+
+#
+# def check_lock(lock_name):
+#     memcache_client = memcache.Client([(MEMCACHED_IP, MEMCACHED_PORT)])
+#     if memcache_client.get(lock_name) is None:
+#         return False
+#     else:
+#         return True
+
+
+def get_shared_value(key_name):
+    memcache_client = memcache.Client([(MEMCACHED_IP, MEMCACHED_PORT)])
+    return memcache_client.get(key_name)
+
+
+def release_lock(lock_name):
+    memcache_client = memcache.Client([(MEMCACHED_IP, MEMCACHED_PORT)])
+    memcache_client.delete(lock_name)
