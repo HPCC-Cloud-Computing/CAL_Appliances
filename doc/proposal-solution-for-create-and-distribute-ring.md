@@ -6,16 +6,21 @@ Tại thời điểm t, người quản trị hệ thống gửi request lên m�
 
 Vấn đề cần giải quyết ở đây là làm sao để Các Cluster Inactive sau khi kết nối trở lại hệ thống, cũng như các Cluster mới kết nối tới hệ thống nhận được Ring được tạo ra tại thời điểm **t**. Một vấn đề khác đi cùng vấn đề này, đó là khi một Ring nào đó được cập nhật, chúng ta cũng cần phải gửi Ring mới tới các Cluster trên hệ thống.
 
-Giải pháp mà em đề xuất là: Sau khi Ring được tạo ra ở Cluster nhận Request, Cluster này sẽ gửi Ring lên message queue kèm với 3 thông tin định danh là
+Đề xuất giải pháp mới:
 
-- ring_name
-- version 
-- timeStamp 
+Trên Database của mỗi cluster sẽ duy trì cơ sở dữ liệu về các Ring và trạng thái của Ring tại các cluster trên hệ thống:
 
-và **Routing\_key** là "ring". Tất cả các Cluster trên hệ thống sẽ đều có một queue để listen **Routing\_key** này. 
+![cluster_table.png](./images/cluster_table.png)
 
-Đồng thời, định kỳ một khoảng thời gian delta\_t, các Cluster trên hệ thống sẽ gửi message chứa các Ring tới message_queue với **Routing\_key** này.
+Dựa trên 3 table này, tại một cluster bất kỳ trong hệ thống có thể xác định được với 1 Ring **x** đã có bao nhiêu cluster có được Ring này. Từ đó xác định ra các Ring chưa có thông tin về Ring này.
 
-Redis\_server trên cluster khi nhận được message chứa Ring sẽ kiểm tra từng Ring trong message. Nếu Ring chưa có trên Cluster, nó thêm Ring vào cluster. Nếu Ring đã có trên cluster, nó kiểm tra version và timestamp của Ring trong message, nếu Ring trong message có timestamp và version lớn hơn Ring hiện tại đang có trong cluster, chúng ta sẽ cập nhật Ring trong cluster. Trong trường hợp còn lại chúng ta drop message.
+Giải thuật được xây dựng như sau: Định kỳ sau khoảng thời gian delta_t, tại 1 cluster **x** trên hệ thống sẽ tiến hành kiểm tra thông tin từ cơ sở dữ liệu, từ đó xác định với từng Ring mà nó có đã có bao nhiêu cluster có được thông tin về Ring đó. Xác định ra đối với Cluster đang xét thì các cluster nào chưa có thông tin về Ring này, xem trong các cluster này các cluster **k** nào đang ở trạng thái Active, thì cluster **x** sẽ gửi thông điệp chứa thông tin về ring tới cluster **k**.
 
-Tất cả các Resolver trong cluster sẽ dùng chung thông tin của Ring. Thông tin của Ring được lưu trữ tại một file xác định trên Cluster, cũng như được lưu trên Memcache.
+Một cluster nhận được thông điệp chứa Ring sẽ thực hiện 2 công việc:
+
+- Nếu Ring chưa có trong Cluster đó, tiến hành thêm Ring đó vào hệ thống.
+- Nếu cluster gửi Ring chưa có trong dánh sách các Cluster đã cập nhật Ring (bảng **Cluster_Table**), thêm cluster gửi Ring vào table này.
+
+Thuật toán dừng lại đối với Ring **i** nếu tại cluster **x** bất kỳ trên hệ thống, cluster **x** đã biết được rằng các cluster khác đã có được Ring **i**.
+
+Độ phức tạp của thuật toán là O(**m**x**n^2**), với m là số lượng Ring, và n là số lượng cluster có trong hệ thống.
