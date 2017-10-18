@@ -24,3 +24,32 @@ Một cluster nhận được thông điệp chứa Ring sẽ thực hiện 2 c�
 Thuật toán dừng lại đối với Ring **i** nếu tại cluster **x** bất kỳ trên hệ thống, cluster **x** đã biết được rằng các cluster khác đã có được Ring **i**.
 
 Độ phức tạp của thuật toán là O(**m**x**n^2**), với m là số lượng Ring, và n là số lượng cluster có trong hệ thống.
+
+## Update - 18/10/2017
+
+Hôm nay em đã suy nghĩ lại về vấn đề tạo ring và phân phối ring. Em mới nhìn nhận lại thì có 1 vấn đề sau với các Ring trong hệ thống, đấy là mỗi Ring trong hệ thống đều là một tài nguyên chia sẻ chung trong cluster. Vì vậy em nghĩ là em phải có biện pháp để bảo vệ và chỉ cho phép 1 ring được tạo/cập nhật bởi 1 cluster trong một thời điểm t xác định, tức là phải thực hiện lock và unlock quyền được tạo/cập nhật 1 ring trước khi thực hiện tạo ring. Lý do là bởi vì như sau:
+
+Giả sử trên hệ thống có các cluster 1,2,3,4,5,6,7,8,9,10. Tại thời điểm t, hệ thống bị phân mảnh thành 2 mảnh 1,2,3,4,5,6 và mảnh 7,8,9,10 (các cluster trong cùng 1 mảnh nói chuyện được với nhau nhưng không nói chuyện được với các cluster ở mảnh kia). Nếu chúng ta cho phép nhiều cluster đồng thời được tạo/cập nhật một ring cùng 1 lúc , thì nếu tại thời điểm t+1 xảy ra sự kiện 2 admin cùng thực hiện gửi request tạo account\_ring tới cluster 1 và clust 8 với 2 thông số khác nhau, thì sau khi các cluster xử lý request của 2 admin, trên hệ thống sẽ tồn tại 2 account\_ring khác nhau.  Nếu vậy tại thời điểm t+2, khi 2 mảnh kết nối trở lại với nhau, ring nào trong 2 account\_ring trên sẽ trở thành accout\_ring của toàn bộ hệ thống.
+
+Theo quan điểm của em, thì quá trình tạo và cập nhật 1 ring xác định lên các cluster trên hệ thống phải được tiến hành như sau để đảm bảo tính chính xác và đúng đắn của hệ thống.
+
+1. Admin gửi request tạo **ring x** lên một Cluster.
+2. Cluster nhận request tạo ring acquire lock từ hệ thống.
+3. Nếu cluster acquire lock thành công, system\_lock sẽ bật trên **ring x**. Cluster tiến hành tạo ring.
+4. Cơ chế cập nhật ring sẽ thực hiện việc populate ring x tới tất cả các cluster trên hệ thống.
+5. Hệ thống sẽ lựa chọn ra 1 cluster làm leader. leader cluster sẽ thực hiện việc định kỳ kiểm tra xem 1 ring đã được cập nhật tới tất cả các cluster trên hệ thống hay chưa, và timeout của ring đó ( ví dụ chúng ta quy định sau khi ring x có mặt trên tất cả các cluster trên hệ thống 1 ngày, thì mới được phép tiếp tục cập nhật ring x). Nếu thỏa mãn rồi thì leader cluster mở khóa - release cho ring x.
+
+Có 2 vấn đề mà em muốn thầy và anh góp ý kiến:
+
+- **Vấn đề 1**: làm sao để acquire\_lock cũng như lựa chọn leader cluster, trong điều kiện hệ thống biến đổi trạng thái liên tục. Em đang dự định sử dụng zookeeper để giải quyết 2 vấn đề này. Em muốn xin ý kiến thầy với anh là dùng zookeeper trong trường hợp này liệu có ổn không ạ.
+
+- **Vấn đề 2**: Cơ chế cập nhật ring em đang dự định thực hiện như sau:
+
+- Các cluster sẽ có một cơ sở dữ liệu chia sẻ chung - chính là nơi lưu trữ keystone database của authentications service. Share database duy trì một danh sách theo dõi tình trạng cập nhật của các ring.
+- Định kỳ, leader cluster sẽ kiểm tra một ring xem có bao nhiêu cluster đã được cập nhật ring đó. Lúc này xảy ra 2 trường hợp:
+
+- TH1: Leader Cluster đã có ring: Leader Cluster sẽ thực hiện việc gửi Ring tới các Cluster chưa có ring và đang active. Sau đó các Cluster nhận được Ring sẽ reply cho Leader Cluster, Leader Cluster ghi các cluster đã nhận được ring vào danh sách đã được cập nhật ring.
+- TH2: Leader Cluster chưa có ring: Leader Cluster sẽ thực hiện việc lấy Ring từ một trong số các cluster đã có Ring và đang ở trạng thái ACTIVE, sau đó thực hiện tiếp tục như trường hợp 1.
+- Thuật toán kết thúc khi tất cả các cluster đã đều ở trong danh sách được cập nhật ring.
+
+Anh và thầy xem cơ chế cập nhật ring như thế này ổn chưa ạ.  
