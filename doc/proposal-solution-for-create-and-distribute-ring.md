@@ -52,4 +52,39 @@ Có 2 vấn đề mà em muốn thầy và anh góp ý kiến:
 - TH2: Leader Cluster chưa có ring: Leader Cluster sẽ thực hiện việc lấy Ring từ một trong số các cluster đã có Ring và đang ở trạng thái ACTIVE, sau đó thực hiện tiếp tục như trường hợp 1.
 - Thuật toán kết thúc khi tất cả các cluster đã đều ở trong danh sách được cập nhật ring.
 
-Anh và thầy xem cơ chế cập nhật ring như thế này ổn chưa ạ.  
+## 25/10 Rewrite proposal for create and distribute ring
+
+Để giải quyết bài toán tạo ring và phân phối ring, chúng ta cần 2 luồng hoạt động sau:
+
+- Luồng hoạt động 1: Luồng hoạt động của cluster X nào đó trong hệ thống xử lý request yêu cầu tạo/cập nhật ring T do một User A gửi tới X.
+
+1. X xin lock tạo/cập nhật ring từ hệ thống.
+2. Xảy ra 2 trường hợp:
+    2.1 X không xin được khóa, X thông báo trở lại cho User A Ring T đang được một người khác tạo/cập nhật trên hệ thống, yêu cầu User A thực hiện lại thao tác vào lúc khác.
+    2.2 X xin được khóa, lúc này trên toàn bộ hệ thống, ring T bị lock tạo/cập nhật. X tiếp tục thực hiện bước 3 và 4:
+3. X thực hiện tạo ring T từ dữ liệu của người dùng, sau đó X thêm danh sách theo dõi cập nhật Ring T vào shared database.
+4. X gửi response cho người dùng thông báo Ring T đã được tạo và đang được phân phối sang các cluster khác trên hệ thống.
+
+- Luồng hoạt động 2: Phân phối ring.
+
+Kịch bản: Trên mỗi cluster X ta có **m monitor\_process** có id phân biệt với nhau, có n cluster trên hệ thống. Ý tưởng được đưa ra ở đây là cần chọn ra chính xác 1 trong số **m*n** process này để thực hiện công việc phân phối ring tới các cluster và mở khóa tạo/cập nhật ring, chúng ta gọi id của process này là **t1**.  
+Để thực hiện ý tưởng trên, cần có 1 cơ chế đề thực hiện việc lựa chọn **t1** cũng như lưu trữ phân tán giá trị **t1**, mà lần trước là em đề xuất sử dụng zookeeper.Sau đó, mỗi process trong **m*n** process trên chạy 1 chương trình với nội dung như sau:
+
+Lặp vô hạn (cho đến khi process bị dừng) 4 thao tác sau:
+
+    1. Kiểm tra xem giá trị **t1** là bao nhiêu bằng.
+    2. Xảy ra 2 trường hợp:
+        -TH2.1: **t1** chưa được thiết lập, thực hiện cơ chế chọn t1 - cơ chế election trong hệ phân tán.
+        -TH2.2: **t1 đã được thiết lập**, thực hiện kiểm tra xem giá trị của process hiện tại có phải là t1 hay không ?
+            TH2.1 Nếu không phải là t1, chuyển xuống thực hiện bước **sleep**
+            TH2.2 Nếu là t1, thực hiện các bước 3,4 dưới đây để phân phối ring và mở khóa tạo/cập nhật ring T:
+
+    3. kiểm tra xem 1 ring đã được cập nhật tới tất cả các cluster trên hệ thống hay chưa bằng cách kiểm tra shared database. 
+        TH3.1: Nếu chưa hoàn tấp thì xác định các cluster chưa được cập nhật ring, lấy ring từ các cluster đã được cập nhật rồi gửi tới các cluster chưa được cập nhật mà đang active. Sau đó dựa trên phản hồi từ các cluster này mà cập nhật danh sách các cluster đã cập nhật ring T trên shared database.
+        TH3.2: Nếu đã cập nhật xong, thực hiện việc mở khóa tạo/cập nhật ring.
+
+    4. Sleep 5 giây
+
+Các giả thiết được đặt ra:
+
+- zookeeper đảm bảo rằng trong toàn bộ n cluster trên hệ thống sẽ chỉ có tối đa 1 process được chọn ra trong  **m*n** process tại bất kỳ thời điểm nào, trong mọi trường hợp.
