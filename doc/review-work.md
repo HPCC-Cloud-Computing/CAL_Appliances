@@ -24,5 +24,5 @@ Cho tới thời điểm hiện tại, các công việc đã thực hiện đư
 
 - Thử nghiệm benchmark cloud với hệ số = 2,3
 - Thử nghiệm benchmark cloud với loại ổ đĩa là SSD (ảo hóa bằng RAM).
-- Xây dựng cơ chế tạo các object ring
+- Xây dựng cơ chế tạo các ring trong multi-ring
 - Implement các cơ chế phục vụ user: Tạo container, tạo file, xóa file...
