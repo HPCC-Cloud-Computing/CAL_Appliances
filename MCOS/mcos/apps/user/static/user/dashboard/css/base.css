@@ -1,0 +1,119 @@
+#main-header-title {
+    /*color: #888888;*/
+    color: #fff;
+    /*padding-left: 20px;*/
+    font-weight: 900;
+    font-size: 25px;
+    line-height: 70px;
+    text-align: center;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+#header-title-content {
+    font-weight: 400;
+    padding-left: 20px;
+    /*color: #888888;*/
+    color: #fff;
+    /*padding-left: 20px;*/
+    font-weight: 900;
+    font-size: 15px;
+    line-height: 70px;
+    text-align: center;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    padding-right: 20px;
+}
+
+#main-header-title > #header-page-name {
+    padding-left: 20px;
+}
+
+#main-header-title > #header-title-logo {
+    width: 230px;
+    border-right: 1px solid #eee;
+    border-left-width: 0;
+}
+
+#main-header-title > div {
+    display: inline-block;
+}
+
+#nav-header-right-panel {
+    margin-right: 10px;
+    height: 70px;
+}
+
+#nav-header-right-panel > .navbar-nav > li.user-menu {
+    float: right;
+}
+
+.main-header .navbar {
+    margin-left: 0;
+
+}
+
+.main-sidebar, .left-side {
+    padding-top: 70px;
+}
+
+#nav-header-right-panel > .navbar-nav > li > a {
+    line-height: 30px;
+
+    padding-top: 20px;
+    padding-bottom: 20px;
+
+    /*padding: 10px 20px;*/
+}
+
+.fixed .content-wrapper, .fixed .right-side {
+    padding-top: 70px;
+}
+
+.content {
+    padding-top: 15px;
+}
+
+.box-header .box-title{
+    height: 34px;
+    line-height: 24px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.table-search-input {
+    margin: 0;
+    margin-top: 0px;
+    padding: 0;
+}
+
+.table-search-input .search-query {
+    padding-right: 3px;
+    padding-right: 4px \9;
+    padding-left: 3px;
+    padding-left: 4px \9;
+    /* IE7-8 doesn't have border-radius, so don't indent the padding */
+
+    margin-bottom: 0;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
+.table-search-input > .search-icon {
+    border: 0;
+    background: none;
+    /** belows styles are working good */
+    padding: 2px 5px;
+    margin-top: 2px;
+    position: relative;
+    left: -28px;
+    /* IE7-8 doesn't have border-radius, so don't indent the padding */
+    margin-bottom: 0;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    color: #606368;
+}
+
+.search-query:focus + button {
+    z-index: 3;
+}

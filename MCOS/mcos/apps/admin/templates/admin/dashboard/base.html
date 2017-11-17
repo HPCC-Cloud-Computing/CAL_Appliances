@@ -6,6 +6,8 @@
           rel="stylesheet" type="text/css">
     <link href="{% static 'admin/dashboard/css/jquery.dataTables.min.css' %}"
           rel="stylesheet" type="text/css">
+    {% block custom_extra_head %}
+    {% endblock %}
 {% endblock %}
 
 {% block bodyclass %}
@@ -19,6 +21,25 @@
     {% include 'admin/dashboard/lib/_main_sidebar.html' %}
 {% endblock %}
 {% block content_wrapper %}
+
+    <div class="col-md-4"
+         style="z-index: 1050; position: absolute;top:55px;right:50px;"
+         id="alert-message-box">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.extra_tags }} alert-dismissable">
+                    <a href="#" class="close" data-dismiss="alert"
+                       aria-label="close">×</a>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        {#        <div class="alert alert-success alert-dismissable">#}
+        {#            <a href="#" class="close" data-dismiss="alert"#}
+        {#               aria-label="close">×</a>#}
+        {#            Create account ring successful!#}
+        {#        </div>#}
+    </div>
     <div class="content-wrapper">
         {% block content_header %}
             {#            <section class="content-header">#}
@@ -50,10 +71,11 @@
     </div>
 {% endblock content_wrapper %}
 {% block javascript %}
-    <script type="text/javascript"
-            src="{% static 'admin/dashboard/js/jquery.slimscroll.js' %}"></script>
     <script src="{% static "jquery/dist/jquery.min.js" %}"></script>
+    <script src="{% static 'admin/dashboard/js/jquery.slimscroll.js' %}"></script>
     <script src="{% static "admin/dashboard/js/jquery-ui.min.js" %}"></script>
+    <script src="{% static "admin/dashboard/js/js.cookie.js" %}"></script>
+
     <!-- Resolve conflict in jQuery UI with Bootstrap -->
     <script>
         $.widget.bridge('uibutton', $.ui.button);
@@ -61,7 +83,22 @@
     <script src="{% static "bootstrap/dist/js/bootstrap.min.js" %} "></script>
     <script src="{% static "admin-lte/dist/js/app.min.js" %}"></script>
     <script src="{% static "admin/dashboard/js/jquery.dataTables.min.js" %}"></script>
+    <script src="{% static "admin/dashboard/js/_create_alert_message.js" %}"></script>
 
+    <script type="text/javascript">
+        let csrftoken = Cookies.get("csrftoken");
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+    </script>
     {% block user_javascript %}
     {% endblock %}
 {% endblock %}

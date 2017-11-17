@@ -92,6 +92,8 @@ def check_container_is_exist(storage_service_connector, container_name):
 def set_lock(lock_name, lock_value=DEFAULT_LOCK_VALUE):
     memcache_client = memcache.Client([(MEMCACHED_IP, MEMCACHED_PORT)])
     if memcache_client.get(lock_name) is None:
+        # print("lock name: "+ str(lock_name))
+        # print("lock value: "+ str(lock_value))
         memcache_client.set(lock_name, lock_value)
         return lock_value == memcache_client.get(lock_name)
     else:

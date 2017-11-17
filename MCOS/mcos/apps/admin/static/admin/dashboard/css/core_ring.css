@@ -1,0 +1,22 @@
+/*body #modal-create-account-ring{*/
+    /*!* new custom width *!*/
+    /*width: 1024px;*/
+    /*margin: auto;*/
+    /*!* must be half of the width, minus scrollbar on the left (30px) *!*/
+    /*!*margin-left: -280px;*!*/
+/*}*/
+
+
+#form-modal-body .modal-dialog {
+
+    width: 1024px;
+    margin: 30px auto;
+
+}
+
+/*#form-modal-body .modal-dialog {*/
+
+    /*width: 1024px;*/
+    /*margin: 30px auto;*/
+
+/*}*/

@@ -14,7 +14,7 @@ path.insert(0, os.getcwd())
 # print path
 import mcos
 from mcos.settings import mcos_conf
-from mcos.settings.mcos_conf import PERIODIC_CHECK_STATUS_TIME
+from mcos.settings.shared import PERIODIC_CHECK_STATUS_TIME
 
 
 def setup_django_db_context(db_setting_modules):

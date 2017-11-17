@@ -1,11 +1,62 @@
 {% extends 'user/dashboard/base.html' %}
 
-{% block title %}HPCC Cloud user/dashboard Dashboard
-    {{ cluster_name }}{% endblock %}
-{% block content %}
-    {{ header_title }}
-    Just some example content1321321
-{% endblock %}
+{% block title %}HPCC Cloud Dashboard - Account Overview{% endblock %}
 {% block nav_header %}
-    {% include 'user/dashboard/include/_index_header.html' %}
+    {% include 'user/dashboard/include/_overview_header.html' %}
+{% endblock %}
+{% block content %}
+    {#    {{ header_title }}#}
+    {#    Overview#}
+    <div class="row">
+        <div class="col-xs-4">
+            <!-- small box -->
+            <div class="small-box bg-light-blue">
+                <div class="inner">
+                    <h3>53<sup style="font-size: 20px">%</sup></h3>
+
+                    <p>Quota Used</p>
+                </div>
+                <div class="icon">
+                    {#<i class="fa fa-bookmark-o"></i>#}
+                    <i class="ion ion-pie-graph"></i>
+                </div>
+                <a href="#" class="small-box-footer">
+                    More info <i class="fa fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-xs-4">
+            <div class="small-box bg-red">
+                <div class="inner">
+                    <h3>75</h3>
+
+                    <p>Total Containers</p>
+                </div>
+                <div class="icon">
+                    {#<i class="fa fa-bookmark-o"></i>#}
+                    <i class="fa fa-archive" aria-hidden="true"></i>
+                </div>
+                <a href="#" class="small-box-footer">
+                    More info <i class="fa fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+        <div class="col-xs-4">
+            <div class="small-box bg-yellow">
+                <div class="inner">
+                    <h3>13,468</h3>
+
+                    <p>Uploaded Files</p>
+                </div>
+                <div class="icon">
+                    {#<i class="fa fa-bookmark-o"></i>#}
+                    <i class="fa fa-files-o"></i>
+                </div>
+                <a href="#" class="small-box-footer">
+                    More info <i class="fa fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}

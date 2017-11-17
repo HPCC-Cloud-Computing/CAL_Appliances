@@ -1,0 +1,35 @@
+/*body #modal-create-account-ring{*/
+    /*!* new custom width *!*/
+    /*width: 1024px;*/
+    /*margin: auto;*/
+    /*!* must be half of the width, minus scrollbar on the left (30px) *!*/
+    /*!*margin-left: -280px;*!*/
+/*}*/
+
+
+#form-modal-body .modal-dialog {
+
+    width: 1024px;
+    margin: 30px auto;
+    /*margin-left: 50px;*/
+    /*margin-right: 50px;*/
+
+}
+#form-modal-body .modal-content {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+
+.box{
+    min-height: 100px;
+}
+#no-option-rings-row{
+    min-height: 100px;
+}
+/*#form-modal-body .modal-dialog {*/
+
+    /*width: 1024px;*/
+    /*margin: 30px auto;*/
+
+/*}*/

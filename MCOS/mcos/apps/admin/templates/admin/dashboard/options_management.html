@@ -1,0 +1,298 @@
+{% extends 'admin/dashboard/base.html' %}
+{% load static %}
+
+{% block custom_extra_head %}
+    <link href="{% static 'admin/dashboard/css/option_rings.css' %}"
+          rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block title %}
+    HPCC Cloud Admin Portal - Cluster {{ cluster_name }}
+{% endblock %}
+{% block nav_header %}
+    {% include 'admin/dashboard/include/_options_management_header.html' %}
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="box">
+            <div class="box-header">
+                <h3 class="text-info col-md-6">
+                    Total option rings: {{ total_option_rings }}
+                </h3>
+                <div class="box-tools">
+                    {% if enable_defined_ring %}
+                        <button type="button"
+                                style="min-width: 200px"
+                                id="create-defined-option-ring-btn"
+                                class="btn btn-primary">
+                            Create Defined Ring
+                        </button>
+                    {% endif %}
+                    <button type="button"
+                            style="min-width: 200px"
+                            id="create-custom-option-ring-btn"
+                            class="btn btn-primary">
+                        Create Custom Ring
+                    </button>
+                </div>
+
+                {#                <div class="text-info col-md-4 float-right">#}
+                {##}
+                {#                </div>#}
+            </div>
+            {% if no_option_rings %}
+                <div class="row" id="no-option-rings-row">
+                    <div class="col-md-12">
+                        <h3 class="text-center text-danger text-bold">
+                            No Option Rings is created
+                        </h3>
+                    </div>
+                </div>
+            {% else %}
+                <div class="box-body">
+                    <div id="option-defined-rings">
+                        <div id="option-defined-rings-header" class="box-header">
+                            <h3 class="text-primary">Defined Rings</h3>
+                        </div>
+                        <div id="option-defined-rings-body" class="box-body">
+                            {% for ring in defined_rings %}
+                                <!--ring-boxs -->
+                                <div class="col-xs-12">
+                                    <div class="ring-box" id="{{ ring.id }}">
+                                        <div class="ring-box-header">
+                                            <h4 class="text-info">
+                                                {{ ring.full_name }}
+                                            </h4>
+                                        </div>
+                                        <div class="ring-box-body">
+                                            <div class="row ring-clusters-row">
+                                                <div class="col-md-12 ring-info">
+                                                    <table class="ring-info-table display"
+                                                           cellspacing="0"
+                                                           width="100%">
+                                                        <tbody>
+                                                        <tr>
+                                                            <th>Ring ID</th>
+                                                            <td>{{ ring.id }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Ring Name</th>
+                                                            <td>{{ ring.name }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Ring Full Name</th>
+                                                            <td>
+                                                                {{ ring.full_name }}
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Description</th>
+                                                            <td>
+                                                                {{ ring.description }}
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Version</th>
+                                                            <td>{{ ring.version }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Replica Factor</th>
+                                                            <td>{{ ring.replica_factor }}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Total Partitions</th>
+                                                            <td>{{ ring.total_part }}</td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="col-md-12 ring-cluster-table">
+                                                    <table class="option-ring-clusters-table display"
+                                                           cellspacing="0"
+                                                           width="100%"
+                                                           data-ring-name="{{ ring.name }}"
+                                                           data-ring-version="{{ ring.version }}"
+                                                           data-get-clusters-api="{% url 'admin:dashboard:get_ring_clusters' %}">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>ID</th>
+                                                            <th>Name</th>
+                                                            <th>Address</th>
+                                                            <th>Storage Type</th>
+                                                            <th>Status</th>
+                                                            <th>Last Update</th>
+                                                            <th>Actions</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tfoot>
+                                                        <tr>
+                                                            <th>ID</th>
+                                                            <th>Name</th>
+                                                            <th>Address</th>
+                                                            <th>Storage Type</th>
+                                                            <th>Status</th>
+                                                            <th>Last Update</th>
+                                                            <th>Actions</th>
+                                                        </tr>
+                                                        </tfoot>
+                                                        <tbody>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-body -->
+                                    </div>
+                                    <!-- /.box -->
+                                </div>
+                                <!--ring-boxs -->
+                            {% endfor %}
+                        </div>
+
+                    </div>
+
+                    {% for ring in custom_rings %}
+                        <!--ring-boxs -->
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <div class="ring-box" id="{{ ring.id }}">
+                                    <div class="ring-box-header">
+                                        <h3 class="text-info">
+                                            {{ ring.full_name }}
+                                        </h3>
+                                    </div>
+                                    <div class="ring-box-body">
+                                        <div class="row ring-clusters-row">
+                                            <div class="col-md-12 ring-info">
+                                                <h4 class="text-primary">
+                                                    {{ ring.full_name }} Info
+                                                </h4>
+                                                <table class="ring-info-table display"
+                                                       cellspacing="0"
+                                                       width="100%">
+                                                    <tbody>
+                                                    <tr>
+                                                        <th>Ring ID</th>
+                                                        <td>{{ ring.id }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Ring Name</th>
+                                                        <td>{{ ring.name }} -
+                                                            {{ ring.full_name }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Description</th>
+                                                        <td>
+                                                            {{ ring.description }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Version</th>
+                                                        <td>{{ ring.version }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Replica Factor</th>
+                                                        <td>{{ ring.replica_factor }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Total Partitions</th>
+                                                        <td>{{ ring.total_part }}</td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-12 ring-cluster-table">
+                                                <table class="ring-clusters-table display"
+                                                       cellspacing="0"
+                                                       width="100%"
+                                                       data-ring-id="{{ ring.id }}"
+                                                       data-get-clusters-ids-api="{% url 'admin:dashboard:get_ring_clusters' %}">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>ID</th>
+                                                        <th>Name</th>
+                                                        <th>Address</th>
+                                                        <th>Storage Type</th>
+                                                        <th>Status</th>
+                                                        <th>Last Update</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tfoot>
+                                                    <tr>
+                                                        <th>ID</th>
+                                                        <th>Name</th>
+                                                        <th>Address</th>
+                                                        <th>Storage Type</th>
+                                                        <th>Status</th>
+                                                        <th>Last Update</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                    </tfoot>
+                                                    <tbody>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- /.box-body -->
+                                </div>
+                                <!-- /.box -->
+                            </div>
+                        </div>
+                        <!--ring-boxs -->
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+
+        </div>
+    </div>
+
+
+    <!-- create ring modals -->
+    {% include 'admin/dashboard/include/_create_defined_option_ring.html' %}
+    {% include 'admin/dashboard/include/_create_custom_option_ring.html' %}
+
+    <!--./create ring modals -->
+{% endblock %}
+
+{% block user_javascript %}
+    <script src="{% static "admin/dashboard/js/_load_option_ring_clusters_table.js" %} "></script>
+    <script type="text/javascript">
+        $("table.option-ring-clusters-table").each(function () {
+            load_clusters_table(this,"Ring Clusters")
+        })
+    </script>
+    {#    <script type="text/javascript">#}
+    {#        if ($("#account-ring-status").data('exist') === true) {#}
+    {#            load_clusters_table('#account-clusters-table', 'Ring Clusters');#}
+    {#        }#}
+    {#        if ($("#container-ring-status").data('exist') === true) {#}
+    {#            load_clusters_table('#container-clusters-table', 'Ring Clusters');#}
+    {#        }#}
+    {#        if ($("#group-resolver-ring-status").data('exist') === true) {#}
+    {#            load_clusters_table('#group-resolver-clusters-table', 'Ring Clusters');#}
+    {#        }#}
+    {#    </script>#}
+    {##}
+    <script src="{% static "admin/dashboard/js/_create_defined_option_rings.js" %} "></script>
+    <script type="text/javascript">
+        // handle create account ring
+        setupCreateDefinedForm('#create-defined-option-ring-form');
+        $('#create-defined-option-ring-btn').on('click', function () {
+            initCreateClusterRingForm('#create-defined-option-ring-form');
+        });
+        {#            $('#create-container-ring-btn').on('click', function () {#}
+        {#                initCreateClusterRingForm('#create-container-ring-form');#}
+        {#            });#}
+        {#            $('#create-group-resolver-ring-btn').on('click', function () {#}
+        {#                initCreateClusterRingForm('#create-group-resolver-ring-form');#}
+        {#            });#}
+    </script>
+
+
+{% endblock %}
+
+

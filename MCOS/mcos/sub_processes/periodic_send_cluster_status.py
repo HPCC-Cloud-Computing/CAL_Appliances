@@ -11,7 +11,7 @@ from django.utils import timezone
 from os.path import abspath, dirname
 
 path.insert(0, os.getcwd())
-from mcos.settings.mcos_conf import PERIODIC_SEND_STATUS_TIME
+from mcos.settings.shared import PERIODIC_SEND_STATUS_TIME
 from mcos.settings.mcos_conf import MCOS_CLUSTER_NAME
 from mcos.settings.base import TIME_ZONE
 from mcos_celery_server import tasks
@@ -40,8 +40,8 @@ while not_exit:
             name=MCOS_CLUSTER_NAME).first()
         if check_internal_cluster(current_cluster) is True:
             current_time = timezone.now()
-            print current_time
-            print time.mktime(current_time.timetuple())
+            print(current_time)
+            print(time.mktime(current_time.timetuple()))
             tasks.update_cluster_status.delay(
                 str(current_cluster.id),
                 SystemCluster.ACTIVE,
@@ -58,5 +58,5 @@ while not_exit:
         time.sleep(PERIODIC_SEND_STATUS_TIME)
 
     except Exception as e:
-        print e
+        print(e)
         # sys.exit(1)

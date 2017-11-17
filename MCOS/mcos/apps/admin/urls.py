@@ -5,6 +5,8 @@ from django.conf import settings
 
 from .dashboard import urls as dashboard_urls
 from .system import urls as system_urls
+from .ring_and_option import urls as ring_and_option_urls
+
 import views
 
 urls = [
@@ -13,17 +15,11 @@ urls = [
                                 namespace='dashboard')),
     url(r'^system/', include(system_urls.urlpatterns,
                              namespace='system')),
+    url(r'^ring-and-option/', include(ring_and_option_urls.urlpatterns,
+                                      namespace='ring_and_option')),
 ]
 urlpatterns = urls
+
+
 # urlpatterns = urls + static(settings.MEDIA_URL,
 #                             document_root=settings.MEDIA_ROOT)
-
-
-def my_login_required(function):
-    def wrapper(request, *args, **kw):
-        user=request.user
-        if not (user.id and request.session.get('code_success')):
-            return HttpResponseRedirect('/splash/')
-        else:
-            return function(request, *args, **kw)
-    return wrapper

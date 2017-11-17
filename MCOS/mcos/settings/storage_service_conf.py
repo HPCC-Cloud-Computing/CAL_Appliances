@@ -22,26 +22,30 @@ STORAGE_SERVICE_CONFIG = {
         'os_auth_version': '3',
         'os_swiftclient_version': '2.0',
     },
-    "specifications": {
-        "capacity": "26",  # in TB
+    "specifications": { # hdd large
+        "capacity": "30000",  # in TB
         "backend-type": "SSD",  # HDD, SSD, None
-        "128k-read": {
-            "resp_time": "25",  # milliseconds
-            "op_per_second": "4320"  # operations per second
-        },
-        "128k-write": {
-            "resp_time": "60",
-            "op_per_second": "1560"
-        },
-        "10mb-read": {
-            "resp_time": "105",
-            "op_per_second": "590"
-        },
-        "10mb-write": {
-            "resp_time": "230",
-            "op_per_second": "230"
-        },
+        "128k-read": "90",
+        "128k-write": "60",
+        "10mb-read": "600",
+        "10mb-write": "300",
     }
+    # "specifications": { # ssd_small
+    #     "capacity": "500",  # in TB
+    #     "backend-type": "HDD",  # HDD, SSD, None
+    #     "128k-read": "60",
+    #     "128k-write": "30",
+    #     "10mb-read": "300",
+    #     "10mb-write": "200",
+    # }
+    # "specifications": { # hdd_small
+    #     "capacity": "1000",  # in TB
+    #     "backend-type": "HDD",  # HDD, SSD, None
+    #     "128k-read": "9",
+    #     "128k-write": "6",
+    #     "10mb-read": "60",
+    #     "10mb-write": "30",
+    # }
 }
 
 # # EXAMPLE CONFIG FOR SWIFT

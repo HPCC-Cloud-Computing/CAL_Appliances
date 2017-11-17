@@ -1,0 +1,19 @@
+{% extends 'admin/dashboard/include/_create_cluster_ring_base.html' %}
+
+{% load adminlte_helpers i18n %}
+{% load staticfiles %}
+{% block form-info %}
+    <div class="form-modal-info"
+         id="create-group-resolver-ring-form"
+         data-ring-type="group_resolver"
+         data-cluster-list-api="{% url 'admin:dashboard:clusters_tbl_api' %}"
+         data-submit-url="{% url 'admin:ring_and_option:add_core_ring' %}">
+    </div>
+{% endblock %}
+
+{% block form-title %}
+    Create Group Resolver Cluster Ring
+{% endblock %}
+{% block ring-name %}
+    Group Resolver Ring
+{% endblock %}

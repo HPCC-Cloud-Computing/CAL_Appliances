@@ -1,0 +1,425 @@
+{% extends 'admin/dashboard/base.html' %}
+{% load static %}
+
+{% block custom_extra_head %}
+    <link href="{% static 'admin/dashboard/css/core_ring.css' %}"
+          rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block title %}
+    HPCC Cloud Admin Portal - Cluster {{ cluster_name }}
+{% endblock %}
+{% block nav_header %}
+    {% include 'admin/dashboard/include/_core_ring_header.html' %}
+{% endblock %}
+{% block content %}
+
+    <!--account-box -->
+
+    <div class="row">
+
+        <div class="col-xs-12">
+            <div class="box" id="account-ring-box">
+                <div class="box-header">
+                    <h3 class="text-info">
+                        Account Rings
+                    </h3>
+                    {% if account_info %}
+                        <div id="account-ring-status" data-exist="true"></div>
+                    {% else %}
+                        <div id="account-ring-status" data-exist="false"></div>
+                        <div class="box-tools">
+                            <button type="button"
+                                    style="min-width: 200px"
+                                    id="create-account-ring-btn"
+                                    class="btn btn-block btn-primary">
+                                Create Account Ring ...
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="box-body">
+                    {% if account_info %}
+                        <div class="row" id="account-clusters-row">
+                            <div class="col-md-12" id="account-ring-info">
+                                <h4 class="text-primary">
+                                    Ring Info
+                                </h4>
+                                <table id="account-ring-info-table"
+                                       class="display" cellspacing="0"
+                                       width="100%">
+                                    <tbody>
+                                    <tr>
+                                        <th>Ring ID</th>
+                                        <td>{{ account_info.id }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Ring Name</th>
+                                        <td>{{ account_info.name }} -
+                                            {{ account_info.full_name }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Description</th>
+                                        <td>
+                                            {{ account_info.description }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Version</th>
+                                        <td>{{ account_info.version }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Replica Factor</th>
+                                        <td>{{ account_info.replica_factor }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Total Partitions</th>
+                                        <td>{{ account_info.total_part }}</td>
+                                    </tr>
+                                    </tbody>
+
+
+                                </table>
+                            </div>
+                            <div class="col-md-12 ring-cluster-table">
+                                <table id="account-clusters-table"
+                                       class="display"
+                                       cellspacing="0"
+                                       width="100%"
+                                       data-cluster-ids="{{ account_info.cluster_ids }}"
+                                       data-get-clusters-ids-api="{% url 'admin:dashboard:get_clusters_ids' %}">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Address</th>
+                                        <th>Storage Type</th>
+                                        <th>Status</th>
+                                        <th>Last Update</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tfoot>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Address</th>
+                                        <th>Storage Type</th>
+                                        <th>Status</th>
+                                        <th>Last Update</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                    </tfoot>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="row" id="no-account-ring-row">
+                            <div class="col-md-12">
+                                <h3 class="text-center text-danger text-bold">
+                                    Account Ring is not created
+                                </h3>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+        </div>
+    </div>
+
+    <!--./account-box -->
+
+    <!--container-box -->
+
+    <div class="row">
+
+        <div class="col-xs-12">
+            <div class="box" id="container-ring-box">
+                <div class="box-header">
+                    <h3 class="text-info">
+                        Container Rings
+                    </h3>
+                    {% if container_info %}
+                        <div id="container-ring-status"
+                             data-exist="true"></div>
+                    {% else %}
+                        <div id="container-ring-status"
+                             data-exist="false"></div>
+                        <div class="box-tools">
+                            <button type="button"
+                                    style="min-width: 200px"
+                                    id="create-container-ring-btn"
+                                    class="btn btn-block btn-primary">
+                                Create Container Ring ...
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="box-body">
+                    {% if container_info %}
+                        <div class="row" id="container-clusters-row">
+                            <div class="col-md-12" id="container-ring-info">
+                                <h4 class="text-primary">
+                                    Ring Info
+                                </h4>
+                                <table id="container-ring-info-table"
+                                       class="display" cellspacing="0"
+                                       width="100%">
+                                    <tbody>
+                                    <tr>
+                                        <th>Ring ID</th>
+                                        <td>{{ container_info.id }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Ring Name</th>
+                                        <td>{{ container_info.name }} -
+                                            {{ container_info.full_name }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Description</th>
+                                        <td>
+                                            {{ container_info.description }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Version</th>
+                                        <td>{{ container_info.version }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Replica Factor</th>
+                                        <td>{{ container_info.replica_factor }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Total Partitions</th>
+                                        <td>{{ container_info.total_part }}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-12 ring-cluster-table">
+                                <table id="container-clusters-table"
+                                       class="display"
+                                       cellspacing="0"
+                                       width="100%"
+                                       data-cluster-ids="{{ container_info.cluster_ids }}"
+                                       data-get-clusters-ids-api="{% url 'admin:dashboard:get_clusters_ids' %}">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Address</th>
+                                        <th>Storage Type</th>
+                                        <th>Status</th>
+                                        <th>Last Update</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tfoot>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Address</th>
+                                        <th>Storage Type</th>
+                                        <th>Status</th>
+                                        <th>Last Update</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                    </tfoot>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="row" id="no-container-ring-row">
+                            <div class="col-md-12">
+                                <h3 class="text-center text-danger text-bold">
+                                    Container Ring is not created
+                                </h3>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+        </div>
+    </div>
+
+    <!--./container-box -->
+
+
+    <!--group-resolver-box -->
+
+    <div class="row">
+
+        <div class="col-xs-12">
+            <div class="box" id="group-resolver-ring-box">
+                <div class="box-header">
+                    <h3 class="text-info">
+                        Group Resolver Rings
+                    </h3>
+                    {% if group_resolver_info %}
+                        <div id="group-resolver-ring-status"
+                             data-exist="true"></div>
+                    {% else %}
+                        <div id="group-resolver-ring-status"
+                             data-exist="false"></div>
+                        <div class="box-tools">
+                            <button type="button"
+                                    style="min-width: 200px"
+                                    id="create-group-resolver-ring-btn"
+                                    class="btn btn-block btn-primary">
+                                Create Group Resolver Ring ...
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="box-body">
+                    {% if group_resolver_info %}
+                        <div class="row" id="group-resolver-clusters-row">
+                            <div class="col-md-12"
+                                 id="group-resolver-ring-info">
+                                <h4 class="text-primary">
+                                    Ring Info
+                                </h4>
+                                <table id="group-resolver-ring-info-table"
+                                       class="display" cellspacing="0"
+                                       width="100%">
+                                    <tbody>
+                                    <tr>
+                                        <th>Ring ID</th>
+                                        <td>{{ group_resolver_info.id }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Ring Name</th>
+                                        <td>{{ group_resolver_info.name }} -
+                                            {{ group_resolver_info.full_name }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Description</th>
+                                        <td>
+                                            {{ group_resolver_info.description }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Version</th>
+                                        <td>{{ group_resolver_info.version }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Replica Factor</th>
+                                        <td>{{ group_resolver_info.replica_factor }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Total Partitions</th>
+                                        <td>{{ group_resolver_info.total_part }}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-12 ring-cluster-table">
+                                <table id="group-resolver-clusters-table"
+                                       class="display"
+                                       cellspacing="0"
+                                       width="100%"
+                                       data-cluster-ids="{{ group_resolver_info.cluster_ids }}"
+                                       data-get-clusters-ids-api="{% url 'admin:dashboard:get_clusters_ids' %}">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Address</th>
+                                        <th>Storage Type</th>
+                                        <th>Status</th>
+                                        <th>Last Update</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tfoot>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Address</th>
+                                        <th>Storage Type</th>
+                                        <th>Status</th>
+                                        <th>Last Update</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                    </tfoot>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="row" id="no-group-resolver-ring-row">
+                            <div class="col-md-12">
+                                <h3 class="text-center text-danger text-bold">
+                                    Group Resolver Ring is not created
+                                </h3>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+        </div>
+    </div>
+
+    <!--./group-resolver-box -->
+
+    <!-- create ring modals -->
+
+    {% include 'admin/dashboard/include/_create_account_ring.html' %}
+    {% include 'admin/dashboard/include/_create_container_ring.html' %}
+    {% include 'admin/dashboard/include/_create_group_resolver_ring.html' %}
+
+    <!--./create ring modals -->
+{% endblock %}
+
+{% block user_javascript %}
+    <script src="{% static "admin/dashboard/js/_load_clusters_table.js" %} "></script>
+    <script type="text/javascript">
+        if ($("#account-ring-status").data('exist') === true) {
+            load_clusters_table('#account-clusters-table', 'Ring Clusters');
+        }
+        if ($("#container-ring-status").data('exist') === true) {
+            load_clusters_table('#container-clusters-table', 'Ring Clusters');
+        }
+        if ($("#group-resolver-ring-status").data('exist') === true) {
+            load_clusters_table('#group-resolver-clusters-table', 'Ring Clusters');
+        }
+    </script>
+
+    <script src="{% static "admin/dashboard/js/_create_core_rings.js" %} "></script>
+    <script type="text/javascript">
+        // handle create account ring
+        $('#create-account-ring-btn').on('click', function () {
+            initCreateClusterRingForm('#create-account-ring-form');
+        });
+        $('#create-container-ring-btn').on('click', function () {
+            initCreateClusterRingForm('#create-container-ring-form');
+        });
+        $('#create-group-resolver-ring-btn').on('click', function () {
+            initCreateClusterRingForm('#create-group-resolver-ring-form');
+        });
+    </script>
+
+
+{% endblock %}
+
+

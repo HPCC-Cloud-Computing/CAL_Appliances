@@ -66,13 +66,13 @@ class ObjectServiceInfo(models.Model):
         elif service_type_input == 'ceph' or \
                         service_type_input == 'CEPH':
             service_type = ObjectServiceInfo.CEPH
-        auth_info = json.dumps(auth_info_input)
-        service_specs = json.dumps(service_specs_input)
+        # auth_info = json.dumps(auth_info_input)
+        # service_specs = json.dumps(service_specs_input)
         object_storage_service_info = ObjectServiceInfo(
             id=service_id,
             service_type=service_type,
-            specifications=service_specs,
-            auth_info=auth_info
+            specifications=service_specs_input,
+            auth_info=auth_info_input
         )
         return object_storage_service_info
 

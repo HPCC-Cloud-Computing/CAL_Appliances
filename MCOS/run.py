@@ -10,6 +10,7 @@ from sys import path
 from os.path import abspath, dirname
 import os
 import signal
+
 path.insert(0, os.getcwd())
 from mcos.sub_processes import manage as sub_procs_manage
 
@@ -27,13 +28,16 @@ if __name__ == "__main__":
         sub_procs_manage.start_periodic_send_cluster_status()
     check_cluster_status_proc_id = \
         sub_procs_manage.start_periodic_check__clusters_status()
+    ring_periodic_update_proc_id = \
+        sub_procs_manage.start_ring_periodic_update_proc()
 
     import atexit
 
     atexit.register(kill_child, [
         mcos_celery_server_proc_id,
         send_cluster_status_proc_id,
-        check_cluster_status_proc_id
+        check_cluster_status_proc_id,
+        ring_periodic_update_proc_id
     ])
 
     from mcos import wsgi

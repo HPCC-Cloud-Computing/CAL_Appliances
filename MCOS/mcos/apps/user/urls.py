@@ -9,6 +9,8 @@ urls = [
 
     url(r'^$',
         views.index, name='index'),
-    url(r'^dashboard', views.dashboard, name='dashboard')
+    url(r'^dashboard', views.dashboard, name='dashboard'),
+    url(r'^data-management', views.data_management, name='data-management')
+
 ]
 urlpatterns = urls

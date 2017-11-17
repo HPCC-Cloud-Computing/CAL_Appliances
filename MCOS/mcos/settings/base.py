@@ -99,9 +99,11 @@ STATIC_URL = '/static/'
 # Additional locations of static files
 
 STATICFILES_DIRS = (
-    root('static'),
+    BASE_DIR+'/static',
 )
-
+# print(root('static')+'/mcos')
+# print('static dir')
+# print(BASE_DIR+'/static')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 

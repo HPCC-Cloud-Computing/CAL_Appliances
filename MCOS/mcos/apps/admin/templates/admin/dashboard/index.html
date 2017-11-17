@@ -4,7 +4,78 @@
     {{ cluster_name }}{% endblock %}
 {% block content %}
     {{ header_title }}
-    Just some example content1321321
+    <div class="row">
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <a href="{% url 'admin:dashboard:cluster_management' %}">
+                <div class="info-box">
+                    <span class="info-box-icon bg-red"><i class="fa fa-cubes" aria-hidden="true"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Total Clusters</span>
+                        <span class="info-box-number">{{ total_clusters }}</span>
+                    </div>
+                    <!-- /.info-box-content -->
+                </div>
+            </a>
+            <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+        <a href="{% url 'admin:dashboard:cluster_management' %}">
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box ">
+                <span class="info-box-icon bg-blue-active">
+                    <i class="fa fa-cube" aria-hidden="true"></i>
+                </span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Active Clusters</span>
+                        <span class="info-box-number">{{ total_active_clusters }}</span>
+
+                        <div class="progress">
+                            <div class="progress-bar bg-blue-active" style="width: {{ active_cluster_percent }}"></div>
+                        </div>
+                        <span class="progress-description">
+                            {{ active_cluster_percent }} is active.
+                  </span>
+                    </div>
+                    <!-- /.info-box-content -->
+                </div>
+                <!-- /.info-box -->
+            </div>
+        </a>
+
+        <!-- /.col -->
+        <a href="{% url 'admin:dashboard:core_ring' %}">
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                    <span class="info-box-icon bg-green"><i class="fa fa-cogs"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Total Core Rings</span>
+                        <span class="info-box-number">{{ total_core_rings }}</span>
+                    </div>
+                    <!-- /.info-box-content -->
+                </div>
+                <!-- /.info-box -->
+            </div>
+        </a>
+        <!-- /.col -->
+        <a href="{% url 'admin:dashboard:options_management' %}">
+            <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="info-box">
+                <span class="info-box-icon bg-yellow">
+                    <i class="fa fa-object-ungroup" aria-hidden="true"></i>
+                </span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text">Total Options</span>
+                        <span class="info-box-number">{{ total_option_rings }}</span>
+                    </div>
+                    <!-- /.info-box-content -->
+                </div>
+                <!-- /.info-box -->
+            </div>
+            <!-- /.col -->
+        </a>
+    </div>
+    <!-- /.row -->
 {% endblock %}
 {% block nav_header %}
     {% include 'admin/dashboard/include/_index_header.html' %}

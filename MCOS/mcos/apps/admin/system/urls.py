@@ -20,7 +20,9 @@ urls = \
             name='add_new_cluster'),
         url(r'^release_add_cluster_perm/',
             views.release_add_cluster_perm,
-            name='release_add_cluster_perm')
+            name='release_add_cluster_perm'),
+
+
 
         # url(r'^cluster_list_secured/$',
         #     views.get, name='cluster_list_secured'),

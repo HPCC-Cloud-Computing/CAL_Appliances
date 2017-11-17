@@ -1,0 +1,94 @@
+{% extends 'adminlte/base.html' %}
+{% load staticfiles %}
+{% block extra_head %}
+
+    <link href="{% static 'user/dashboard/css/base.css' %}"
+          rel="stylesheet" type="text/css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="{% static 'bower_components/bootstrap/dist/css/bootstrap.min.css' %}">
+{#    <link href="{% static 'user/dashboard/css/jquery.dataTables.min.css' %}"#}
+{#          rel="stylesheet" type="text/css">#}
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="{% static 'bower_components/font-awesome/css/font-awesome.min.css' %}">
+    <!-- Ionicons -->
+    <link rel="stylesheet"
+          href="{% static 'bower_components/Ionicons/css/ionicons.min.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+
+{% endblock %}
+
+{% block bodyclass %}
+    {#    skin-black-light fixed#}
+    skin-purple-light fixed
+{% endblock %}
+{% block nav_header %}
+    {% include 'user/dashboard/lib/_main_header.html' %}
+{% endblock %}
+{% block nav_sidebar %}
+    {% include 'user/dashboard/lib/_main_sidebar.html' %}
+{% endblock %}
+{% block content_wrapper %}
+    <div class="content-wrapper">
+        {% block content_header %}
+            {#            <section class="content-header">#}
+            {#                <h1>#}
+            {#                    {% block page_name %}{% endblock %}#}
+            {#                    {% block no_description %}#}
+            {#                        <small>#}
+            {#                            {% block page_description %}{% endblock %}</small>#}
+            {#                    {% endblock %}#}
+            {#                </h1>#}
+            {#                {% block breadcrumbs %}#}
+            {#                    Breadcrumb implementation left to developers#}
+            {#                {% endblock %}#}
+            {#            </section>#}
+        {% endblock %}
+
+        {% block content_outer %}
+            <section class="content">
+                {% block messages %}
+                    {% include 'adminlte/lib/_messages.html' %}
+                {% endblock %}
+
+                {% block content_block_wrap %}
+                    {% block content %}{% endblock %}
+                {% endblock %}
+            </section>
+        {% endblock %}
+
+    </div>
+{% endblock content_wrapper %}
+
+
+{% block nav_footer %}
+    {% include 'user/dashboard/lib/_main_footer.html' %}
+{% endblock %}
+
+{% block javascript %}
+    <script src="{% static "bower_components/jquery/dist/jquery.min.js" %} "></script>
+{#        <script src="{% static "user/dashboard/js/jquery-ui.min.js" %}"></script>#}
+{#        <!-- Resolve conflict in jQuery UI with Bootstrap -->#}
+{#        <script>#}
+{#            $.widget.bridge('uibutton', $.ui.button);#}
+{#        </script>#}
+
+    <script src="{% static "bootstrap/dist/js/bootstrap.min.js" %} "></script>
+    <script src="{% static "user/dashboard/js/jquery.dataTables.min.js" %}"></script>
+    <script src="{% static "bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js" %}"></script>
+    <script src="{% static "bower_components/jquery-slimscroll/jquery.slimscroll.min.js" %} ">
+    </script>
+    {#    <script src="{% static "admin-lte/dist/js/app.min.js" %}"></script>#}
+    <script src="{% static "bower_components/fastclick/lib/fastclick.js" %} "></script>
+    <script src="{% static "dist/js/adminlte.min.js" %}"></script>
+    {#    <script src="{% static "dist/js/adminlte.min.js" %}"></script>#}
+
+    <script src="{% static "admin-lte/dist/js/app.min.js" %}"></script>
+
+    <!-- AdminLTE App -->
+    <!-- AdminLTE for demo purposes -->
+    {% block user_javascript %}
+    {% endblock %}
+{% endblock %}

@@ -1,0 +1,403 @@
+{% extends 'user/dashboard/base.html' %}
+
+{% block title %}HPCC Cloud Dashboard - Data Management{% endblock %}
+{% block nav_header %}
+    {% include 'user/dashboard/include/_file_management_header.html' %}
+{% endblock %}
+{% block content %}
+    <div class="row" xmlns="http://www.w3.org/1999/html">
+        <div class="col-lg-4">
+            <div class="box">
+                <div class="box-header">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <h4 class="box-title">Containers</h4>
+                        </div>
+                        <div class="col-md-7" style="float: right">
+                            <div class="table-search-input">
+                                <div class="input-group col-md-12">
+                                    <input type="text"
+                                           class="  search-query form-control"
+                                           placeholder="Filter"/>
+                                    <span class="input-group-btn">
+                                    <span class="btn btn-info search-icon">
+                                        <span class=" glyphicon glyphicon-search"></span>
+                                    </span>
+                                </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <table id="example1"
+                           class="table table-bordered table-hover">
+                        <thead>
+                        <tr>
+                            <th>Container</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Trident
+                                <div style="float: right" class="btn-group">
+                                    <button type="button" class="btn btn-info">
+                                        Action
+                                    </button>
+                                    <button type="button"
+                                            class="btn btn-info dropdown-toggle"
+                                            data-toggle="dropdown">
+                                        <span class="caret"></span>
+                                        <span class="sr-only">Toggle Dropdown</span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href="#">Action</a></li>
+                                        <li><a href="#">Another action</a></li>
+                                        <li><a href="#">Something else here</a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li><a href="#">Separated link</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td>Presto
+                                <div class="btn-group" style="float: right">
+                                    <button type="button" class="btn btn-info">
+                                        Action
+                                    </button>
+                                    <button type="button"
+                                            class="btn btn-info dropdown-toggle"
+                                            data-toggle="dropdown">
+                                        <span class="caret"></span>
+                                        <span class="sr-only">Toggle Dropdown</span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href="#">Action</a></li>
+                                        <li><a href="#">Another action</a></li>
+                                        <li><a href="#">Something else here</a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li><a href="#">Separated link</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td>Presto</td>
+
+                        </tr>
+                        <tr>
+                            <td>Presto</td>
+
+                        </tr>
+
+                        <tr>
+                            <td>KHTML</td>
+                        </tr>
+                        <tr>
+                            <td>Tasman</td>
+
+                        </tr>
+                        <tr>
+                            <td>Trident</td>
+
+                        </tr>
+                        <tr>
+                            <td>Presto</td>
+
+                        </tr>
+                        <tr>
+                            <td>Presto</td>
+
+                        </tr>
+                        <tr>
+                            <td>Presto</td>
+
+                        </tr>
+
+                        <tr>
+                            <td>KHTML</td>
+                        </tr>
+                        <tr>
+                            <td>Tasman</td>
+
+                        </tr>
+                        <tr>
+                            <td>Trident</td>
+
+                        </tr>
+                        <tr>
+                            <td>Presto</td>
+
+                        </tr>
+                        <tr>
+                            <td>Presto</td>
+
+                        </tr>
+                        <tr>
+                            <td>Presto</td>
+
+                        </tr>
+
+                        <tr>
+                            <td>KHTML</td>
+                        </tr>
+                        <tr>
+                            <td>Tasman</td>
+
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- /.box-body -->
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="box">
+                <div class="box-header">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <h4 class="box-title">Files</h4>
+                        </div>
+                        <div class="col-md-7" style="float: right">
+                            <div class="table-search-input">
+                                <div class="input-group col-md-12">
+                                    <input type="text"
+                                           class="  search-query form-control"
+                                           placeholder="Filter"/>
+                                    <span class="input-group-btn">
+                                    <span class="btn btn-info search-icon">
+                                        <span class=" glyphicon glyphicon-search"></span>
+                                    </span>
+                                </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>                <!-- /.box-header -->
+                <div class="box-body">
+                    <table id="example2"
+                           class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <th>File Name</th>
+                            <th>Last Update</th>
+                            <th>Size</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Trident</td>
+                            <td>Internet
+                                Explorer 4.0
+                            </td>
+                            <td>Win 95+</td>
+                        </tr>
+                        <tr>
+                            <td>Trident</td>
+                            <td>Internet
+                                Explorer 5.0
+                            </td>
+                            <td>Win 95+</td>
+                        </tr>
+                        <tr>
+                            <td>Trident</td>
+                            <td>Internet
+                                Explorer 5.5
+                            </td>
+                            <td>Win 95+</td>
+                        </tr>
+                        <tr>
+                            <td>Trident</td>
+                            <td>Internet Explorer 6
+                            </td>
+                            <td>Win 98+</td>
+
+                        </tr>
+                        <tr>
+                            <td>Trident</td>
+                            <td>Internet Explorer 7</td>
+                            <td>Win XP SP2+</td>
+
+                        </tr>
+                        <tr>
+                            <td>Trident</td>
+                            <td>AOL browser (AOL desktop)</td>
+                            <td>Win XP</td>
+
+                        </tr>
+                        <tr>
+                            <td>Gecko</td>
+                            <td>Firefox 1.0</td>
+                            <td>Win 98+ / OSX.2+</td>
+
+                        </tr>
+
+                        <tr>
+                            <td>Trident</td>
+                            <td>Internet
+                                Explorer 4.0
+                            </td>
+                            <td>Win 95+</td>
+                        </tr>
+                        <tr>
+                            <td>Trident</td>
+                            <td>Internet
+                                Explorer 5.0
+                            </td>
+                            <td>Win 95+</td>
+                        </tr>
+                        <tr>
+                            <td>Trident</td>
+                            <td>Internet
+                                Explorer 5.5
+                            </td>
+                            <td>Win 95+</td>
+                        </tr>
+                        <tr>
+                            <td>Trident</td>
+                            <td>Internet Explorer 6
+                            </td>
+                            <td>Win 98+</td>
+
+                        </tr>
+                        <tr>
+                            <td>Trident</td>
+                            <td>Internet Explorer 7</td>
+                            <td>Win XP SP2+</td>
+
+                        </tr>
+                        <tr>
+                            <td>Trident</td>
+                            <td>AOL browser (AOL desktop)</td>
+                            <td>Win XP</td>
+
+                        </tr>
+                        <tr>
+                            <td>Gecko</td>
+                            <td>Firefox 1.0</td>
+                            <td>Win 98+ / OSX.2+</td>
+
+                        </tr>
+                        <tr>
+                            <td>Trident</td>
+                            <td>Internet Explorer 7</td>
+                            <td>Win XP SP2+</td>
+
+                        </tr>
+                        <tr>
+                            <td>Trident</td>
+                            <td>AOL browser (AOL desktop)</td>
+                            <td>Win XP</td>
+
+                        </tr>
+                        <tr>
+                            <td>Gecko</td>
+                            <td>Firefox 1.0</td>
+                            <td>Win 98+ / OSX.2+</td>
+
+                        </tr>
+                        <tr>
+                            <td>Trident</td>
+                            <td>Internet Explorer 7</td>
+                            <td>Win XP SP2+</td>
+
+                        </tr>
+                        <tr>
+                            <td>Trident</td>
+                            <td>AOL browser (AOL desktop)</td>
+                            <td>Win XP</td>
+
+                        </tr>
+                        <tr>
+                            <td>Gecko</td>
+                            <td>Firefox 1.0</td>
+                            <td>Win 98+ / OSX.2+</td>
+
+                        </tr>
+                        <tr>
+                            <td>Trident</td>
+                            <td>Internet Explorer 7</td>
+                            <td>Win XP SP2+</td>
+
+                        </tr>
+                        <tr>
+                            <td>Trident</td>
+                            <td>AOL browser (AOL desktop)</td>
+                            <td>Win XP</td>
+
+                        </tr>
+                        <tr>
+                            <td>Gecko</td>
+                            <td>Firefox 1.0</td>
+                            <td>Win 98+ / OSX.2+</td>
+
+                        </tr>
+                        <tr>
+                            <td>Trident</td>
+                            <td>Internet Explorer 7</td>
+                            <td>Win XP SP2+</td>
+
+                        </tr>
+                        <tr>
+                            <td>Trident</td>
+                            <td>AOL browser (AOL desktop)</td>
+                            <td>Win XP</td>
+
+                        </tr>
+                        <tr>
+                            <td>Gecko</td>
+                            <td>Firefox 1.0</td>
+                            <td>Win 98+ / OSX.2+</td>
+
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- /.box-body -->
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block user_javascript %}
+    <script type="text/javascript">
+        {#        $('#example2').DataTable(#}
+        {#            {#}
+        {#                scrollY: '40vh',#}
+        {#                scrollX: false,#}
+        {#                scrollCollapse: true,#}
+        {#                paging: false#}
+        {#            }#}
+        {#        );#}
+        $('#example1').DataTable(
+            {
+                scrollY: '350px',
+                scrollCollapse: true,
+                paging: false,
+                "searching": false
+            }
+        );
+        $('#example2').DataTable(
+            {
+                {#                scrollY: '40vh',#}
+                'paging': true,
+                'lengthChange': false,
+                'searching': false,
+                'ordering': true,
+                'info': true,
+                'autoWidth': true,
+                "pageLength": 9
+            }
+        );
+
+
+    </script>
+
+{% endblock %}

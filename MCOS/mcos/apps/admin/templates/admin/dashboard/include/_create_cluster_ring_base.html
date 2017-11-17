@@ -1,0 +1,105 @@
+{% load adminlte_helpers i18n %}
+{% load staticfiles %}
+{#<div class="modal fade"#}
+{#     id="modal-create-container-ring"#}
+{#     data-cluster-list-api="{% url 'admin:dashboard:clusters_tbl_api' %}"#}
+{#     data-submit-url="{% url 'admin:ring_and_option:add_container_ring' %}">#}
+<div class="create-cluster-ring-modal-form">
+    {% block form-info %}
+        {#form-info-example#}
+        {#        <div class="form-modal-info"#}
+        {#     id="{% block create-ring-form-id %}{% endblock %}"#}
+        {#     id="create-account-ring-form"#}
+        {#             data-cluster-list-api="{% block cluster-list-api %}{% endblock %}"#}
+        {#             data-submit-url="{% block form-submit-url %}{% endblock %}">#}
+        {#        </div>#}
+    {% endblock %}
+    <div class="modal fade" id="form-modal-body">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="Close">
+                        <span aria-hidden="true">&times;</span></button>
+                    <h3 class="modal-title">
+                        {% block form-title %}{% endblock %}</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-xs-5">
+                            <div><h4 class="text-info">System Clusters</h4>
+                            </div>
+                            <table id="ring-system-clusters"
+                                   class="hover" width="100%" cellspacing="0"
+                                   data-cluster-list-api="">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Address</th>
+                                    <th>Storage Type</th>
+                                </tr>
+                                </thead>
+                                <tfoot>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Address</th>
+                                    <th>Storage Type</th>
+                                </tr>
+                                </tfoot>
+                                <tbody>
+                                </tbody>
+                            </table>
+
+                        </div>
+                        <div class="col-xs-2" style="padding-top: 150px;">
+                            <button type="button" id="move-cluster-right"
+                                    class="btn btn-block"><i
+                                    class="glyphicon glyphicon-chevron-right"></i>
+                            </button>
+                            <button type="button" id="move-cluster-left"
+                                    class="btn btn-block"><i
+                                    class="glyphicon glyphicon-chevron-left"></i>
+                            </button>
+                        </div>
+                        <div class="col-xs-5">
+                            <div>
+                                <h4 class="text-info">
+                                    Selected Clusters For
+                                    {% block ring-name %}{% endblock %}
+                                </h4>
+                            </div>
+                            <table id="ring-selected-clusters"
+                                   class="display"
+                                   cellspacing="0"
+                                   width="100%">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Address</th>
+                                    <th>Storage Type</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-lg btn-default pull-left"
+                            data-dismiss="modal">Cancel
+                    </button>
+                    <button type="button" class="btn btn-lg btn-primary"
+                            id="create-ring-submit-btn">
+                        Create
+                    </button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+
+</div>

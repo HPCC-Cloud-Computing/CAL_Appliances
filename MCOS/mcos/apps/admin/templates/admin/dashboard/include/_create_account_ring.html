@@ -1,0 +1,19 @@
+{% extends 'admin/dashboard/include/_create_cluster_ring_base.html' %}
+
+{% load adminlte_helpers i18n %}
+{% load staticfiles %}
+{% block form-info %}
+    <div class="form-modal-info"
+         id="create-account-ring-form"
+         data-cluster-list-api="{% url 'admin:dashboard:clusters_tbl_api' %}"
+         data-ring-type="account"
+         data-submit-url="{% url 'admin:ring_and_option:add_core_ring' %}">
+    </div>
+{% endblock %}
+
+{% block form-title %}
+    Create Account Cluster Ring
+{% endblock %}
+{% block ring-name %}
+    Account Ring
+{% endblock %}

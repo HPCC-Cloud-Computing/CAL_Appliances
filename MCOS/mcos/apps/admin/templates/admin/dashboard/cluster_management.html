@@ -119,10 +119,10 @@
                     {
                         data: 'status',
                         "render": function (data, type, row) {
-                            if (data == 'ACTIVE') {
+                            if (data === 'ACTIVE') {
                                 return '<span class="label label-primary">' + data + '</span>';
 
-                            } else if (data == 'SHUTOFF') {
+                            } else if (data === 'SHUTOFF') {
                                 return '<span class="label label-danger">' + data + '</span>';
 
                             }else{

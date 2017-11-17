@@ -27,7 +27,7 @@ class SendNewClusterInfoError(Exception):
 
 
 def request_csrf_token(root_url, http_session):
-    req_headers=create_auth_token_header()
+    req_headers = create_auth_token_header()
     get_csrf_token_url = root_url + \
                          'admin/system/get_csrf_token'
     csrftoken = http_session.get(
@@ -93,14 +93,18 @@ def gain_add_cluster_perm_from_cluster(cluster_setup_pid,
                     'request_cluster_id':
                         cluster_setup_pid
                 },
-                timeout=105
+                timeout=600
             )
             status_code = resp.status_code
             if status_code == 200:
                 resp_data = resp.json()
                 if resp_data['acquired_lock'] == 'accept':
+                    print(
+                    "cluster " + gain_add_cluster_perm_url + " accept lock")
                     return 'accept', 'lock is acquired'
                 elif resp_data['acquired_lock'] == 'reject':
+                    print(
+                    "cluster " + gain_add_cluster_perm_url + " reject lock")
                     return 'reject', 'lock is rejected'
                 elif resp_data['acquired_lock'] == 'wait':
                     time.sleep(5)
@@ -186,7 +190,7 @@ def release_add_cluster_permissions(cluster_permission_list):
                         get_shared_value('cluster_setup_pid'),
                 })
             if resp.status_code == 200 and \
-                    resp.json()['release_lock_result'] == 'success':
+                            resp.json()['release_lock_result'] == 'success':
                 pass
             else:
                 pass
@@ -205,8 +209,8 @@ def release_add_cluster_perm(request):
         release_perm_form = \
             ReleaseAddClusterPermForm(request.POST)
         if release_perm_form.is_valid() and \
-            release_perm_form.cleaned_data['request_cluster_id'] == \
-                get_shared_value('cluster_setup_pid'):
+                        release_perm_form.cleaned_data['request_cluster_id'] == \
+                        get_shared_value('cluster_setup_pid'):
             release_lock('cluster_setup_pid')
             return JsonResponse({'release_lock_result': 'success',
                                  'message': 'cls setup lock is released.'})
@@ -282,7 +286,7 @@ def send_new_cluster_to_other_cluster(cluster_access_info, system_form):
                 'cluster_port': system_form.cleaned_data['cluster_port'],
                 'service_info': system_form.cleaned_data['service_info'],
             },
-            timeout=100
+            timeout=600
         )
         status_code = resp.status_code
         if status_code == 200:
@@ -375,6 +379,13 @@ def add_new_cluster(request):
         return JsonResponse({'add_cluster_result': 'failed',
                              'message': 'only cluster which hold lock can '
                                         'add new cluster to this clusters.'})
+
+
+@api_login_required(role='admin')
+def check_health(request):
+    if request.method == 'GET':
+        return JsonResponse({'current_status': 'active'})
+
 
 
 @api_login_required(role='admin')

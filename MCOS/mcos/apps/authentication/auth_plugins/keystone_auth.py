@@ -102,3 +102,12 @@ class KeyStoneClient(Client):
             except Exception as e:
                 print(e)
                 return KeyStoneClient.TOKEN_EXPIRED
+
+    @staticmethod
+    def get_request_user_data(request):
+        token = request.session.get('auth_token')
+        if token is None:
+            token = request.META.get('HTTP_X_AUTH_TOKEN', None)
+        return KeyStoneClient.create_admin_client().tokens.validate(
+            get_user_token(request)
+        )
