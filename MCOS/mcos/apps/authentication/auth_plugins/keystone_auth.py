@@ -108,6 +108,12 @@ class KeyStoneClient(Client):
         token = request.session.get('auth_token')
         if token is None:
             token = request.META.get('HTTP_X_AUTH_TOKEN', None)
-        return KeyStoneClient.create_admin_client().tokens.validate(
-            get_user_token(request)
-        )
+        admin_client = KeyStoneClient.create_admin_client()
+        access_info = admin_client.tokens.validate(token)
+        return access_info
+    @staticmethod
+    def logout(request):
+        token = request.session.get('auth_token')
+        if token is None:
+            token = request.META.get('HTTP_X_AUTH_TOKEN', None)
+        return KeyStoneClient.create_admin_client().tokens.revoke_token(token)

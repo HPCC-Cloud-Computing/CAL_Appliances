@@ -23,12 +23,12 @@
       <work type="init" workers="1" config="containers=r(1,32)" />
     </workstage>
     <workstage name="main-128KBwrite">
-      <work name="main" workers="10" runtime="450">
-        <operation type="write" ratio="100" config="containers=u(1,32);objects=u(1,2000);sizes=c(128)KB" />
+      <work name="main" workers="10" runtime="900">
+        <operation type="write" ratio="100" config="containers=u(1,32);objects=u(1,5000);sizes=c(128)KB" />
       </work>
     </workstage>
     <workstage name="cleanup-128KBwrite">
-      <work type="cleanup" workers="1" config="containers=r(1,32);objects=r(1,2000)" />
+      <work type="cleanup" workers="1" config="containers=r(1,32);objects=r(1,5000)" />
     </workstage>
     <workstage name="dispose-128KBwrite">
       <work type="dispose" workers="1" config="containers=r(1,32)" />

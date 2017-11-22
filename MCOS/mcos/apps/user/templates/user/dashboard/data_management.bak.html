@@ -1,0 +1,469 @@
+{% extends 'user/dashboard/base.html' %}
+{% load staticfiles %}
+
+{% block title %}HPCC Cloud Dashboard - Data Management{% endblock %}
+{% block custom_styles %}
+    <link rel="stylesheet"
+          href="{% static 'user_dashboard/data_management/data_management.css' %}">
+{% endblock %}
+{% block nav_header %}
+    {% include 'user/dashboard/include/_file_management_header.html' %}
+{% endblock %}
+{% block content %}
+    <div class="row" xmlns="http://www.w3.org/1999/html">
+        <div class="box col-lg-5" id="containers-box">
+            <div class="box-header">
+                <div class="row">
+                    <div class="col-md-3">
+                        <h4 class="box-title">Containers</h4>
+                    </div>
+                    <div class="col-md-9 btn-group" style="float: right">
+                        <button type="button" class="btn btn-default"
+                                data-toggle="tooltip" title="Create Container">
+                            <span class="fa fa-plus"></span>
+                        </button>
+                        <div class="input-group table-filter">
+                            <input class="form-control"
+                                   id="containers-filter"
+                                   type="text" placeholder="Filter Containers" style="border-radius: 0">
+                            <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default btn-flat">
+                                        <span class=" glyphicon glyphicon-search"></span>
+                                    </button>
+                                </span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <table id="containers-table"
+                       class="table table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>Container</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Presto</td>
+
+                    </tr>
+                    <tr>
+                        <td>Presto</td>
+
+                    </tr>
+
+                    <tr>
+                        <td>KHTML</td>
+                    </tr>
+                    <tr>
+                        <td>Tasman</td>
+
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="panel-group" ng-transclude="">
+                                <!-- ngRepeat: container in cc.model.containers -->
+                                <!-- end ngRepeat: container in cc.model.containers -->
+                                <div class="panel panel-default ng-isolate-scope panel-primary"
+                                     ng-repeat="container in cc.model.containers"
+                                     ng-class="{'panel-primary': container.name === cc.model.container.name}"
+                                     ng-click="cc.selectContainer(container)">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a class="accordion-toggle" ng-click="toggleOpen()"
+                                               accordion-transclude="heading">
+                                                <div ng-click="cc.selectContainer(container)" class="ng-scope">
+              <span class="hz-container-title truncate ng-scope ng-binding" tooltip="cal.1.storage"
+                    tooltip-placement="top" tooltip-popup-delay="500" tooltip-trigger="mouseenter">
+                cal.1.storage
+              </span>
+                                                    <!-- ngIf: container.name === cc.model.container.name --><span
+                                                        tooltip="Delete Container" tooltip-placement="top"
+                                                        tooltip-trigger="mouseenter"
+                                                        class="fa fa-trash hz-container-delete-icon ng-scope"
+                                                        ng-if="container.name === cc.model.container.name"
+                                                        ng-click="cc.deleteContainer(container); $event.stopPropagation()"></span>
+                                                    <!-- end ngIf: container.name === cc.model.container.name -->
+                                                </div>
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div class="panel-collapse collapse in" collapse="!isOpen" style="height: auto;">
+                                        <div class="panel-body" ng-transclude="">
+                                            <accordion-heading class="ng-scope"></accordion-heading>
+
+                                            <!-- ngIf: !container.is_fetched -->
+                                            <!-- ngIf: container.is_fetched -->
+                                            <ul ng-if="container.is_fetched" class="hz-object-detail ng-scope">
+                                                <li class="hz-object-count row">
+                                                    <span class="hz-object-label col-lg-7 col-md-12" translate=""><span
+                                                            class="ng-scope">Object Count</span></span>
+                                                    <span class="hz-object-val col-lg-5 col-md-12 ng-binding">0</span>
+                                                </li>
+                                                <li class="hz-object-size row">
+                                                    <span class="hz-object-label col-lg-7 col-md-12" translate=""><span
+                                                            class="ng-scope">Size</span></span>
+                                                    <span class="hz-object-val col-lg-5 col-md-12 ng-binding">0 bytes</span>
+                                                </li>
+                                                <li class="hz-object-timestamp row">
+                                                    <span class="hz-object-label col-lg-7 col-md-12" translate=""><span
+                                                            class="ng-scope">Date Created</span></span>
+                                                    <span class="hz-object-val col-lg-5 col-md-12 ng-binding">Nov 20, 2017</span>
+                                                </li>
+                                                <li class="hz-object-link row">
+                                                    <div class="themable-checkbox col-lg-7 col-md-12">
+                                                        <!-- ngIf: container.name === cc.model.container.name --><input
+                                                            id="id_access" ng-model="container.is_public"
+                                                            ng-if="container.name === cc.model.container.name"
+                                                            ng-click="cc.toggleAccess(container)"
+                                                            class="ng-pristine ng-untouched ng-valid ng-scope"
+                                                            type="checkbox">
+                                                        <!-- end ngIf: container.name === cc.model.container.name -->
+                                                        <label class="hz-object-label" for="id_access"
+                                                               translate=""><span
+                                                                class="ng-scope">Public Access</span></label>
+                                                    </div>
+                                                    <span class="hz-object-val col-lg-5 col-md-12">
+                  <a href="" target="_blank" ng-show="container.public_url" translate="" class="ng-hide"><span
+                          class="ng-scope">link</span></a>
+                  <span ng-hide="container.public_url" translate=""><span class="ng-scope">disabled</span></span>
+                </span>
+                                                </li>
+                                            </ul><!-- end ngIf: container.is_fetched -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Presto
+                            <div class="btn-group" style="float: right">
+                                <button type="button" class="btn btn-info">
+                                    Action
+                                </button>
+                                <button type="button"
+                                        class="btn btn-info dropdown-toggle"
+                                        data-toggle="dropdown">
+                                    <span class="caret"></span>
+                                    <span class="sr-only">Toggle Dropdown</span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href="#">Action</a></li>
+                                    <li><a href="#">Another action</a></li>
+                                    <li><a href="#">Something else here</a>
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li><a href="#">Separated link</a></li>
+                                </ul>
+                            </div>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td>Aresto</td>
+
+                    </tr>
+                    <tr>
+                        <td>Eresto</td>
+
+                    </tr>
+
+                    <tr>
+                        <td>KHTML</td>
+                    </tr>
+                    <tr>
+                        <td>Tasman</td>
+
+                    </tr>
+                    <tr>
+                        <td>Trident</td>
+
+                    </tr>
+                    <tr>
+                        <td>KHTML</td>
+                    </tr>
+                    <tr>
+                        <td>Tasman</td>
+
+                    </tr>
+                    <tr>
+                        <td>Trident</td>
+
+                    </tr>
+                    <tr>
+                        <td>Presto</td>
+
+                    </tr>
+                    <tr>
+                        <td>Presto</td>
+
+                    </tr>
+                    <tr>
+                        <td>Presto</td>
+
+                    </tr>
+
+                    <tr>
+                        <td>KHTML</td>
+                    </tr>
+                    <tr>
+                        <td>Tasman</td>
+
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <div class="box col-lg-7" id="files-box">
+            <div class="box-header">
+                <div class="row">
+                    <div class="col-md-3">
+                        <h4 class="box-title">Files</h4>
+                    </div>
+                    <div class="col-md-9 btn-group" style="float: right">
+                        {##}
+                        {#                        >#}
+                        {#                            <button type="button" class="btn btn-default">#}
+                        <button type="button" class="btn btn-default"
+                                data-toggle="tooltip" title="Select All">
+                            <i class="fa fa-check" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="btn btn-default"
+                                data-toggle="tooltip" title="Clear Selection">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="btn btn-default"
+                                data-toggle="tooltip" title="Upload File">
+                            <span class="fa fa-upload"></span>
+                        </button>
+                        <button type="button" class="btn btn-danger"
+                                data-toggle="tooltip" title="Delete Selection">
+                            <i class="fa fa-trash" aria-hidden="true"></i>
+                        </button>
+                        <div class="input-group table-filter">
+                            <input class="form-control"
+                                   id="files-filter"
+                                   type="text" placeholder="Filter Files" style="border-radius: 0">
+                            <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default btn-flat">
+                                        <span class=" glyphicon glyphicon-search"></span>
+                                    </button>
+                                </span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>                <!-- /.box-header -->
+            <div class="box-body">
+                <table id="files-table"
+                       class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>Last Update</th>
+                        <th>Size</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>Trident</td>
+                        <td>Internet
+                            Explorer 4.0
+                        </td>
+                        <td>Win 95+</td>
+                    </tr>
+                    <tr>
+                        <td>Trident</td>
+                        <td>Internet
+                            Explorer 5.0
+                        </td>
+                        <td>Win 95+</td>
+                    </tr>
+                    <tr>
+                        <td>Gecko</td>
+                        <td>Firefox 1.0</td>
+                        <td>Win 98+ / OSX.2+</td>
+
+                    </tr>
+                    <tr>
+                        <td>Trident</td>
+                        <td>Internet Explorer 7</td>
+                        <td>Win XP SP2+</td>
+
+                    </tr>
+                    <tr>
+                        <td>Gecko</td>
+                        <td>Firefox 1.0</td>
+                        <td>Win 98+ / OSX.2+</td>
+
+                    </tr>
+                    <tr>
+                        <td>Trident</td>
+                        <td>Internet
+                            Explorer 4.0
+                        </td>
+                        <td>Win 95+</td>
+                    </tr>
+                    <tr>
+                        <td>Trident</td>
+                        <td>Internet
+                            Explorer 5.0
+                        </td>
+                        <td>Win 95+</td>
+                    </tr>
+                    <tr>
+                        <td>Gecko</td>
+                        <td>Firefox 1.0</td>
+                        <td>Win 98+ / OSX.2+</td>
+
+                    </tr>
+                    <tr>
+                        <td>Trident</td>
+                        <td>Internet Explorer 7</td>
+                        <td>Win XP SP2+</td>
+
+                    </tr>
+                    <tr>
+                        <td>Gecko</td>
+                        <td>Firefox 1.0</td>
+                        <td>Win 98+ / OSX.2+</td>
+
+                    </tr>
+                    <tr>
+                        <td>Trident</td>
+                        <td>Internet
+                            Explorer 4.0
+                        </td>
+                        <td>Win 95+</td>
+                    </tr>
+                    <tr>
+                        <td>Trident</td>
+                        <td>Internet
+                            Explorer 5.0
+                        </td>
+                        <td>Win 95+</td>
+                    </tr>
+                    <tr>
+                        <td>Gecko</td>
+                        <td>Firefox 1.0</td>
+                        <td>Win 98+ / OSX.2+</td>
+
+                    </tr>
+                    <tr>
+                        <td>Trident</td>
+                        <td>Internet Explorer 7</td>
+                        <td>Win XP SP2+</td>
+
+                    </tr>
+                    <tr>
+                        <td>Gecko</td>
+                        <td>Firefox 1.0</td>
+                        <td>Win 98+ / OSX.2+</td>
+
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- /.box-body -->
+    </div>
+{% endblock %}
+
+
+{% block user_javascript %}
+    <script src="{% static "user_dashboard/data_management/load_table.js" %}"></script>
+
+    <script type="text/javascript">
+    </script>
+
+{% endblock %}
+
+
+
+
+
+<div class="btn-group">
+    <button type="button" class="btn btn-default"
+            data-toggle="tooltip" title="Select All">
+        <i class="fa fa-check" aria-hidden="true"></i>
+    </button>
+    <button type="button" class="btn btn-default"
+            data-toggle="tooltip" title="Clear Selection">
+        <i class="fa fa-times" aria-hidden="true"></i>
+    </button>
+    <button type="button" class="btn btn-default"
+            data-toggle="tooltip" title="Upload File">
+        <span class="fa fa-upload"></span>
+    </button>
+    <button type="button" class="btn btn-danger"
+            data-toggle="tooltip" title="Delete Selection">
+        <i class="fa fa-trash" aria-hidden="true"></i>
+    </button>
+</div>
+
+
+
+
+<div ng-form="containerForm" class="ng-pristine ng-scope ng-valid-pattern ng-invalid ng-invalid-required ng-valid-maxlength">
+  <div class="modal-header ui-draggable-handle">
+    <a href="#" class="close" ng-click="$dismiss()">
+      <span class="fa fa-times"></span>
+    </a>
+    <div class="h3 modal-title" translate=""><span class="ng-scope">Create Container</span></div>
+  </div>
+
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-sm-6">
+        <fieldset>
+          <div class="form-group required" ng-class="{'has-error': containerForm.name.$invalid &amp;&amp; containerForm.name.$dirty}">
+            <label class="control-label required" for="id_name" translate=""><span class="ng-scope">Container Name</span></label>
+            <span class="hz-icon-required fa fa-asterisk"></span>
+            <div>
+              <input class="form-control ng-pristine ng-untouched ng-valid-pattern ng-invalid ng-invalid-required ng-valid-maxlength" id="id_name" ng-model="ctrl.model.name" maxlength="255" name="name" ng-required="true" pattern="[^/]+" placeholder="Required" required="required" type="text">
+            </div>
+            <span class="help-block ng-hide" ng-show="containerForm.name.$error.pattern" translate=""><span class="ng-scope">Container name must not contain "/".</span></span>
+          </div>
+          <div class="form-group">
+            <label class="control-label" translate=""><span class="ng-scope">Container Access</span></label>
+            <div>
+              <label for="id_public">
+                <input ng-model="ctrl.model.public" name="public" checked="" id="id_public" class="ng-pristine ng-untouched ng-valid" type="checkbox">
+                <span translate=""><span class="ng-scope">Public</span></span>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="col-sm-6">
+        <p translate=""><span class="ng-scope">A container is a storage compartment for your data and provides a way
+          for you to organize your data. You can think of a container as a
+          folder in Windows® or a directory in UNIX®. The primary difference
+          between a container and these other file system concepts is that
+          containers cannot be nested. You can, however, create an unlimited
+          number of containers within your account. Data must be stored in a
+          container so you must have at least one container defined in your
+          account prior to uploading data.</span></p>
+        <p translate=""><span class="ng-scope">Note: A Public Container will allow anyone with the Public URL to
+          gain access to your objects in the container.</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="$dismiss()">
+      <span class="fa fa-close"></span>
+      <translate><span class="ng-scope">Cancel</span></translate>
+    </button>
+    <button class="btn btn-primary" ng-click="$close(ctrl.model)" ng-disabled="containerForm.$invalid" disabled="disabled">
+      <span class="fa fa-plus"></span>
+      <translate><span class="ng-scope">Create</span></translate>
+    </button>
+  </div>
+</div>

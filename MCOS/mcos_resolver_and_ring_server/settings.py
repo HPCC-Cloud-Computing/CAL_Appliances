@@ -40,6 +40,14 @@ task_routes = {
         {'queue': MCOS_CLUSTER_NAME,
          'exchange': 'mcos_exchange_topic',
          'routing_key': MCOS_CLUSTER_NAME + '.get_ring_info', },
+    'mcos_resolver_and_ring_server.tasks.get_container_list':
+        {'queue': MCOS_CLUSTER_NAME,
+         'exchange': 'mcos_exchange_topic',
+         'routing_key': MCOS_CLUSTER_NAME + '.get_container_list', },
+    'mcos_resolver_and_ring_server.tasks.get_container_info':
+        {'queue': MCOS_CLUSTER_NAME,
+         'exchange': 'mcos_exchange_topic',
+         'routing_key': MCOS_CLUSTER_NAME + '.get_container_info', },
 }
 
 task_queues = (

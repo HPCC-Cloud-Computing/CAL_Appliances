@@ -1,0 +1,129 @@
+.table-filter {
+    /*width: 200px!important;*/
+    /*float: right;*/
+}
+
+.content {
+    padding-top: 0;
+}
+
+#containers-box, #files-box {
+    height: 550px;
+}
+
+.box-title {
+    color: #0f74a8;
+}
+
+.container-info {
+    margin-bottom: 0;
+}
+
+.container-info dl {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#containers-table-body {
+    position: relative;
+}
+
+#containers-table-loading {
+    /*display:    block;*/
+    position: absolute;
+    text-align: center;
+    z-index: 1000;
+    height: 100%;
+    width: 100%;
+    background: rgba(255, 255, 255, .8) url('http://i.stack.imgur.com/FhHRx.gif') 30% 30% no-repeat;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#containers-table-loading .loading-info {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    margin-top: 22px;
+}
+
+#containers-table .dl-horizontal dt {
+    width: 100px;
+}
+
+#containers-table .dl-horizontal dd {
+    margin-left: 120px;
+}
+
+#files-table-body {
+    position: relative;
+}
+
+#files-table-loading {
+    /*display:    block;*/
+    position: absolute;
+    text-align: center;
+    z-index: 1000;
+    height: 100%;
+    width: 100%;
+    background: rgba(255, 255, 255, .8) url('http://i.stack.imgur.com/FhHRx.gif') 30% 30% no-repeat;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#files-table-loading .loading-info {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    margin-top: 22px;
+}
+
+#files-table > tbody > tr > td .btn-group button {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    line-height: 13px;
+
+}
+
+#files-table > tbody > tr > td {
+    line-height: 20px;
+
+}
+
+.btn-center {
+    text-align: center;
+}
+
+.modal-backdrop {
+    opacity: 0.2 !important;
+}
+
+.modal-dialog {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.42857;
+    color: #333;
+    width: 700px;
+    margin: 30px auto;
+    /*margin-left: 50px;*/
+    /*margin-right: 50px;*/
+
+}
+
+.modal-header {
+    padding: 15px;
+    border-bottom: 1px solid #e5e5e5;
+    min-height: 16.42857px;
+}
+
+.modal-content {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+/*#files-table > tbody > tr > th.select-checkbox{*/
+/*padding-top: 12px;*/
+/*padding-bottom: 12px;*/
+/*}*/

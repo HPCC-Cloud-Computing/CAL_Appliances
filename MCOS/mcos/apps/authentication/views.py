@@ -8,6 +8,7 @@ from django.shortcuts import render, reverse, redirect
 from django.contrib import messages
 from .forms import LoginForm, UserRegisterForm
 from .auth_plugins.keystone_auth import KeyStoneClient, ClientException
+from .auth_plugins.decorators import login_required
 
 
 class ViewMessage:
@@ -122,6 +123,7 @@ def user_exists(request):
     return True
 
 
+@login_required(role='user')
 def logout_view(request):
-    logout(request)
+    KeyStoneClient.logout(request)
     return redirect(reverse('auth:login'))

@@ -140,3 +140,55 @@ def check_ring_exist(ring_name):
             is_exist = True
             break
     return is_exist
+
+
+# get container list
+@app.task
+def get_container_list(user_name):
+    container_list = []
+    for i in range(1, 20):
+        container_list.append(str(i))
+    return container_list
+
+
+import random
+import time
+
+
+def strTimeProp(start, end, format, prop):
+    stime = time.mktime(time.strptime(start, format))
+    etime = time.mktime(time.strptime(end, format))
+
+    ptime = stime + prop * (etime - stime)
+
+    return time.strftime(format, time.localtime(ptime))
+
+
+def randomDate(start, end, prop):
+    return strTimeProp(start, end, '%m/%d/%Y %I:%M %p', prop)
+
+
+@app.task
+def get_container_info(user_name, container_name):
+    import random
+    data_object_list = []
+    total_object = random.randint(5, 20)
+    container_size = 0
+    for i in range(0, total_object):
+        data_object_info = {
+            'file_name': str(random.randint(5, 100)),
+            'last_update': str(randomDate("1/1/2015 1:30 PM",
+                                          "1/1/2017 4:50 AM",
+                                          random.random())),
+            'size': str(random.randint(5, 30000))
+        }
+        container_size += int(data_object_info['size'])
+        data_object_list.append(data_object_info)
+    container_info = {
+        'name': container_name,
+        'date_created': ' Nov 15, 2017',
+        'object_count': len(data_object_list),
+        'object_list': data_object_list,
+        'size': container_size
+    }
+    return container_info
