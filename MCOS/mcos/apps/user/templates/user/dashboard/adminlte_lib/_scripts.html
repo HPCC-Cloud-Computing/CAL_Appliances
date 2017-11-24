@@ -1,0 +1,12 @@
+{% load static %}
+
+{% block scripts %}
+    <script src="{% static "adminlte_lib/jquery/dist/jquery.min.js" %}"></script>
+    <script src="{% static "adminlte_lib/jquery/jquery-ui.min.js" %}"></script>
+    <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+    <script>
+        $.widget.bridge('uibutton', $.ui.button);
+    </script>
+    <script src="{% static "adminlte_lib/bootstrap/dist/js/bootstrap.min.js" %} "></script>
+    <script src="{% static "adminlte_lib/adminlte_base/dist/js/app.min.js" %}"></script>
+{% endblock %}

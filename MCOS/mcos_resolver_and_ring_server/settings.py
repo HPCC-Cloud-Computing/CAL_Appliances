@@ -40,14 +40,53 @@ task_routes = {
         {'queue': MCOS_CLUSTER_NAME,
          'exchange': 'mcos_exchange_topic',
          'routing_key': MCOS_CLUSTER_NAME + '.get_ring_info', },
-    'mcos_resolver_and_ring_server.tasks.get_container_list':
-        {'queue': MCOS_CLUSTER_NAME,
-         'exchange': 'mcos_exchange_topic',
-         'routing_key': MCOS_CLUSTER_NAME + '.get_container_list', },
+
+
     'mcos_resolver_and_ring_server.tasks.get_container_info':
         {'queue': MCOS_CLUSTER_NAME,
          'exchange': 'mcos_exchange_topic',
          'routing_key': MCOS_CLUSTER_NAME + '.get_container_info', },
+
+    'mcos_resolver_and_ring_server.tasks.api_get_container_list':
+        {'queue': MCOS_CLUSTER_NAME,
+         'exchange': 'mcos_exchange_topic',
+         'routing_key': MCOS_CLUSTER_NAME + '.api_get_container_list', },
+
+    'mcos_resolver_and_ring_server.tasks.get_container_list':
+        {'queue': MCOS_CLUSTER_NAME,
+         'exchange': 'mcos_exchange_topic',
+         'routing_key': MCOS_CLUSTER_NAME + '.get_container_list', },
+
+    'mcos_resolver_and_ring_server.tasks.api_create_container':
+        {'queue': MCOS_CLUSTER_NAME,
+         'exchange': 'mcos_exchange_topic',
+         'routing_key': MCOS_CLUSTER_NAME + '.api_create_container', },
+    'mcos_resolver_and_ring_server.tasks.create_container':
+        {'queue': MCOS_CLUSTER_NAME,
+         'exchange': 'mcos_exchange_topic',
+         'routing_key': MCOS_CLUSTER_NAME + '.create_container', },
+    'mcos_resolver_and_ring_server.tasks.populate_new_container':
+        {'queue': MCOS_CLUSTER_NAME,
+         'exchange': 'mcos_exchange_topic',
+         'routing_key': MCOS_CLUSTER_NAME + '.populate_new_container', },
+
+    'mcos_resolver_and_ring_server.tasks.get_container_details':
+        {'queue': MCOS_CLUSTER_NAME,
+         'exchange': 'mcos_exchange_topic',
+         'routing_key': MCOS_CLUSTER_NAME + '.get_container_details', },
+
+    'mcos_resolver_and_ring_server.tasks.get_object_list':
+        {'queue': MCOS_CLUSTER_NAME,
+         'exchange': 'mcos_exchange_topic',
+         'routing_key': MCOS_CLUSTER_NAME + '.get_object_list', },
+    # 'mcos_resolver_and_ring_server.tasks.create_container':
+    #     {'queue': MCOS_CLUSTER_NAME,
+    #      'exchange': 'mcos_exchange_topic',
+    #      'routing_key': MCOS_CLUSTER_NAME + '.create_container', },
+    # 'mcos_resolver_and_ring_server.tasks.populate_new_container':
+    #     {'queue': MCOS_CLUSTER_NAME,
+    #      'exchange': 'mcos_exchange_topic',
+    #      'routing_key': MCOS_CLUSTER_NAME + '.populate_new_container', },
 }
 
 task_queues = (

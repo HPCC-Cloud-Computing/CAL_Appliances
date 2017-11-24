@@ -8,13 +8,18 @@ import os
 import sys
 import pytz
 import json
+import hashlib
 from sys import path
 import uuid
+import celery
+import datetime
 from django.utils import timezone
 from os.path import abspath, dirname
+from celery.result import allow_join_result
 
 path.insert(0, os.getcwd())
 from mcos.settings.mcos_conf import PERIODIC_CHECK_STATUS_TIME
+from mcos.settings.mcos_conf import MCOS_CLUSTER_NAME as current_cluster_name
 from .celery import app
 
 # django db setup
@@ -26,6 +31,8 @@ from mcos.apps.admin.shared_database.models import Cluster, Ring, \
 from mcos.apps.admin.shared_database.connection import SharedDatabaseConnection
 from mcos.apps.utils.cache import MemcacheClient
 from .ring_db import Session as LocalRingDbSession, Ring as LocalRing
+from .account_db import Session as AccountSession, ContainerInfo
+from .container_db import Session as ContainerSession, ObjectInfo
 
 
 @app.task()
@@ -143,12 +150,189 @@ def check_ring_exist(ring_name):
 
 
 # get container list
-@app.task
+@app.task(time_limit=10)
+def api_get_container_list(user_name):
+    memcache_client = MemcacheClient()
+    account_ring = memcache_client.get('ring_account_1')
+    if account_ring is None:
+        return {
+            'result': 'Failed',
+            'message': 'account ring is not found'
+        }
+    account_ring = json.loads(account_ring)
+    user_hash = hashlib.md5(user_name)
+    partition_pos = int(bin(int(user_hash.hexdigest(), 16))[2:][-account_ring['power_number']:], 2)
+    ref_clusters = account_ring['parts'][partition_pos]['cluster_refs']
+    with allow_join_result():
+        container_list = None
+        for cluster_id in ref_clusters:
+            cluster_info = SystemCluster.objects.filter(id=cluster_id).first()
+            cluster_status = cluster_info.status
+            if cluster_status == SystemCluster.ACTIVE:
+                cluster_name = cluster_info.name
+                try:
+                    get_container_list_task = get_container_list.apply_async(
+                        (user_name,),
+                        routing_key=cluster_name + '.get_container_list'
+                    )
+                    container_list = get_container_list_task.get(timeout=3)
+                    if container_list is not None:
+                        break
+                        # print(container_list)
+                except Exception as e:
+                    print ('Failed to retrieval container list from cluster ' + cluster_name)
+        return container_list
+        # return None
+
+
+@app.task(time_limit=5)
 def get_container_list(user_name):
     container_list = []
-    for i in range(1, 20):
-        container_list.append(str(i))
+    account_db_conn = AccountSession()
+    container_list_info = account_db_conn.query(ContainerInfo). \
+        filter_by(account_name=user_name).all()
+    for container in container_list_info:
+        container_list.append(container.container_name)
+    account_db_conn.close()
     return container_list
+
+
+@app.task(time_limit=10)
+def api_create_container(user_name, container_name):
+    memcache_client = MemcacheClient()
+    account_ring = memcache_client.get('ring_account_1')
+    if account_ring is None:
+        return {
+            'is_created': False,
+            'message': 'account ring is not found'
+        }
+    account_ring = json.loads(account_ring)
+    user_hash = hashlib.md5(user_name)
+    partition_pos = int(bin(int(user_hash.hexdigest(), 16))[2:][-account_ring['power_number']:], 2)
+    ref_clusters = account_ring['parts'][partition_pos]['cluster_refs']
+    is_created = False
+    with allow_join_result():
+        for cluster_id in ref_clusters:
+            cluster_info = SystemCluster.objects.filter(id=cluster_id).first()
+            cluster_status = cluster_info.status
+            if cluster_status == SystemCluster.ACTIVE:
+                cluster_name = cluster_info.name
+                try:
+                    create_container_task = create_container.apply_async(
+                        (user_name, container_name),
+                        routing_key=cluster_name + '.create_container'
+                    )
+                    is_created = create_container_task.get(timeout=3)
+                    if is_created:
+                        break
+                except Exception as e:
+                    print ('Failed to create container in cluster ' + cluster_name)
+        if is_created:
+            return {
+                'is_created': True,
+                'message': 'new container is created'
+            }
+        else:
+            return {
+                'is_created': False,
+                'message': 'Container already exists or failed to connect to Container Clusters'
+            }
+            # return None
+
+
+@app.task(time_limit=5)
+def create_container(user_name, container_name):
+    # check if container is already exists
+    account_db_conn = AccountSession()
+    container_list_info = account_db_conn.query(ContainerInfo). \
+        filter_by(account_name=user_name, container_name=container_name).all()
+    if len(container_list_info) > 0:
+        return True
+    try:
+        # add new container to database
+        new_container = ContainerInfo(
+            account_name=user_name,
+            container_name=container_name,
+            object_count=0,
+            size=0,
+            date_created=datetime.datetime.utcnow()
+        )
+        # print(datetime.datetime.utcnow())
+        account_db_conn.add(new_container)
+        account_db_conn.commit()
+        # populate_new_container
+        memcache_client = MemcacheClient()
+        account_ring = memcache_client.get('ring_account_1')
+        account_ring = json.loads(account_ring)
+        user_hash = hashlib.md5(user_name)
+        partition_pos = int(bin(int(user_hash.hexdigest(), 16))[2:][-account_ring['power_number']:], 2)
+        ref_clusters = account_ring['parts'][partition_pos]['cluster_refs']
+        with allow_join_result():
+            for cluster_id in ref_clusters:
+                cluster_info = SystemCluster.objects.filter(id=cluster_id).first()
+                print (current_cluster_name)
+                if cluster_info.name != current_cluster_name:
+                    populate_new_container.apply_async(
+                        ({
+                             'account_name': new_container.account_name,
+                             'container_name': new_container.container_name,
+                             'object_count': new_container.object_count,
+                             'size': new_container.size,
+                             'date_created': str(new_container.date_created)
+                         },),
+                        routing_key=cluster_info.name + '.populate_new_container'
+                    )
+        account_db_conn.close()
+        return True
+    except Exception as e:
+        print(e)
+        account_db_conn.close()
+        return False
+
+
+@app.task(ignore_result=True)
+def populate_new_container(new_container_info):
+    # check if container is already exists
+    account_db_conn = AccountSession()
+    container_list_info = account_db_conn.query(ContainerInfo). \
+        filter_by(account_name=new_container_info['account_name'],
+                  container_name=new_container_info['container_name']).all()
+    if len(container_list_info) > 0:
+        return True
+    try:
+        # add new container to database
+        new_container = ContainerInfo(
+            account_name=new_container_info['account_name'],
+            container_name=new_container_info['container_name'],
+            object_count=new_container_info['object_count'],
+            size=new_container_info['size'],
+            date_created=datetime.datetime.strptime(
+                new_container_info['date_created'],
+                '%Y-%m-%d %H:%M:%S.%f')
+        )
+        account_db_conn.add(new_container)
+        account_db_conn.commit()
+        account_db_conn.close()
+    except Exception as e:
+        print (e)
+        account_db_conn.close()
+
+
+#
+# @app.task(time_limit=5)
+# def rpc_get_container_list(user_name):
+#     container_info_list = []
+#     account_db_conn = AccountSession()
+#     container_list = account_db_conn.query(ContainerInfo). \
+#         filter_by(account_name=user_name).all()
+#     for container in container_list:
+#         container_info_list.append({
+#             'container_name': container.container_name,
+#             'object_count': container.object_count,
+#             'size': container.size,
+#             'date_created': container.date_created,
+#         })
+#     return container_info_list
 
 
 import random
@@ -168,27 +352,159 @@ def randomDate(start, end, prop):
     return strTimeProp(start, end, '%m/%d/%Y %I:%M %p', prop)
 
 
+def get_active_account_clusters_ref(user_name):
+    memcache_client = MemcacheClient()
+    account_ring = memcache_client.get('ring_account_1')
+    if account_ring is None:
+        return {
+            'result': 'Failed',
+            'message': 'account ring is not found'
+        }
+    account_ring = json.loads(account_ring)
+    user_hash = hashlib.md5(user_name)
+    partition_pos = int(bin(int(user_hash.hexdigest(), 16))[2:][-account_ring['power_number']:], 2)
+    ref_clusters = account_ring['parts'][partition_pos]['cluster_refs']
+    active_clusters = []
+    for cluster_id in ref_clusters:
+        cluster_info = SystemCluster.objects.filter(id=cluster_id).first()
+        cluster_status = cluster_info.status
+        if cluster_status == SystemCluster.ACTIVE:
+            active_clusters.append(cluster_info.name)
+    return active_clusters
+
+
+def get_active_container_clusters_ref(user_name, container_name):
+    # global name of this container is user_name.container_name
+    container_abs_name = user_name + '.' + container_name
+    memcache_client = MemcacheClient()
+    container_ring = memcache_client.get('ring_container_1')
+    if container_ring is None:
+        return {
+            'result': 'Failed',
+            'message': 'account ring is not found'
+        }
+    container_ring = json.loads(container_ring)
+    container_hash = hashlib.md5(container_abs_name)
+    partition_pos = int(bin(int(container_hash.hexdigest(), 16))[2:][-container_ring['power_number']:], 2)
+    ref_clusters = container_ring['parts'][partition_pos]['cluster_refs']
+    active_clusters = []
+    for cluster_id in ref_clusters:
+        cluster_info = SystemCluster.objects.filter(id=cluster_id).first()
+        cluster_status = cluster_info.status
+        if cluster_status == SystemCluster.ACTIVE:
+            active_clusters.append(cluster_info.name)
+    return active_clusters
+
+
+@app.task(time_limit=5)
+def get_container_details(user_name, container_name):
+    container_details = None
+    account_db_conn = AccountSession()
+    container_info = account_db_conn.query(ContainerInfo). \
+        filter_by(account_name=user_name, container_name=container_name).first()
+    # print(container_info)
+    if container_info is not None:
+        container_details = {
+            'account_name': container_info.account_name,
+            'container_name': container_info.container_name,
+            'object_count': container_info.object_count,
+            'size': container_info.size,
+            'date_created': str(container_info.date_created)
+        }
+    account_db_conn.close()
+    return container_details
+
+
+@app.task(time_limit=5)
+def get_object_list(user_name, container_name):
+    object_list = []
+    container_db_conn = ContainerSession()
+    object_info_list = container_db_conn.query(ObjectInfo). \
+        filter_by(account_name=user_name, container_name=container_name).all()
+    for object_info in object_info_list:
+        object_list.append({
+            'object_name': object_info.object_name,
+            'account_name': object_info.account_name,
+            'container_name': object_info.container_name,
+            'size': object_info.size,
+            'last_update': object_info.last_update,
+        })
+        container_db_conn.close()
+    return object_list
+
+
 @app.task
 def get_container_info(user_name, container_name):
-    import random
-    data_object_list = []
-    total_object = random.randint(5, 20)
-    container_size = 0
-    for i in range(0, total_object):
-        data_object_info = {
-            'file_name': str(random.randint(5, 100)),
-            'last_update': str(randomDate("1/1/2015 1:30 PM",
-                                          "1/1/2017 4:50 AM",
-                                          random.random())),
-            'size': str(random.randint(5, 30000))
-        }
-        container_size += int(data_object_info['size'])
-        data_object_list.append(data_object_info)
-    container_info = {
-        'name': container_name,
-        'date_created': ' Nov 15, 2017',
-        'object_count': len(data_object_list),
-        'object_list': data_object_list,
-        'size': container_size
-    }
-    return container_info
+    active_account_ref = get_active_account_clusters_ref(user_name)
+    with allow_join_result():
+        container_details = None
+        for cluster_name in active_account_ref:
+            # print(cluster_name)
+            cluster_name = cluster_name
+            try:
+                get_container_list_task = get_container_details.apply_async(
+                    (user_name, container_name),
+                    routing_key=cluster_name + '.get_container_list'
+                )
+                container_details = get_container_list_task.get(timeout=3)
+                if container_details is not None:
+                    break
+                    # print(container_list)
+            except Exception as e:
+                print ('Failed to retrieval container list from cluster ' + cluster_name)
+        if container_details is None:
+            return {
+                'result': 'failed',
+                'message': 'Container ' + user_name + '.' + container_name + " is not found."
+            }
+        else:
+            active_container_refs = get_active_container_clusters_ref(user_name, container_name)
+            container_object_list = None
+            for cluster_name in active_container_refs:
+                print(cluster_name)
+                cluster_name = cluster_name
+                try:
+                    get_object_list_task = get_object_list.apply_async(
+                        (user_name, container_name),
+                        routing_key=cluster_name + '.get_object_list'
+                    )
+                    container_object_list = get_object_list_task.get(timeout=3)
+                    if container_object_list is not None:
+                        break
+                        # print(container_list)
+                except Exception as e:
+                    print ('Failed to retrieval container list from cluster ' + cluster_name)
+            if container_object_list is None:
+                return {
+                    'result': 'failed',
+                    'message': 'Failed to retrieval object list from container clusters .'
+                }
+            else:
+                container_details['object_list'] = container_object_list
+                return {
+                    'result': 'success',
+                    'container_info': container_details
+                }
+            # print container_details
+            # import random
+            # data_object_list = []
+            # total_object = random.randint(5, 20)
+            # container_size = 0
+            # for i in range(0, total_object):
+            #     data_object_info = {
+            #         'file_name': str(random.randint(5, 100)),
+            #         'last_update': str(randomDate("1/1/2015 1:30 PM",
+            #                                       "1/1/2017 4:50 AM",
+            #                                       random.random())),
+            #         'size': str(random.randint(5, 30000))
+            #     }
+            #     container_size += int(data_object_info['size'])
+            #     data_object_list.append(data_object_info)
+            # container_info = {
+            #     'name': container_name,
+            #     'date_created': ' Nov 15, 2017',
+            #     'object_count': len(data_object_list),
+            #     'object_list': data_object_list,
+            #     'size': container_size
+            # }
+            # return container_info

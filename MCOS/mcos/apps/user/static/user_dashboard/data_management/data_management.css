@@ -35,7 +35,7 @@
     z-index: 1000;
     height: 100%;
     width: 100%;
-    background: rgba(255, 255, 255, .8) url('http://i.stack.imgur.com/FhHRx.gif') 30% 30% no-repeat;
+    background: rgba(255, 255, 255, .8) url('../loading.gif') 30% 30% no-repeat;
     background-repeat: no-repeat;
     background-position: center;
 }
@@ -67,7 +67,7 @@
     z-index: 1000;
     height: 100%;
     width: 100%;
-    background: rgba(255, 255, 255, .8) url('http://i.stack.imgur.com/FhHRx.gif') 30% 30% no-repeat;
+    background: rgba(255, 255, 255, .8) url('../loading.gif') 30% 30% no-repeat;
     background-repeat: no-repeat;
     background-position: center;
 }
@@ -127,3 +127,49 @@
 /*padding-top: 12px;*/
 /*padding-bottom: 12px;*/
 /*}*/
+
+.containter-info-btn-group {
+    cursor: pointer;
+}
+
+#upload-file-modal .modal-dialog {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.42857;
+    color: #333;
+    width: 850px;
+    margin: 30px auto;
+    /*margin-left: 50px;*/
+    /*margin-right: 50px;*/
+
+}
+
+input[type=file] {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 300px;
+}
+
+#file-uploading-loading {
+    /*display:    block;*/
+    position: absolute;
+    text-align: center;
+    z-index: 1000;
+    height: 100%;
+    width: 100%;
+    background: rgba(255, 255, 255, .8) url('../file_uploading.gif') 30% 30% no-repeat;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#file-uploading-loading .loading-info {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 20px;
+    line-height: 1.42857;
+    margin-top: 25px;
+}

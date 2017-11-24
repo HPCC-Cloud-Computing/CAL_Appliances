@@ -7,12 +7,18 @@ from django.conf.urls import (
 )
 
 urlpatterns = [
-                  url(r'^admin/', include('mcos.apps.admin.urls',
-                                          namespace='admin')),
-                  url(r'^auth/', include('mcos.apps.authentication.urls',
-                                         namespace='auth')),
-                  url(r'^', include('mcos.apps.user.urls',
-                                    namespace='user'))
+                  url(r'^admin/',
+                      include('mcos.apps.admin.urls',
+                              namespace='admin')),
+                  url(r'^auth/',
+                      include('mcos.apps.authentication.urls',
+                              namespace='auth')),
+                  url(r'^file-and-container/',
+                      include('mcos.apps.file_and_container.urls',
+                              namespace='file_and_container')),
+                  url(r'^',
+                      include('mcos.apps.user.urls',
+                              namespace='user'))
                   # url(r'^lookup/', include('mcs.apps.lookup.urls',
                   #                          namespace='auth')),
 

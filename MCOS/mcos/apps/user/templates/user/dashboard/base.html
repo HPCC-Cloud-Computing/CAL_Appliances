@@ -1,4 +1,4 @@
-{% extends 'adminlte/base.html' %}
+{% extends 'user/dashboard/adminlte_lib/base.html' %}
 {% load staticfiles %}
 {% block extra_head %}
 
@@ -17,6 +17,9 @@
           href="{% static 'bower_components/Ionicons/css/ionicons.min.css' %}">
     <link rel="stylesheet"
           href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+    <link rel="stylesheet"
+          href="{% static 'user_dashboard/base.css' %}">
+
     {% block custom_styles %}
     {% endblock %}
 {% endblock %}
@@ -32,6 +35,24 @@
 {% endblock %}
 {% block content_wrapper %}
     <div class="content-wrapper">
+        <div class="col-md-4"
+             style="z-index: 1050; position: absolute;top:55px;right:50px;"
+             id="alert-message-box">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.extra_tags }} alert-dismissable">
+                        <a href="#" class="close" data-dismiss="alert"
+                           aria-label="close">×</a>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {#        <div class="alert alert-success alert-dismissable">#}
+            {#            <a href="#" class="close" data-dismiss="alert"#}
+            {#               aria-label="close">×</a>#}
+            {#            Create account ring successful!#}
+            {#        </div>#}
+        </div>
         {% block content_header %}
             {#            <section class="content-header">#}
             {#                <h1>#}
@@ -74,6 +95,22 @@
     {#        <script>#}
     {#            $.widget.bridge('uibutton', $.ui.button);#}
     {#        </script>#}
+    <script src="{% static "user_dashboard/js.cookie.js" %}"></script>
+    <script type="text/javascript">
+        let csrftoken = Cookies.get("csrftoken");
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+    </script>
+
 
     <script src="{% static "bootstrap/dist/js/bootstrap.min.js" %} "></script>
     <script src="{% static "user/dashboard/js/jquery.dataTables.min.js" %}"></script>

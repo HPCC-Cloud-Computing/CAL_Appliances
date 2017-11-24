@@ -22,7 +22,7 @@
                         <h5 class="box-title">Containers</h5>
                     </div>
                     <div class="col-md-8 btn-group" style="float: right">
-                        <button type="button" id="create-container-btn"class="btn btn-default"
+                        <button type="button" id="create-container-btn" class="btn btn-default"
                                 rel="tooltip" title="Create Container">
                             <span class="fa fa-plus"></span>
                         </button>
@@ -49,8 +49,9 @@
                         {#                       class="hover"#}
                        class="table table-hover table-bordered table-striped"
                         {#                       cellspacing="0"#}
-                       data-container-list-api="{% url 'user:container_list' %}"
-                       data-container-info-api="{% url 'user:container_info' %}">
+                       data-container-list-api="{% url 'file_and_container:container_list' %}"
+                       data-container-info-api="{% url 'file_and_container:container_info' %}"
+                       data-create-container-api="{% url 'file_and_container:create_container' %}">
                     <thead>
                     <tr>
                         <th>Container Name</th>
@@ -68,8 +69,15 @@
                                 <span class="truncate" id="container-name">
                                     cal.1.storage
                                 </span>
-                                <span class="fa fa-trash" style="float: right"
-                                      rel="tooltip" title="Delete Container">
+                                <span class="containter-info-btn-group" style="float: right;">
+                                    <span class="fa fa-trash delete-container-btn"
+                                          style="margin-right:3px;"
+                                          rel="tooltip" title="Delete Container">
+                                    </span>
+                                    <span class="fa fa-bars collapse-container-btn"
+                                              rel="tooltip" title="Collapse">
+                                    </span>
+
                                 </span>
                             </h4>
                         </div>
@@ -105,6 +113,7 @@
                             <i class="fa fa-times" aria-hidden="true"></i>
                         </button>
                         <button type="button" class="btn btn-default"
+                                id="upload-file"
                                 rel="tooltip" title="Upload File">
                             <span class="fa fa-upload"></span>
                         </button>
@@ -131,7 +140,8 @@
                     <div class="loading-info text-primary text-bold">Loading...</div>
                 </div>
                 <table id="files-table"
-                       class=" table table-hover table-select table-bordered table-striped">
+                       class=" table table-hover table-select table-bordered table-striped"
+                       data-upload-file-api="{% url 'file_and_container:upload_file' %}">
                     <thead>
                     <tr>
                         <th></th>
@@ -165,12 +175,14 @@
         </div>
     </div>
     {% include 'user/dashboard/include/_create_container_modal.html' %}
+    {% include 'user/dashboard/include/_upload_file.html' %}
 
 {% endblock %}
 
 
 {% block user_javascript %}
     <script src="{% static "user_dashboard/data_management/dataTables.select.js" %}"></script>
+    <script src="{% static "user_dashboard/data_management/_create_alert_message.js" %}"></script>
     <script src="{% static "user_dashboard/data_management/load_table.js" %}"></script>
     <script type="text/javascript">
     </script>
