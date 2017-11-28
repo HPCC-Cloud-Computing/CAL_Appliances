@@ -12,18 +12,16 @@ Base = declarative_base()
 
 # Ring table, use to quick load ring to memcached
 
-class ContainerInfo(Base):
-    __tablename__ = 'container'
+class ResolverInfo(Base):
+    __tablename__ = 'object'
+    # object name
+    object_name = Column(String(255), primary_key=True, nullable=False)
     # account name
     account_name = Column(String(255), primary_key=True, nullable=False)
     # container name
     container_name = Column(String(255), primary_key=True, nullable=False)
-    # object count
-    object_count = Column(Integer, nullable=False)
-    # total size, in MB
-    size = Column(Float, nullable=False)
-    # ring type
-    date_created = Column(DateTime, nullable=False)
+    # total size, in bytes
+    option_name = Column(String(255), nullable=False)
 
     time_stamp = Column(DateTime, nullable=False)
 
@@ -33,7 +31,7 @@ class ContainerInfo(Base):
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-engine = create_engine('sqlite:///rings/account_db.sqlite')
+engine = create_engine('sqlite:///rings/container_db.sqlite')
 
 Session = sessionmaker()
 Session.configure(bind=engine)

@@ -1,7 +1,7 @@
 import os
 import uuid
 from sqlalchemy import Table, Column, Integer, Numeric, String
-from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, func, Float
+from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, func, Float, Boolean
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import relationship, backref
@@ -24,6 +24,10 @@ class ObjectInfo(Base):
     size = Column(Integer, nullable=False)
     # last_updated
     last_update = Column(DateTime, nullable=False)
+
+    time_stamp = Column(DateTime, nullable=False)
+
+    is_deleted = Column(Boolean, default=False)
 
 
 from sqlalchemy import create_engine

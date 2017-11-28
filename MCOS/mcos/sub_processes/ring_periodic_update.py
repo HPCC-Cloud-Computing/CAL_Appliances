@@ -4,6 +4,7 @@ from __future__ import absolute_import, unicode_literals
 import os
 import sys
 import time
+import datetime
 import django
 import json
 import memcache
@@ -16,7 +17,8 @@ from os.path import abspath, dirname
 
 path.insert(0, os.getcwd())
 # from mcos.settings.mcos_conf import PERIODIC_SEND_STATUS_TIME
-from mcos.settings.mcos_conf import PERIODIC_UPDATE_AND_POPULATE_RING
+# from mcos.settings.mcos_conf import PERIODIC_UPDATE_AND_POPULATE_RING
+PERIODIC_UPDATE_AND_POPULATE_RING = 120
 from mcos.settings.mcos_conf import MCOS_CLUSTER_NAME
 from mcos.settings.base import TIME_ZONE
 from mcos_celery_server import tasks
@@ -173,6 +175,7 @@ def main():
     shared_db_conn = None
     while not_exit:
         try:
+            print(datetime.datetime.now())
             # print("Current node:" + str(current_seq_number))
             # if current node is leader node,
             # check populate ring and send ring to active cluster not updated

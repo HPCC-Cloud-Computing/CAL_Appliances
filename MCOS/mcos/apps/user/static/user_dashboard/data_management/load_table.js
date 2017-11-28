@@ -13,7 +13,7 @@ $(document).ready(function () {
                 // console.log(data.name);
                 $(row).attr('data-container-name', data.info);
             },
-            scrollY: '342px',
+            scrollY: '400px',
             scrollX: false,
             // scrollCollapse: true,
             paging: false,
@@ -94,7 +94,7 @@ $(document).ready(function () {
             'ordering': true,
             'info': true,
             'autoWidth': true,
-            "pageLength": 9
+            "pageLength": 10
             // "pageLength": 9
         }
     );
@@ -204,9 +204,9 @@ $(document).ready(function () {
                         var monthNames = ["January", "February", "March", "April", "May", "June",
                             "July", "August", "September", "October", "November", "December"
                         ];
-                        // console.log(containerInfo);
                         let createdDate = new Date(containerInfo.date_created);
-                        createdDateDisplay = monthNames[createdDate.getMonth()] + ' ' + createdDate.getDay() + ', ' + createdDate.getFullYear();
+                        // console.log(createdDate);
+                        createdDateDisplay = monthNames[createdDate.getMonth()] + ' ' + createdDate.getDate() + ', ' + createdDate.getFullYear();
                         let containerInfoHtml = $('#container-info-soure').html();
                         let containerInfoBox = $('<td/>').html(containerInfoHtml);
                         containerInfoBox.find("#container-name").html(containerInfo.container_name);

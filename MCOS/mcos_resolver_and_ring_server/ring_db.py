@@ -1,7 +1,7 @@
 import os
 import uuid
 from sqlalchemy import Table, Column, Integer, Numeric, String
-from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, func
+from sqlalchemy import Column, DateTime, String, Integer, ForeignKey, func, Boolean
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import relationship, backref
@@ -17,7 +17,7 @@ class Ring(Base):
     # ring_id
     id = Column(String(255), primary_key=True)
     # ring name
-    name = Column(String(255),nullable=False)
+    name = Column(String(255), nullable=False)
     # ring version
     version = Column(Integer, nullable=False)
     # ring type

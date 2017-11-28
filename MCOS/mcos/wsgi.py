@@ -3,11 +3,16 @@ WSGI config for mcos project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 """
-import eventlet
+# import eventlet
+#
+# eventlet.monkey_patch()
+# from eventlet import wsgi
+from gevent import monkey
 
-eventlet.monkey_patch()
+monkey.patch_all()
+from gevent.wsgi import WSGIServer
+
 import os
-from eventlet import wsgi
 from django.core.wsgi import get_wsgi_application
 import time
 from optparse import OptionParser
@@ -15,7 +20,6 @@ from os.path import abspath, dirname
 from sys import path
 from system_setup import SystemConnectionError, connect_to_system
 from mcos.settings.mcos_conf import MCOS_PORT
-
 
 SITE_ROOT = dirname(dirname(abspath(__file__)))
 path.insert(0, SITE_ROOT)
@@ -65,24 +69,30 @@ SYSTEM_INFO = {
 
 
 def setup_system_and_start_servers():
-
     try:
         connect_to_system('mcos.settings', SYSTEM_INFO)
         application = get_wsgi_application()
-        run_wsgi_app(eventlet, wsgi, application, int(MCOS_PORT))
+        run_wsgi_app(application, int(MCOS_PORT))
+        # run_wsgi_app(eventlet, wsgi, application, int(MCOS_PORT))
     except Exception as e:
         print("Cannot connect to system. Server will be exited. ")
         print("Reason: " + e.message)
 
 
-def run_wsgi_app(eventlet, wsgi, app, port):
-    """Run a wsgi compatible app using eventlet"""
-    print("starting eventlet server on port %i" % port)
-    wsgi.server(
-        eventlet.listen(('', port)),
-        app,
-        max_size=MAX_GREEN_THREADS,
-    )
+def run_wsgi_app(app, port):
+    server = WSGIServer(("127.0.0.1", port), app)
+    print "Starting server on http://127.0.0.1:" + str(port)
+    server.serve_forever()
+
+
+# def run_wsgi_app(eventlet, wsgi, app, port):
+#     """Run a wsgi compatible app using eventlet"""
+#     print("starting eventlet server on port %i" % port)
+#     wsgi.server(
+#         eventlet.listen(('', port)),
+#         app,
+#         max_size=MAX_GREEN_THREADS,
+#     )
 
 if __name__ == "__main__":
     setup_system_and_start_servers()

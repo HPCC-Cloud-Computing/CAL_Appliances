@@ -16,7 +16,7 @@ function alert_message(message_content, alert_class_type) {
         alert_element.fadeOut("normal", function () {
             $(this).remove();
         });
-    }, 10000);
+    }, 5000);
 
     // <div class="alert alert-success alert-dismissable">
     //     <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
