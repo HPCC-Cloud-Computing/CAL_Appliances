@@ -1,5 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 import eventlet
+
 eventlet.monkey_patch()
 import os
 import sys
@@ -12,7 +13,7 @@ from os.path import abspath, dirname
 
 path.insert(0, os.getcwd())
 # from mcos.settings.shared import PERIODIC_SEND_STATUS_TIME
-PERIODIC_SEND_STATUS_TIME=180
+PERIODIC_SEND_STATUS_TIME = 360
 from mcos.settings.mcos_conf import MCOS_CLUSTER_NAME
 from mcos.settings.base import TIME_ZONE
 from mcos_celery_server import tasks

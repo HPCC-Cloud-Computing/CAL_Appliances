@@ -13,7 +13,7 @@ Base = declarative_base()
 # Ring table, use to quick load ring to memcached
 
 class ResolverInfo(Base):
-    __tablename__ = 'object'
+    __tablename__ = 'resolver'
     # object name
     object_name = Column(String(255), primary_key=True, nullable=False)
     # account name
@@ -31,7 +31,7 @@ class ResolverInfo(Base):
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-engine = create_engine('sqlite:///rings/container_db.sqlite')
+engine = create_engine('sqlite:///rings/resolver_db.sqlite')
 
 Session = sessionmaker()
 Session.configure(bind=engine)

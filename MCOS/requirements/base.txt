@@ -15,6 +15,7 @@ requests
 Pillow<3.5.0
 
 eventlet
+grequests
 kazoo
 
 django-role-permissions

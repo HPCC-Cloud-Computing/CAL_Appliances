@@ -7,6 +7,25 @@ $(document).ready(function () {
         container: 'body',
         trigger: 'hover'
     });
+    function handleFailedAjaxRequest(jqXHR, textStatus, error, msgHeader) {
+        // console.log(jqXHR);
+        if (jqXHR.status == 403) {
+            alert_message(
+                msgHeader + ' Reason: Token Expired! ' +
+                'Redirecting to login page...',
+                'alert-danger');
+
+            setTimeout(function () {
+                window.location.replace($("#login-url").data('login-url'));
+            }, 1000);
+
+        } else {
+            alert_message(
+                msgHeader + 'Reason: ' + jqXHR.responseJSON.message,
+                'alert-danger');
+        }
+    }
+
     let containersTable = $('#containers-table').DataTable(
         {
             'createdRow': function (row, data, dataIndex) {
@@ -35,30 +54,52 @@ $(document).ready(function () {
                     orderable: false,
                     className: 'select-checkbox',
                     targets: 0,
+                    "width": "5%",
                     "data": null,
                     "defaultContent": ''
                 },
                 {
                     "className": "btn-center",
-                    "width": "20%", "targets": -1,
+                    "width": "25%", "targets": -1,
                     "orderable": false,
                     "data": function (row, type, val, meta) {
+                        // load downloadlink for each object
                         // console.log(row);
                         // console.log(val);
+                        let downloadUrl = $('#files-table').data('file-download-api');
+                        downloadUrl+='?account_name='+row.account_name;
+                        downloadUrl+='&container_name='+row.container_name;
+                        downloadUrl+='&file_name='+row.object_name;
                         let fileActions = $("#file-actions-source").html();
                         let fileActionsBox = $(fileActions);
+                        // console.log(fileActionsBox.find('a.btn-download-file')[0]);
+                        // console.log(downloadUrl);
+                        $(fileActionsBox.find('a.btn-download-file')[0]).attr('href',downloadUrl);
                         fileActionsBox.attr('data-object-name', row.file_name);
                         // console.log(fileActionsBox.prop('outerHTML'));
                         // return "<button>Edit</button>";
                         return fileActionsBox.prop('outerHTML');
                     }
                 },
-                {"data": "file_name", "targets": 1},
                 {
+                    "data": "object_name",
+                    "render": function (data, type, row) {
+                        if (data.length >= 25) {
+                            data = data.substring(0, 22) + '...';
+                        }
+                        return data;
+                    },
+                    "targets": 1,
+                    "width": "30%",
+                },
+                {
+                    "width": "25%",
                     "data": "last_update", "targets": 2,
                     "render": function (data, type, row) {
-                        console.log(data);
-                        return data;
+                        let lastUpdate = moment.utc(data, "YYYY-MM-DD HH:mm:ss.SS");
+                        // createdDateDisplay = moment(lastUpdate).local().format('YYYY MMM DD');
+                        // console.log(data);
+                        return moment(lastUpdate).local().format('DD-MM-YYYY HH:mm:ss');
                         // if (data === 'ACTIVE') {
                         //     return '<span class="label label-primary">' + data + '</span>';
                         //
@@ -70,11 +111,30 @@ $(document).ready(function () {
                         // }
                     }
                 },
-                {"data": "size", "targets": 3},
+                {
+                    "data": "size", "targets": 3,
+                    "width": "15%",
+                    "render": function (data, type, row) {
+                        if (data < 512) {
+                            return data + " byte"
+                        }
+                        else if (512 <= data && data <= 1024 * 1024 * 0.5) {
+                            return (data * 1.0 / 1024).toFixed(2) + " KB"
+                        }
+                        else if (1024 * 1024 * 0.5 <= data && data < 1024 * 1024 * 512) {
+                            return (data * 1.0 / (1024 * 1024)).toFixed(2) + " MB"
+                        }
+                        else if (1024 * 1024 * 512 <= data && data < 1024 * 1024 * 1024 * 512) {
+                            return (data * 1.0 / (1024 * 1024 * 1024)).toFixed(2) + " GB"
+                        }
+
+                    }
+
+                },
             ],
             'createdRow': function (row, data, dataIndex) {
                 // console.log(data.name);
-                $(row).attr('data-file-name', data.file_name);
+                $(row).attr('data-file-name', data.object_name);
             },
             // columns: [
             //     // {data: ''},
@@ -93,11 +153,81 @@ $(document).ready(function () {
             dom: 'lrtip',
             'ordering': true,
             'info': true,
-            'autoWidth': true,
-            "pageLength": 10
+            fixedColumns: true,
+            'autoWidth': false,
+            "pageLength": 9
             // "pageLength": 9
         }
     );
+
+    // show object info
+    $('#files-table').on('click', 'tbody tr .btn-info-file', function () {
+        let trSelectedElement = $(this).closest('tr');
+        let selectedFileName = $(trSelectedElement).data('file-name').toString();
+        let selectedContainerName = containersTable.$('tr.selected').data('container-name').toString();
+        $('#file-info-modal').modal();
+        $("#file-info-loading .loading-info").html('Loading File Info...');
+        $("#file-info-loading").show();
+        $.ajax({
+            method: "GET",
+            data: {
+                'file_name': selectedFileName,
+                'container_name': selectedContainerName
+            },
+            url: $('#files-table').data('file-info-api')
+        })
+            .done(function (data) {
+                // console.log(data);
+                if (data.result == 'success') {
+                    let objectInfo = data.object_info;
+                    let fileInfoDisplay = $('#file-info-modal').find('#file-info');
+                    $(fileInfoDisplay).empty();
+                    for (var key in objectInfo) {
+                        if (key == 'last_update') {
+                            let lastUpdate = moment.utc(objectInfo[key], "YYYY-MM-DD HH:mm:ss.SS");
+                            // createdDateDisplay = moment(lastUpdate).local().format('YYYY MMM DD');
+                            // console.log(data);
+                            lastUpdate = moment(lastUpdate).local().format('DD-MM-YYYY HH:mm:ss');
+                            fileInfoDisplay.append($('<dt>' + key + '</dt>'));
+                            fileInfoDisplay.append($('<dd>' + lastUpdate + '</dd>'));
+                        } else if (key == 'file_size') {
+                            let fileSize = '';
+                            let data = parseInt(objectInfo[key]);
+                            if (data < 512) {
+                                fileSize = data + " byte"
+                            }
+                            else if (512 <= data && data <= 1024 * 1024 * 0.5) {
+                                fileSize = (data * 1.0 / 1024).toFixed(2) + " KB"
+                            }
+                            else if (1024 * 1024 * 0.5 <= data && data < 1024 * 1024 * 512) {
+                                fileSize = (data * 1.0 / (1024 * 1024)).toFixed(2) + " MB"
+                            }
+                            else if (1024 * 1024 * 512 <= data && data < 1024 * 1024 * 1024 * 512) {
+                                fileSize = (data * 1.0 / (1024 * 1024 * 1024)).toFixed(2) + " GB"
+                            }
+                            fileInfoDisplay.append($('<dt>' + key + '</dt>'));
+                            fileInfoDisplay.append($('<dd>' + fileSize + '</dd>'));
+
+                        } else {
+                            fileInfoDisplay.append($('<dt>' + key + '</dt>'));
+                            fileInfoDisplay.append($('<dd>' + objectInfo[key] + '</dd>'));
+                        }
+                        // console.log(key, yourobject[key]);
+                    }
+
+                } else {
+                    alert_message(
+                        'Failed to load file info.' + 'Reason: ' + data.message,
+                        'alert-danger');
+                }
+            })
+            .fail(function (jqXHR, textStatus, error) {
+                handleFailedAjaxRequest(jqXHR, textStatus, error, 'Failed to load file info.');
+            })
+            .always(function (data) {
+                $("#file-info-loading").hide();
+            });
+    });
 
 
     function loadContainersTable() {
@@ -119,10 +249,7 @@ $(document).ready(function () {
             .done(function (data) {
             })
             .fail(function (jqXHR, textStatus, error) {
-                // Handle error here
-                alert_message(
-                    'Failed to retrieval container list. Reason: ' + textStatus,
-                    'alert-danger');
+                handleFailedAjaxRequest(jqXHR, textStatus, error, 'Failed to load container list.');
             })
             .always(function (data) {
                 let container_list = [];
@@ -151,8 +278,103 @@ $(document).ready(function () {
             });
     }
 
+    function loadContainerDetails(selectedContainerRow) {
+        let isRowSelected = false;
+        if ($(selectedContainerRow).hasClass('selected')) {
+            isRowSelected = true;
+        }
+        // console.log(isRowSelected);
+        // let selectedContainerRow = $('#containers-table').find('tr.selected');
+        // show loading screens in containers table and files table
+        $("#containers-filter").prop("disabled", true);
+        $("#containers-table-loading .loading-info").html('Loading Container Information...');
+        $("#containers-table-loading").show();
+
+        $("#files-filter").prop("disabled", true);
+        $("#files-table-loading .loading-info").html('Loading File Object List...');
+        $("#files-table-loading").show();
+
+
+        let selectedRow = $(selectedContainerRow);
+        let tblElement = $('#containers-table');
+        let getContainerInfoApi = tblElement.data("container-info-api");
+        $.ajax({
+            method: "GET",
+            data: {'container_name': $(selectedContainerRow).data('container-name').toString()},
+            url: getContainerInfoApi
+        })
+            .done(function (data) {
+            })
+            .fail(function (jqXHR, textStatus, error) {
+                handleFailedAjaxRequest(jqXHR, textStatus, error, 'Failed to load container details.');
+            })
+            .always(function (data) {
+                let containerInfo = data.container_info;
+                let objectList = []
+                if (data.result === 'success') {
+                    let containerSize = containerInfo.size.toFixed(2);
+                    let containerSizeDisplay;
+                    let createdDateDisplay;
+                    if (containerSize >= 512) {
+                        containerSizeDisplay = containerSize / 1024 + ' GB';
+                    } else {
+                        containerSizeDisplay = containerSize + ' MB';
+                    }
+                    var monthNames = ["January", "February", "March", "April", "May", "June",
+                        "July", "August", "September", "October", "November", "December"
+                    ];
+                    // var date = moment.utc("22017-11-29 21:57:03.258749", "YYYY-MM-DD HH:mm:ss.SS")
+                    // console.log(moment(date).local().format('YYYY-MMM-DD h:mm A'));
+                    // console.log(containerInfo.date_created);
+                    let createdDate = moment.utc(containerInfo.date_created, "YYYY-MM-DD HH:mm:ss.SS");
+                    createdDateDisplay = moment(createdDate).local().format('YYYY MMM DD');
+                    let containerInfoHtml = $('#container-info-soure').html();
+                    let selectedRowTd = $(selectedRow).find('td');
+                    $(selectedRowTd).html(containerInfoHtml);
+                    selectedRowTd.find("#container-name").html(containerInfo.container_name);
+                    selectedRowTd.find("#object-count").html(containerInfo.object_count);
+                    selectedRowTd.find("#container-size").html(containerSizeDisplay);
+                    selectedRowTd.find("#date-created").html(createdDateDisplay);
+                    if (!isRowSelected) {
+                        let prevSelectedRow = containersTable.$('tr.selected');
+                        if (prevSelectedRow.length !== 0) {
+                            // console.log(selectedRow);
+                            prevSelectedRow.find('td')
+                                .html($(prevSelectedRow).data('container-name').toString());
+                            prevSelectedRow.removeClass('selected');
+                        }
+                        $(selectedRow).addClass('selected');
+
+                    }
+                    objectList = containerInfo.object_list;
+                    // console.log(objectList);
+                } else if (data.result === 'failed') {
+                    alert_message(
+                        'Failed to retrieval container list. Reason: ' + data.message,
+                        'alert-danger');
+                }
+                setTimeout(function () {
+                    // push data for files table
+                    filesTable.clear().draw();
+                    filesTable.rows.add(objectList);
+                    filesTable.draw();
+                    // load downloadlink for each object
+                    // console.log($("#files-table").find('a.btn-download-file'));
+                    // $("#files-table").find('a.btn-download-file').each(function () {
+                    //     console.log(this);
+                    // })
+                    // turnoff loading screens
+                    $("#containers-filter").prop("disabled", false);
+                    $("#containers-table-loading").hide();
+                    $("#files-filter").prop("disabled", false);
+                    $("#files-table-loading").hide();
+                }, 100);
+            });
+    }
+
     // loading container info when click to a container in table
     $('#containers-table').on('click', 'tbody tr', function () {
+
         // console.log($(this).data('container-name'));
         if (!$(this).data('container-name')) {
         }
@@ -163,91 +385,13 @@ $(document).ready(function () {
             // empty files table
         }
         else {
-            // show loading screens in containers table and files table
-            $("#containers-filter").prop("disabled", true);
-            $("#containers-table-loading .loading-info").html('Loading Container Information...');
-            $("#containers-table-loading").show();
-
-            $("#files-filter").prop("disabled", true);
-            $("#files-table-loading .loading-info").html('Loading File Object List...');
-            $("#files-table-loading").show();
-
-
-            let selectedRow = this;
-            let tblElement = $('#containers-table');
-            let getContainerInfoApi = tblElement.data("container-info-api");
-            $.ajax({
-                method: "GET",
-                data: {'container_name': $(this).data('container-name').toString()},
-                url: getContainerInfoApi
-            })
-                .done(function (data) {
-                })
-                .fail(function (jqXHR, textStatus, error) {
-                    // Handle error here
-                    alert_message(
-                        'Failed to retrieval container list. Reason: ' + textStatus,
-                        'alert-danger');
-                })
-                .always(function (data) {
-                    let containerInfo = data.container_info;
-                    let objectList = []
-                    if (data.result === 'success') {
-                        let containerSize = containerInfo.size;
-                        let containerSizeDisplay;
-                        let createdDateDisplay;
-                        if (containerSize >= 512) {
-                            containerSizeDisplay = containerSize / 1024 + ' GB';
-                        } else {
-                            containerSizeDisplay = containerSize + ' MB';
-                        }
-                        var monthNames = ["January", "February", "March", "April", "May", "June",
-                            "July", "August", "September", "October", "November", "December"
-                        ];
-                        let createdDate = new Date(containerInfo.date_created);
-                        // console.log(createdDate);
-                        createdDateDisplay = monthNames[createdDate.getMonth()] + ' ' + createdDate.getDate() + ', ' + createdDate.getFullYear();
-                        let containerInfoHtml = $('#container-info-soure').html();
-                        let containerInfoBox = $('<td/>').html(containerInfoHtml);
-                        containerInfoBox.find("#container-name").html(containerInfo.container_name);
-                        containerInfoBox.find("#object-count").html(containerInfo.object_count);
-                        containerInfoBox.find("#container-size").html(containerSizeDisplay);
-                        containerInfoBox.find("#date-created").html(createdDateDisplay);
-                        // console.log(containerInfoBox);
-                        $(selectedRow).empty();
-                        $(selectedRow).append(containerInfoBox);
-                        let prevSelectedRow = containersTable.$('tr.selected');
-                        if (prevSelectedRow.length !== 0) {
-                            // console.log(selectedRow);
-                            prevSelectedRow.find('td')
-                                .html($(prevSelectedRow).data('container-name').toString());
-                            containersTable.$('tr.selected').removeClass('selected');
-                        }
-                        $(selectedRow).addClass('selected');
-                        objectList = containerInfo.object_list;
-                    } else if (data.result === 'failed') {
-                        alert_message(
-                            'Failed to retrieval container list. Reason: ' + data.message,
-                            'alert-danger');
-                    }
-                    setTimeout(function () {
-                        // push data for files table
-                        filesTable.clear().draw();
-                        filesTable.rows.add(objectList);
-                        filesTable.draw();
-                        // turnoff loading screens
-                        $("#containers-filter").prop("disabled", false);
-                        $("#containers-table-loading").hide();
-                        $("#files-filter").prop("disabled", false);
-                        $("#files-table-loading").hide();
-                    }, 100);
-                });
-            ;
-
+            // $(this).addClass('selected');
+            loadContainerDetails(this);
         }
     });
 
     $('#containers-table').on('click', 'tbody tr .collapse-container-btn', function () {
+        // console.log('deleted!');
         let trSelectedElement = $(this).closest('tr');
         $(trSelectedElement).find('td').html($(trSelectedElement).data('container-name').toString());
         filesTable.clear().draw();
@@ -325,6 +469,8 @@ $(document).ready(function () {
     $("#create-container-submit-btn").on('click', function () {
         let inputContainerName = $("#input-container-name").val();
         let createContainerApi = $('#containers-table').data("create-container-api");
+        $("#create-container-loading .loading-info").html('Creating new container...');
+        $("#create-container-loading").show();
         // console.log(inputContainerName);
         $.ajax({
             method: "POST",
@@ -352,25 +498,26 @@ $(document).ready(function () {
             .fail(function (jqXHR, textStatus, error) {
                 // Handle error here
                 setTimeout(function () {
-                    $('#create-container-modal').modal('hide');
-                    alert_message(
-                        'Failed to create container ' + inputContainerName + '.Reason: ' + textStatus,
-                        'alert-danger'
-                    );
+                    handleFailedAjaxRequest(jqXHR, textStatus, error,
+                        'Failed to create container ' + inputContainerName);
                 }, 100);
+            })
+            .always(function (data) {
+                $("#create-container-loading").hide();
+                $('#create-container-modal').modal('hide');
             });
 
     });
 
     $("#upload-file").on('click', function () {
-        let selectedContainer = containersTable.$('tr.selected');
-        if (selectedContainer.length != 1) {
+        let selectedContainerRow = containersTable.$('tr.selected');
+        if (selectedContainerRow.length != 1) {
             alert_message(
                 'Select extract container which you want to put uploaded file in !',
                 'alert-warning');
         } else {
-            console.log(selectedContainer);
-            let selectecdContainerName = $(selectedContainer).data('container-name');
+            // console.log(selectedContainerRow);
+            let selectecdContainerName = $(selectedContainerRow).data('container-name');
             $('#upload-file-modal').find("span#input-container-name").attr('data-container-name', selectecdContainerName);
             $('#upload-file-modal').find("span#input-container-name").html(selectecdContainerName);
             $("input#input-object-file[type=file]").val('');
@@ -447,7 +594,35 @@ $(document).ready(function () {
                 }
                 return myXhr;
             },
-        });
+        })
+            .done(function (data) {
+                if (data.result === 'success') {
+                    loadContainerDetails
+                    // console.log(data);
+                    setTimeout(function () {
+                        alert_message('New file ' + fileName + ' is uploaded.', 'alert-success');
+                        let selectedContainerRow = containersTable.$('tr.selected');
+                        // console.log(selectedContainerRow);
+                        // console.log(!selectedContainerRow.hasClass('selected'));
+                        loadContainerDetails(selectedContainerRow);
+                    }, 100);
+                } else {
+                    setTimeout(function () {
+                        alert_message(
+                            'Failed to create object ' + fileName +
+                            '. Reason: ' + data.message,
+                            'alert-danger');
+                    }, 100);
+                }
+            })
+            .fail(function (jqXHR, textStatus, error) {
+                handleFailedAjaxRequest(jqXHR, textStatus, error, 'Failed to create object ' + fileName);
+            })
+            .always(function (data) {
+                $("#file-uploading-loading").hide();
+                $('#upload-file-modal').modal('hide');
+            });
+        ;
     });
 
 

@@ -8,7 +8,9 @@
 }
 
 #containers-box, #files-box {
+    border: none;
     height: 580px;
+    padding-bottom: 0px;
     margin-bottom: 0px;
 }
 
@@ -81,7 +83,8 @@
     margin-top: 22px;
 }
 
-#files-table > tbody > tr > td .btn-group button {
+#files-table > tbody > tr > td .btn-group button,
+#files-table > tbody > tr > td .btn-group a {
     padding-top: 3px;
     padding-bottom: 3px;
     line-height: 13px;
@@ -133,6 +136,13 @@
     cursor: pointer;
 }
 
+input[type=file] {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 300px;
+}
+
 #upload-file-modal .modal-dialog {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 13px;
@@ -143,13 +153,6 @@
     /*margin-left: 50px;*/
     /*margin-right: 50px;*/
 
-}
-
-input[type=file] {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 300px;
 }
 
 #file-uploading-loading {
@@ -175,6 +178,25 @@ input[type=file] {
     margin-top: 25px;
 }
 
-#containers-box, #files-box {
-    border-top: none;
+.modal-loading, #create-container-loading {
+    /*display:    block;*/
+    position: absolute;
+    text-align: center;
+    z-index: 1000;
+    height: 100%;
+    width: 100%;
+    background: rgba(255, 255, 255, .8) url('../loading.gif') 30% 30% no-repeat;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#create-container-loading .loading-info, .modal-loading .loading-info {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 20px;
+    line-height: 1.42857;
+    margin-top: 25px;
 }

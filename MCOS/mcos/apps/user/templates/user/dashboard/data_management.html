@@ -142,7 +142,10 @@
                 </div>
                 <table id="files-table"
                        class=" table table-hover table-select table-bordered table-striped"
-                       data-upload-file-api="{% url 'file_and_container:upload_file' %}">
+                       data-upload-file-api="{% url 'file_and_container:upload_file' %}"
+                       data-file-info-api="{% url 'file_and_container:file_info' %}"
+                       data-file-download-api="{% url 'file_and_container:download_file' %}"
+                >
                     <thead>
                     <tr>
                         <th></th>
@@ -165,9 +168,18 @@
             {#                    rel="tooltip" data-container="body" title="Upload New Version">#}
             {#                <i class="fa fa-upload" aria-hidden="true"></i>#}
             {#            </button>#}
-            <button type="button" class="btn btn-default btn-download-file"
-                    rel="tooltip" data-container="body" title="Download File">
+
+            <button type="button" class="btn btn-default btn-info-file"
+                    rel="tooltip" data-container="body" title="View File Info">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+            </button>
+            <a target="_blank" href="http://your_url_here.html"
+               class="btn btn-default btn-download-file">
                 <i class="fa fa-download" aria-hidden="true"></i>
+            </a>
+            <button type="button" class="btn btn-default btn-update-file"
+                    rel="tooltip" data-container="body" title="Update Data">
+                <i class="fa fa-pencil" aria-hidden="true"></i>
             </button>
             <button type="button" class="btn btn-danger btn-delete-file"
                     rel="tooltip" data-container="body" title="Delete File">
@@ -177,6 +189,9 @@
     </div>
     {% include 'user/dashboard/include/_create_container_modal.html' %}
     {% include 'user/dashboard/include/_upload_file.html' %}
+    {% include 'user/dashboard/include/_file_info_modal.html' %}
+
+
 
 {% endblock %}
 
@@ -184,6 +199,7 @@
 {% block user_javascript %}
     <script src="{% static "user_dashboard/data_management/dataTables.select.js" %}"></script>
     <script src="{% static "user_dashboard/data_management/_create_alert_message.js" %}"></script>
+    <script src="{% static "user_dashboard/data_management/moment.js" %}"></script>
     <script src="{% static "user_dashboard/data_management/load_table.js" %}"></script>
     <script type="text/javascript">
     </script>
