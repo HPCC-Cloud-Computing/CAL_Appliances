@@ -1,0 +1,38 @@
+{% load adminlte_helpers i18n %}
+{% load staticfiles %}
+
+<div class="modal fade" id="delete-container-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id="delete-container-loading" style="display: none">
+                <div class="loading-info text-primary text-bold">Loading...</div>
+            </div>
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
+                <div class="h3 modal-title" translate="">
+                    Delete Container
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    Are you really want to delete container <span id="deleted-container-name"></span> ?
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-default pull-left"
+                        data-dismiss="modal">Cancel
+                </button>
+                <button type="button" class="btn btn-danger"
+                        id="delete-container-submit-btn">
+                    Delete
+                </button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+

@@ -97,10 +97,19 @@ function setDefineLimitOptions(formSelector) {
     let selectOptionSelector = $(formSelector).find("#select-option-name");
     let selected_option = $(selectOptionSelector).find(":selected").val();
     let capacityLimit = $(formSelector).find("input#capacity_limit");
-    let read10mb = $(formSelector).find("input#read10mb");
-    let write10mb = $(formSelector).find("input#write10mb");
-    let read128k = $(formSelector).find("input#read128k");
-    let write128k = $(formSelector).find("input#write128k");
+    let read10mb_up = $(formSelector).find("input#read10mb_up");
+    let write10mb_up = $(formSelector).find("input#write10mb_up");
+
+    let read10mb_low = $(formSelector).find("input#read10mb_low");
+    let write10mb_low = $(formSelector).find("input#write10mb_low");
+
+    let read128k_up = $(formSelector).find("input#read128k_up");
+    let write128k_up = $(formSelector).find("input#write128k_up");
+
+
+    let read128k_low = $(formSelector).find("input#read128k_low");
+    let write128k_low = $(formSelector).find("input#write128k_low");
+
     let submitButton = $(formSelector).find('#create-ring-submit-btn');
 
 
@@ -115,25 +124,52 @@ function setDefineLimitOptions(formSelector) {
         $(formSelector).find(".defined-option-input").each(function (index) {
             $(this).show();
         });
-        if (selected_option === 'optimize_big' || selected_option === 'economy_big') {
-            $(read10mb).prop('disabled', false);
-            $(write10mb).prop('disabled', false);
-            $(read128k).prop('disabled', true);
-            $(write128k).prop('disabled', true);
-            $(read10mb).val(1);
-            $(write10mb).val(1);
-            $(read128k).val(-1);
-            $(write128k).val(-1);
+        if (selected_option === 'optimize') {
+            $("#upper_10mb").show();
+            $("#lower_10mb").hide();
+            $("#upper_128kb").show();
+            $("#lower_128kb").hide();
+            $(read10mb_up).val(1);
+            $(write10mb_up).val(1);
+            $(read128k_up).val(1);
+            $(write128k_up).val(1);
+
+            $(read10mb_low).val(1);
+            $(write10mb_low).val(1);
+            $(read128k_low).val(1);
+            $(write128k_low).val(1);
         }
-        if (selected_option === 'optimize_small' || selected_option === 'economy_small') {
-            $(read10mb).prop('disabled', true);
-            $(write10mb).prop('disabled', true);
-            $(read128k).prop('disabled', false);
-            $(write128k).prop('disabled', false);
-            $(read10mb).val(-1);
-            $(write10mb).val(-1);
-            $(read128k).val(1);
-            $(write128k).val(1);
+
+        if (selected_option === 'standard') {
+            $("#upper_10mb").show();
+            $("#lower_10mb").show();
+            $("#upper_128kb").show();
+            $("#lower_128kb").show();
+
+            $(read10mb_up).val(1);
+            $(write10mb_up).val(1);
+            $(read128k_up).val(1);
+            $(write128k_up).val(1);
+
+            $(read10mb_low).val(1);
+            $(write10mb_low).val(1);
+            $(read128k_low).val(1);
+            $(write128k_low).val(1);
+        }
+        if (selected_option === 'economy') {
+            $("#upper_10mb").hide();
+            $("#lower_10mb").show();
+            $("#upper_128kb").hide();
+            $("#lower_128kb").show();
+            $(read10mb_up).val(1);
+            $(write10mb_up).val(1);
+            $(read128k_up).val(1);
+            $(write128k_up).val(1);
+
+            $(read10mb_low).val(1);
+            $(write10mb_low).val(1);
+            $(read128k_low).val(1);
+            $(write128k_low).val(1);
         }
     }
 
@@ -154,20 +190,18 @@ function setupCreateDefinedForm(formSelector) {
         let optionDescription = $("input#option-description").val();
         let optionDuplicateFactor = $("input#duplicate-factor").val();
         let optionCapacityLimit = $("input#capacity-limit").val();
-        let optionRead10mb = $("input#read10mb").val();
-        let optionWrite10mb = $("input#write10mb").val();
-        let optionRead128k = $("input#read128k").val();
-        let optionWrite128k = $("input#write128k").val();
 
-        // console.log(optionName);
-        // console.log(optionFullName);
-        // console.log(optionDescription);
-        // console.log(optionDuplicateFactor);
-        // console.log(optionCapacityLimit);
-        // console.log(optionRead10mb);
-        // console.log(optionWrite10mb);
-        // console.log(optionRead128k);
-        // console.log(optionWrite128k);
+        let read10mb_up = $("input#read10mb_up").val();
+        let write10mb_up = $("input#write10mb_up").val();
+
+        let read10mb_low = $("input#read10mb_low").val();
+        let write10mb_low = $("input#write10mb_low").val();
+
+        let read128k_up = $("input#read128k_up").val();
+        let write128k_up = $("input#write128k_up").val();
+
+        let read128k_low = $("input#read128k_low").val();
+        let write128k_low = $("input#write128k_low").val();
 
         $.ajax({
             type: "POST",
@@ -177,11 +211,18 @@ function setupCreateDefinedForm(formSelector) {
                 optionDescription: optionDescription,
                 optionDuplicateFactor: optionDuplicateFactor,
                 optionCapacityLimit: optionCapacityLimit,
-                optionRead10mb: optionRead10mb,
-                optionWrite10mb: optionWrite10mb,
-                optionRead128k: optionRead128k,
-                optionWrite128k: optionWrite128k,
 
+                read10mb_up: read10mb_up,
+                read10mb_low: read10mb_low,
+
+                write10mb_up: write10mb_up,
+                write10mb_low: write10mb_low,
+
+                read128k_up: read128k_up,
+                read128k_low: read128k_low,
+
+                write128k_up: write128k_up,
+                write128k_low: write128k_low,
             },
             url: $(formSelector).data("submit-url"),
 

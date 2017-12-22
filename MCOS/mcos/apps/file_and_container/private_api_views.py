@@ -10,6 +10,7 @@ from mcos.apps.admin.system.models import SystemCluster
 from mcos_resolver_and_ring_server import tasks
 from mcos.utils import create_service_connector
 from mcos.settings.storage_service_conf import STORAGE_SERVICE_CONFIG, STORAGE_CONTAINER_NAME
+from django.views.decorators.csrf import csrf_exempt
 
 SERVICE_TYPE = STORAGE_SERVICE_CONFIG['type']
 AUTH_INFO = STORAGE_SERVICE_CONFIG['auth_info']
@@ -76,6 +77,7 @@ def get_container_object_list(request):
              'message': 'server error'})
 
 
+@csrf_exempt
 @login_required(role='admin')
 def create_container(request):
     if request.method == 'POST':
@@ -101,7 +103,34 @@ def create_container(request):
         return JsonResponse({'result': 'failed'})
 
 
+@csrf_exempt
+@login_required(role='admin')
+def delete_container(request):
+    if request.method == 'POST':
+        try:
+            container_name = request.POST['container_name']
+            account_name = request.POST['account_name']
+            container_size = float(request.POST['size'])
+            object_count = int(request.POST['object_count'])
+            date_created = request.POST['date_created']
+        except Exception as e:
+            print(e)
+            return JsonResponse({'result': 'failed', 'message': 'invalid parameter'})
+    delete_container_task = tasks.delete_container.apply_async(
+        ({'account_name': account_name,
+          'container_name': container_name,
+          'object_count': object_count,
+          'size': container_size,
+          'date_created': date_created},))
+    delete_result = delete_container_task.get(timeout=10)
+    if delete_result is True:
+        return JsonResponse({'result': 'success'})
+    else:
+        return JsonResponse({'result': 'failed'})
+
+
 # method handle request which data is size of new object push to a container
+@csrf_exempt
 @api_login_required(role='admin')
 def update_container_info(request):
     if request.method == 'POST':
@@ -121,23 +150,10 @@ def update_container_info(request):
             return JsonResponse({'result': 'success'})
         else:
             return JsonResponse({'result': 'failed'})
-            # with open('log.txt', 'a') as f:
-            #     f.write('---handle update container info ---')
-            #     f.write('\n')
-            #     f.write(container_name)
-            #     f.write('\n')
-            #     f.write(account_name)
-            #     f.write('\n')
-            #     f.write(last_update)
-            #     f.write('\n')
-            #     f.write(str(size))
-            #     f.write('\n')
-            #     f.write('///handle update container info///')
-            #     f.write('\n')
-            # return JsonResponse({'result': 'success'})
 
 
 # method handle request which data is size of new object push to a container
+@csrf_exempt
 @api_login_required(role='admin')
 def update_object_info(request):
     if request.method == 'POST':
@@ -158,26 +174,10 @@ def update_object_info(request):
             return JsonResponse({'result': 'success'})
         else:
             return JsonResponse({'result': 'failed'})
-            # with open('log.txt', 'a') as f:
-            #     f.write('---handle update object info ---')
-            #     f.write('\n')
-            #     f.write(container_name)
-            #     f.write('\n')
-            #     f.write(account_name)
-            #     f.write('\n')
-            #     f.write(object_name)
-            #     f.write('\n')
-            #     f.write(last_update)
-            #     f.write('\n')
-            #     f.write(str(size))
-            #     f.write('\n')
-            #     f.write('///handle update object info///')
-            #     f.write('\n')
-            #
-            # return JsonResponse({'result': 'success'})
 
 
 # method handle request which data is size of new object push to a container
+@csrf_exempt
 @api_login_required(role='admin')
 def update_resolver_info(request):
     if request.method == 'POST':
@@ -217,6 +217,7 @@ def update_resolver_info(request):
             #  method handle request which data is size of new object push to a container
 
 
+@csrf_exempt
 @api_login_required(role='admin')
 def upload_object_data(request):
     if request.method == 'POST':
@@ -244,7 +245,8 @@ def upload_object_data(request):
                           'container_name': container_name,
                           'object_name': object_name,
                           'last_update': last_update,
-                          'option_name': option_name}
+                          'option_name': option_name,
+                          'is_deleted': 'false'}
             )
             return JsonResponse({'result': 'success', 'message': ''})
         except Exception as e:
@@ -346,6 +348,14 @@ def download_object(request):
         try:
             service_connector = \
                 create_service_connector(SERVICE_TYPE, AUTH_INFO)
+            uploaded_object_stat = service_connector.stat_object(
+                STORAGE_CONTAINER_NAME, account_name + '.' + container_name + '.' + object_name)
+            object_deleted = uploaded_object_stat['x-object-meta-is-deleted'],
+
+            if object_deleted == 'true':
+                return JsonResponse({'message': 'Object ' + object_name + ' not found!'},
+                                    status=404)
+
             object_data = service_connector.download_object(
                 STORAGE_CONTAINER_NAME, account_name + '.' + container_name + '.' + object_name)
             # resp['Content-Disposition'] = 'attachment; filename="123.txt"'

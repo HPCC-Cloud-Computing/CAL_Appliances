@@ -155,7 +155,7 @@ input[type=file] {
 
 }
 
-#file-uploading-loading {
+#file-uploading-loading, #file-update-loading {
     /*display:    block;*/
     position: absolute;
     text-align: center;
@@ -167,7 +167,7 @@ input[type=file] {
     background-position: center;
 }
 
-#file-uploading-loading .loading-info {
+#file-uploading-loading .loading-info, #file-update-loading .loading-info {
     position: absolute;
     top: 50%;
     left: 0;
@@ -178,7 +178,7 @@ input[type=file] {
     margin-top: 25px;
 }
 
-.modal-loading, #create-container-loading {
+.modal-loading, #delete-container-loading, #create-container-loading {
     /*display:    block;*/
     position: absolute;
     text-align: center;
@@ -190,7 +190,7 @@ input[type=file] {
     background-position: center;
 }
 
-#create-container-loading .loading-info, .modal-loading .loading-info {
+#delete-container-loading .loading-info, #create-container-loading .loading-info, .modal-loading .loading-info {
     position: absolute;
     top: 50%;
     left: 0;

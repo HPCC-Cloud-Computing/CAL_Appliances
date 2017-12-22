@@ -90,6 +90,11 @@ task_routes = {
          'exchange': 'mcos_exchange_topic',
          'routing_key': MCOS_CLUSTER_NAME + '.create_new_container', },
 
+    'mcos_resolver_and_ring_server.tasks.delete_container':
+        {'queue': MCOS_CLUSTER_NAME,
+         'exchange': 'mcos_exchange_topic',
+         'routing_key': MCOS_CLUSTER_NAME + '.delete_container', },
+
     'mcos_resolver_and_ring_server.tasks.update_container_info':
         {'queue': MCOS_CLUSTER_NAME,
          'exchange': 'mcos_exchange_topic',

@@ -16,7 +16,8 @@ urls = \
             private_views.get_container_object_list, name='get_container_object_list'),
         url(r'^create-container/$',
             private_views.create_container, name='create-container'),
-
+        url(r'^delete-container/$',
+            private_views.delete_container, name='delete-container'),
         url(r'^update-container-info/$',
             private_views.update_container_info, name='update_container_info'),
 

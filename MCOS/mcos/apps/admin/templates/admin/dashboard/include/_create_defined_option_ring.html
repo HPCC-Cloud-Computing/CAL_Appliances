@@ -31,24 +31,19 @@
                                         <option value="" disabled selected>
                                             -- Select option ring you want to create --
                                         </option>
-                                        {% if not_defined_opt_rings.optimize_big %}
-                                            <option value="optimize_big">
-                                                Optimize Big File
+                                        {% if not_defined_opt_rings.optimize %}
+                                            <option value="optimize">
+                                                Optimize Speed
                                             </option>
                                         {% endif %}
-                                        {% if not_defined_opt_rings.economy_big %}
-                                            <option value="economy_big">
-                                                Economy Big File
+                                        {% if not_defined_opt_rings.standard %}
+                                            <option value="standard">
+                                                Standard Speed
                                             </option>
                                         {% endif %}
-                                        {% if not_defined_opt_rings.optimize_small %}
-                                            <option value="optimize_small">
-                                                Optimize Small File
-                                            </option>
-                                        {% endif %}
-                                        {% if not_defined_opt_rings.economy_small %}
-                                            <option value="economy_small">
-                                                Economy Small File
+                                        {% if not_defined_opt_rings.economy %}
+                                            <option value="economy">
+                                                Economy Speed
                                             </option>
                                         {% endif %}
                                     </select>
@@ -71,47 +66,86 @@
                                            placeholder="Description for the new option " required>
                                 </div>
                             </div>
-                            <div class="form-group defined-option-input">
+                            <div class="form-group defined-option-input" style="padding-bottom: 20px">
                                 <label for="duplicate-factor"
                                        class="col-md-4 control-label">Duplicate Factor</label>
                                 <div class="col-md-8">
-                                    <input class="form-control" id="duplicate-factor" type="number" min="1" max="6" value="3">
+                                    <input class="form-control" id="duplicate-factor" type="number" min="1" max="6"
+                                           value="3">
                                 </div>
                             </div>
-                            <div class="form-group defined-option-input">
-                                <label for="capacity-limit"
-                                       class="col-md-4 control-label">Cluster Capacity Limit (TB)</label>
-                                <div class="col-md-8">
-                                    <input class="form-control" id="capacity-limit" type="number" min="0">
+{#                            <div class="form-group defined-option-input">#}
+{#                                <label for="capacity-limit"#}
+{#                                       class="col-md-4 control-label">Cluster Capacity Limit (TB)</label>#}
+{#                                <div class="col-md-8">#}
+{#                                    <input class="form-control" id="capacity-limit" type="number" min="0">#}
+{#                                </div>#}
+{#                            </div>#}
+
+                            <div id="upper_10mb" style="padding-bottom: 10px">
+                                <div class="form-group defined-option-input">
+                                    <label for="read10mb"
+                                           class="col-md-4 control-label">Cluster 10MB Read Upper Limit (GB/s)</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" id="read10mb_up" type="number" min="0">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="form-group defined-option-input">
-                                <label for="read10mb"
-                                       class="col-md-4 control-label">Cluster 10MB Read Limit (GB/s)</label>
-                                <div class="col-md-8">
-                                    <input class="form-control" id="read10mb" type="number" min="0">
-                                </div>
-                            </div>
-                            <div class="form-group defined-option-input">
-                                <label for="write10mb"
-                                       class="col-md-4 control-label">Cluster 10MB Write Limit (GB/s)</label>
-                                <div class="col-md-8">
-                                    <input class="form-control" id="write10mb" type="number" min="0">
+                                <div class="form-group defined-option-input">
+                                    <label for="write10mb"
+                                           class="col-md-4 control-label">Cluster 10MB Write Upper Limit (GB/s)</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" id="write10mb_up" type="number" min="0">
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="form-group defined-option-input">
-                                <label for="read128k"
-                                       class="col-md-4 control-label">Cluster 128KB Read Limit (GB/s)</label>
-                                <div class="col-md-8">
-                                    <input class="form-control" id="read128k" type="number" min="0">
+                            <div id="lower_10mb" style="padding-bottom: 10px">
+
+                                <div class="form-group defined-option-input">
+                                    <label for="read10mb"
+                                           class="col-md-4 control-label">Cluster 10MB Read Lower Limit (GB/s)</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" id="read10mb_low" type="number" min="0">
+                                    </div>
+                                </div>
+                                <div class="form-group defined-option-input">
+                                    <label for="write10mb"
+                                           class="col-md-4 control-label">Cluster 10MB Write Lower Limit (GB/s)</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" id="write10mb_low" type="number" min="0">
+                                    </div>
                                 </div>
                             </div>
-                            <div class="form-group defined-option-input">
-                                <label for="write128k"
-                                       class="col-md-4 control-label">Cluster 128KB Write Limit (GB/s)</label>
-                                <div class="col-md-8">
-                                    <input class="form-control" id="write128k" type="number" min="0">
+                            <div id="upper_128kb" style="padding-bottom: 10px">
+                                <div class="form-group defined-option-input">
+                                    <label for="read128k"
+                                           class="col-md-4 control-label">Cluster 128KB Read Upper Limit (GB/s)</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" id="read128k_up" type="number" min="0">
+                                    </div>
+                                </div>
+                                <div class="form-group defined-option-input">
+                                    <label for="write128k"
+                                           class="col-md-4 control-label">Cluster 128KB Write Upper Limit (GB/s)</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" id="write128k_up" type="number" min="0">
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="lower_128kb" style="padding-bottom: 10px">
+                                <div class="form-group defined-option-input">
+                                    <label for="read128k"
+                                           class="col-md-4 control-label">Cluster 128KB Read Lower Limit (GB/s)</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" id="read128k_low" type="number" min="0">
+                                    </div>
+                                </div>
+                                <div class="form-group defined-option-input">
+                                    <label for="write128k"
+                                           class="col-md-4 control-label">Cluster 128KB Write Lower Limit (GB/s)</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" id="write128k_low" type="number" min="0">
+                                    </div>
                                 </div>
                             </div>
                         </form>
@@ -128,10 +162,10 @@
                                         <th>Storage Type</th>
                                         <th>Backend Type</th>
                                         <th>Capacity (TB)</th>
-                                        <th>10MB Read (GB/s)</th>
-                                        <th>10MB Write (GB/s)</th>
-                                        <th>128KB Read (GB/s)</th>
-                                        <th>128KB Write (GB/s)</th>
+                                        <th>10MB Read (MB/s)</th>
+                                        <th>10MB Write (MB/s)</th>
+                                        <th>128KB Read (MB/s)</th>
+                                        <th>128KB Write (MB/s)</th>
                                     </tr>
                                     </thead>
                                     <tbody>

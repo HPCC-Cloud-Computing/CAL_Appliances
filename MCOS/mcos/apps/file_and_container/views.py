@@ -135,16 +135,20 @@ def get_container_details(account_name, container_name):
         for cluster in active_cluster_refs:
             # try to get container details from each cluster in account ring cluster list
             mcos_admin_token = get_admin_token()
-            session = requests.Session()
             cluster_url = 'http://' + cluster['address_ip'] + ":" + cluster['address_port']
             container_list_url = cluster_url + '/file-and-container/private/container-details/'
             re_try = 0
             while re_try < 3:
                 try:
-                    get_container_info_resp = session.get(
-                        container_list_url, headers={'X-Auth-Token': mcos_admin_token},
-                        params={'account_name': account_name,
-                                'container_name': container_name}, timeout=2)
+                    get_ctn_detail_rq = [
+                        grequests.get(
+                            container_list_url, headers={'X-Auth-Token': mcos_admin_token},
+                            params={'account_name': account_name,
+                                    'container_name': container_name}, timeout=2
+                        )
+                    ]
+                    grequests.map(get_ctn_detail_rq)
+                    get_container_info_resp = get_ctn_detail_rq[0].response
                     status_code = get_container_info_resp.status_code
                     if status_code == 200:
                         connected_to_cluster = True
@@ -159,9 +163,10 @@ def get_container_details(account_name, container_name):
                         set_admin_token()
                         mcos_admin_token = get_admin_token()
                 except Exception as e:
+                    pass
                     print(e)
-                    print ('Failed to connect to Server ' + cluster_url)
-            session.close()
+                    re_try += 1
+                    break
             if connected_to_cluster is True:
                 break
         if connected_to_cluster is True:
@@ -189,10 +194,15 @@ def query_container_object_list(account_name, container_name):
             re_try = 0
             while re_try < 3:
                 try:
-                    get_container_info_resp = session.get(
-                        obj_list_url, headers={'X-Auth-Token': mcos_admin_token},
-                        params={'account_name': account_name,
-                                'container_name': container_name}, timeout=2)
+                    get_ctn_info_rq = [
+                        grequests.get(
+                            obj_list_url, headers={'X-Auth-Token': mcos_admin_token},
+                            params={'account_name': account_name,
+                                    'container_name': container_name}, timeout=2
+                        )
+                    ]
+                    grequests.map(get_ctn_info_rq)
+                    get_container_info_resp = get_ctn_info_rq[0].response
                     status_code = get_container_info_resp.status_code
                     if status_code == 200:
                         connected_to_cluster = True
@@ -208,6 +218,7 @@ def query_container_object_list(account_name, container_name):
                 except Exception as e:
                     print(e)
                     print ('Failed to connect to Server ' + cluster_url)
+                    break
             session.close()
             if connected_to_cluster is True:
                 break
@@ -271,7 +282,7 @@ def send_new_container(account_name, container_name):
                     create_container_resp = session.post(
                         create_container_url, headers={'X-Auth-Token': mcos_admin_token},
                         data={
-                            'csrfmiddlewaretoken': csrf_token,
+                            # 'csrfmiddlewaretoken': csrf_token,
                             'account_name': account_name,
                             'container_name': container_name,
                             'object_count': 0,
@@ -467,17 +478,18 @@ def upload_file(request):
         with open(temp_file_name, 'wb+') as temp_file:
             for chunk in object_file_data.chunks():
                 temp_file.write(chunk)
-        if option_name == 'economy':
-            if file_size >= file_size_limit:
-                option_ring_name = 'economy_big'
-            else:
-                option_ring_name = 'economy_small'
-        elif option_name == 'speed':
-            if file_size >= file_size_limit:
-                option_ring_name = 'optimize_big'
-            else:
-                option_ring_name = 'optimize_small'
-            pass
+        option_ring_name = option_name
+        # if option_name == 'economy':
+        #     if file_size >= file_size_limit:
+        #         option_ring_name = 'economy_big'
+        #     else:
+        #         option_ring_name = 'economy_small'
+        # elif option_name == 'speed':
+        #     if file_size >= file_size_limit:
+        #         option_ring_name = 'optimize_big'
+        #     else:
+        #         option_ring_name = 'optimize_small'
+        #     pass
         object_info = {
             'object_name': object_file_name,
             'last_update': last_update,
@@ -875,3 +887,289 @@ def download_file(request):
                 # # resp['Content-Disposition'] = 'attachment; filename="123.txt"'
                 # response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
                 # return response
+
+
+def send_delete_container(account_name, container_name):
+    response_container_deleted = 0
+    get_active_clusters_task = \
+        tasks.get_account_clusters_ref.apply_async((account_name,))
+    active_cluster_refs = get_active_clusters_task.get(timeout=2)
+    shuffle(active_cluster_refs)
+    if active_cluster_refs is not None:
+        re_try = 0
+        mcos_admin_token = get_admin_token()
+        while re_try < 3:
+            try:
+                delete_rq_list = []
+                for cluster in active_cluster_refs:
+                    cluster_url = 'http://' + cluster['address_ip'] + ":" + cluster['address_port']
+                    create_container_url = cluster_url + '/file-and-container/private/delete-container/'
+                    delete_ctn_rq = grequests.post(
+                        create_container_url,
+                        headers={'X-Auth-Token': mcos_admin_token},
+                        data={
+                            'account_name': account_name,
+                            'container_name': container_name,
+                            'object_count': 0,
+                            'size': 0,
+                            'date_created': str(datetime.datetime.utcnow())
+                        }, timeout=5)
+                    delete_rq_list.append(delete_ctn_rq)
+                grequests.map(delete_rq_list)
+                token_expr = False
+                for resp in delete_rq_list:
+                    if resp is not None:
+                        resp = resp.response
+                        status_code = resp.status_code
+                        if status_code == 200:
+                            resp_data = resp.json()
+                            if resp_data['result'] == 'success':
+                                response_container_deleted += 1
+                            break
+                        elif status_code == 403:  # token expired
+                            token_expr = True
+                            set_admin_token()
+                            mcos_admin_token = get_admin_token()
+                            break
+                if token_expr:
+                    re_try += 1
+                else:
+                    break
+
+            except Exception as e:
+                print(e)
+                print('Failed to connect to Server ' + cluster_url)
+                break
+        if response_container_deleted >= 1:
+            return True
+        else:
+            return False
+    else:
+        return False
+
+
+@login_required(role='user')
+def delete_container(request):
+    if request.method == "POST":
+        try:
+            input_container_name = request.POST['container_name']
+            user_access_info = KeyStoneClient.get_request_user_data(request)
+            user_name = user_access_info['user']['name']
+        except Exception as e:
+            print(e)
+            return JsonResponse({'result': 'failed', 'message': 'invalid parameter'})
+        container_deleted = send_delete_container(
+            user_name, input_container_name)
+        if container_deleted is True:
+            return JsonResponse({'result': 'success',
+                                 'message': ''})
+        else:
+            return JsonResponse({'result': 'failed',
+                                 'message': ''})
+
+
+            # send new container to account cluster refs in account ring
+
+
+@login_required(role='user')
+def update_file(request):
+    if request.method == "POST":
+        user_access_info = KeyStoneClient.get_request_user_data(request)
+        account_name = user_access_info['user']['name']
+        container_name = request.POST['container_name']
+        object_file_name = request.POST['file_name']
+        object_file_data = request.FILES['file_data']
+        file_size = request.FILES['file_data'].size
+        last_update = str(datetime.datetime.utcnow())
+        file_size_limit = 2 * 1024 * 1024
+        temp_file_name = str(uuid.uuid4())
+        with open(temp_file_name, 'wb+') as temp_file:
+            for chunk in object_file_data.chunks():
+                temp_file.write(chunk)
+        option_ring_name = option_name
+
+        object_info = {
+            'object_name': object_file_name,
+            'last_update': last_update,
+            'size': file_size,
+            'option_name': option_ring_name
+        }
+
+        # bugs, we need to save file to django before upload file to storage server
+        
+        container_list, err_msg = query_container_list(account_name)
+        if container_list is None:
+            return JsonResponse({'result': 'failed', 'message': err_msg})
+        container_exist = False
+        for check_container_name in container_list:
+            if container_name == check_container_name:
+                container_exist = True
+                break
+        if container_exist is False:
+            return JsonResponse({'result': 'failed',
+                                 'message': 'Container ' + input_container_name + ' is not exist!'})
+
+        obj_list_success, container_object_list, obj_list_msg = \
+            query_container_object_list(account_name, container_name)
+        if obj_list_success is False:
+            return JsonResponse({'result': 'failed',
+                                 'message': obj_list_msg})
+
+        object_exist = False
+        for check_object in container_object_list:
+            if object_file_name == check_object['object_name']:
+                object_exist = True
+                break
+        if object_exist is True:
+            return JsonResponse({'result': 'failed',
+                                 'message': 'Object ' + object_file_name + 'is exist!'})
+
+        get_account_clusters_task = \
+            tasks.get_account_clusters_ref.apply_async(
+                (account_name,))
+        account_clusters = get_account_clusters_task.get(timeout=5)
+
+        get_container_clusters_task = \
+            tasks.get_container_clusters_ref.apply_async(
+                (account_name, container_name))
+        container_clusters = get_container_clusters_task.get(timeout=5)
+
+        get_resolver_clusters_task = \
+            tasks.get_resolver_clusters_ref.apply_async(
+                (account_name, container_name, object_file_name))
+        resolver_clusters = get_resolver_clusters_task.get(timeout=5)
+
+        get_object_cluster_task = \
+            tasks.get_object_cluster_refs.apply_async(
+                (account_name, container_name, object_file_name, option_ring_name))
+        object_clusters = get_object_cluster_task.get(timeout=5)
+
+        if account_clusters is None or container_clusters is None or \
+                        resolver_clusters is None or object_clusters is None:
+            return JsonResponse({'result': 'failed',
+                                 'message': 'Failed to get some ring data'})
+        # if container is exist and object is not exist, create new data object
+        success_container_info = 0
+        success_object_info = 0
+        success_object_data = 0
+        success_resolver_info = 0
+        send_container_info_requests = []
+        send_resolver_info_requests = []
+        send_object_info_requests = []
+        send_object_data_requests = []
+
+        for cluster in account_clusters:
+            cluster_url = 'http://' + cluster['address_ip'] + ":" + cluster['address_port']
+            send_container_info_requests.append(
+                UpdateContainerInfoRequest(cluster_url, account_name, container_name, object_info))
+        for cluster in container_clusters:
+            cluster_url = 'http://' + cluster['address_ip'] + ":" + cluster['address_port']
+            send_object_info_requests.append(
+                UpdateObjectInfoRequest(cluster_url, account_name, container_name, object_info))
+        for cluster in resolver_clusters:
+            cluster_url = 'http://' + cluster['address_ip'] + ":" + cluster['address_port']
+            send_resolver_info_requests.append(
+                UpdateResolverInfoRequest(cluster_url, account_name, container_name, object_info))
+        for cluster in object_clusters:
+            cluster_url = 'http://' + cluster['address_ip'] + ":" + cluster['address_port']
+            send_object_data_requests.append(
+                UploadObjectDataRequest(cluster_url, account_name, container_name,
+                                        object_info, temp_file_name))
+
+        remain_requests = []
+        for request_info in send_container_info_requests:
+            remain_requests.append(request_info.request)
+        for request_info in send_object_info_requests:
+            remain_requests.append(request_info.request)
+        for request_info in send_resolver_info_requests:
+            remain_requests.append(request_info.request)
+        for request_info in send_object_data_requests:
+            remain_requests.append(request_info.request)
+
+        len_ctn_info = len(send_container_info_requests)
+        len_obj_info = len(send_object_info_requests)
+        len_res_info = len(send_resolver_info_requests)
+        len_obj_data = len(send_object_data_requests)
+        while len(remain_requests) > 0:
+            response_list = grequests.map(remain_requests)
+            next_container_info_requests = []
+            next_resolver_info_requests = []
+            next_object_info_requests = []
+            next_object_data_requests = []
+            # process send container info response
+            for i in range(0, len_ctn_info):
+                response = response_list[i]  # i: response index
+                request_index = i
+                if response is not None:
+                    if response.status_code == 200 and response.json()['result'] == 'success':
+                        success_container_info += 1
+                    elif response.status_code == 403:  # admin token expired
+                        set_admin_token()
+                        send_container_info_requests[request_index].create_request()
+                        next_container_info_requests.append(send_container_info_requests[request_index])
+            # process send object info response
+            for i in range(len_ctn_info,
+                           len_ctn_info + len_obj_info):
+                request_index = i - len_ctn_info
+                response = response_list[i]  # i: response index
+                if response is not None:
+                    if response.status_code == 200 and response.json()['result'] == 'success':
+                        success_object_info += 1
+                    elif response.status_code == 403:
+                        set_admin_token()
+                        send_object_info_requests[request_index].create_request()
+                        next_object_info_requests.append(send_object_info_requests[request_index])
+            # process send resolver info response
+            for i in range(len_ctn_info + len_obj_info,
+                           len_ctn_info + len_obj_info + len_res_info):
+                response = response_list[i]  # i: response index
+                request_index = i - (len_ctn_info + len_obj_info)
+                if response is not None:
+                    if response.status_code == 200 and response.json()['result'] == 'success':
+                        success_resolver_info += 1
+                    elif response.status_code == 403:
+                        set_admin_token()
+                        send_resolver_info_requests[request_index].create_request()
+                        next_resolver_info_requests.append(send_resolver_info_requests[request_index])
+            # process send object data response
+            for i in range(len_ctn_info + len_obj_info + len_res_info,
+                           len_ctn_info + len_obj_info + len_res_info + len_obj_data):
+                response = response_list[i]  # i: response index
+                request_index = i - (len_ctn_info + len_obj_info + len_res_info)
+                if response is not None:
+                    if response.status_code == 200 and response.json()['result'] == 'success':
+                        success_object_data += 1
+                    elif response.status_code == 403:
+                        set_admin_token()
+                        send_object_data_requests[request_index].create_request()
+                        next_object_data_requests.append(send_object_data_requests[request_index])
+
+            # next iteration
+            send_container_info_requests = next_container_info_requests
+            send_resolver_info_requests = next_resolver_info_requests
+            send_object_info_requests = next_object_info_requests
+            send_object_data_requests = next_object_data_requests
+
+            remain_requests = []
+            for request_info in send_container_info_requests:
+                remain_requests.append(request_info.request)
+            for request_info in send_object_info_requests:
+                remain_requests.append(request_info.request)
+            for request_info in send_resolver_info_requests:
+                remain_requests.append(request_info.request)
+            for request_info in send_object_data_requests:
+                remain_requests.append(request_info.request)
+
+            len_ctn_info = len(send_container_info_requests)
+            len_obj_info = len(send_object_info_requests)
+            len_res_info = len(send_resolver_info_requests)
+            len_obj_data = len(send_object_data_requests)
+
+        os.remove(temp_file_name)
+        if success_object_data >= 1 and success_object_info >= 1 and \
+                        success_container_info >= 1 and success_resolver_info >= 1:
+            return JsonResponse({'result': 'success', 'message': ''})
+        else:
+            # handle over failure ( not implement)
+            return JsonResponse({'result': 'failed', 'message': 'Some Cluster is unavailable, retry later!'})
+

@@ -18,7 +18,7 @@ from os.path import abspath, dirname
 path.insert(0, os.getcwd())
 # from mcos.settings.mcos_conf import PERIODIC_SEND_STATUS_TIME
 # from mcos.settings.mcos_conf import PERIODIC_UPDATE_AND_POPULATE_RING
-PERIODIC_UPDATE_AND_POPULATE_RING = 120
+PERIODIC_UPDATE_AND_POPULATE_RING = 30
 from mcos.settings.mcos_conf import MCOS_CLUSTER_NAME
 from mcos.settings.base import TIME_ZONE
 from mcos_celery_server import tasks
@@ -146,7 +146,8 @@ def send_ring_data(ring_data, not_updated_cluster):
     if send_result is True:
         return True
     else:
-        print("Update cluster failed at cluster: " + not_updated_cluster.name)
+        pass
+        # print("Update cluster failed at cluster: " + not_updated_cluster.name)
 
 
 # test leader election function
@@ -175,7 +176,7 @@ def main():
     shared_db_conn = None
     while not_exit:
         try:
-            print(datetime.datetime.now())
+            # print(datetime.datetime.now())
             # print("Current node:" + str(current_seq_number))
             # if current node is leader node,
             # check populate ring and send ring to active cluster not updated
@@ -230,12 +231,13 @@ def main():
                                             ring, not_updated_cluster)
                 shared_db_conn.close()
             else:
-                print("Leader node: " + str(leader_seq_number))
-            print("Prev node: " + str(previous_seq_number))
-            print("Current node: " + str(current_seq_number))
-            print("Node set:")
-            # print(zk.get_children(election_path))
-            print("")
+                pass
+            #     print("Leader node: " + str(leader_seq_number))
+            # print("Prev node: " + str(previous_seq_number))
+            # print("Current node: " + str(current_seq_number))
+            # print("Node set:")
+            # # print(zk.get_children(election_path))
+            # print("")
         except Exception as e:
             shared_db_conn.close()
             shared_db_conn = SharedDatabaseConnection()

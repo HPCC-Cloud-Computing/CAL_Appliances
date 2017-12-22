@@ -51,7 +51,8 @@
                         {#                       cellspacing="0"#}
                        data-container-list-api="{% url 'file_and_container:container_list' %}"
                        data-container-info-api="{% url 'file_and_container:container_info' %}"
-                       data-create-container-api="{% url 'file_and_container:create_container' %}">
+                       data-create-container-api="{% url 'file_and_container:create_container' %}"
+                       data-delete-container-api="{% url 'file_and_container:delete_container' %}">
                     <thead>
                     <tr>
                         <th>Container Name</th>
@@ -143,6 +144,7 @@
                 <table id="files-table"
                        class=" table table-hover table-select table-bordered table-striped"
                        data-upload-file-api="{% url 'file_and_container:upload_file' %}"
+                       data-update-file-api="{% url 'file_and_container:update_file' %}"
                        data-file-info-api="{% url 'file_and_container:file_info' %}"
                        data-file-download-api="{% url 'file_and_container:download_file' %}"
                 >
@@ -188,7 +190,10 @@
         </div>
     </div>
     {% include 'user/dashboard/include/_create_container_modal.html' %}
+    {% include 'user/dashboard/include/_delete_container_modal.html' %}
+
     {% include 'user/dashboard/include/_upload_file.html' %}
+    {% include 'user/dashboard/include/_update_file.html' %}
     {% include 'user/dashboard/include/_file_info_modal.html' %}
 
 

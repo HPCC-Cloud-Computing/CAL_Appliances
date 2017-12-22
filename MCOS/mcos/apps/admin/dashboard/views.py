@@ -173,10 +173,9 @@ def options_management(request):
     enable_defined_ring = None
     total_defined_ring_not_create = 4
     not_defined_opt_rings = {
-        'optimize_big': True,
-        'economy_big': True,
-        'optimize_small': True,
-        'economy_small': True
+        'optimize': True,
+        'standard': True,
+        'economy': True,
     }
 
     for ring in rings:

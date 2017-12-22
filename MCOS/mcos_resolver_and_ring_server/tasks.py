@@ -155,7 +155,7 @@ def get_container_list(account_name):
     container_list = []
     account_db_conn = AccountSession()
     container_list_info = account_db_conn.query(ContainerInfo). \
-        filter_by(account_name=account_name).all()
+        filter_by(account_name=account_name, is_deleted=False).all()
     for container in container_list_info:
         container_list.append(container.container_name)
     account_db_conn.close()
@@ -167,7 +167,7 @@ def get_container_details(user_name, container_name):
     container_details = None
     account_db_conn = AccountSession()
     selected_container = account_db_conn.query(ContainerInfo). \
-        filter_by(account_name=user_name, container_name=container_name).first()
+        filter_by(account_name=user_name, container_name=container_name, is_deleted=False).first()
     if selected_container is not None:
         container_details = {
             'account_name': selected_container.account_name,
@@ -187,7 +187,7 @@ def get_object_list(user_name, container_name):
     object_list = []
     container_db_conn = ContainerSession()
     object_info_list = container_db_conn.query(ObjectInfo). \
-        filter_by(account_name=user_name, container_name=container_name).all()
+        filter_by(account_name=user_name, container_name=container_name, is_deleted=False).all()
     for object_info in object_info_list:
         object_list.append({
             'object_name': object_info.object_name,
@@ -312,7 +312,27 @@ def create_new_container(new_container_info):
     print (new_container_info['container_name'])
     print(len(container_exist_list))
     if len(container_exist_list) > 0:
-        return False
+        check_container = container_exist_list[0]
+        if check_container.is_deleted == False:
+            return False
+        else:
+            try:
+                # updated deleted container
+                check_container.object_count = new_container_info['object_count']
+                check_container.size = new_container_info['size']
+                check_container.date_created = datetime.datetime.strptime(
+                    new_container_info['date_created'], '%Y-%m-%d %H:%M:%S.%f')
+                check_container.time_stamp = datetime.datetime.strptime(
+                    new_container_info['date_created'], '%Y-%m-%d %H:%M:%S.%f')
+                check_container.is_deleted = False
+                account_db_conn.add(check_container)
+                account_db_conn.commit()
+                account_db_conn.close()
+                return True
+            except Exception as e:
+                print (e)
+                account_db_conn.close()
+                return False
     try:
         # add new container to database
         new_container = ContainerInfo(
@@ -334,6 +354,36 @@ def create_new_container(new_container_info):
     except Exception as e:
         print (e)
         account_db_conn.close()
+        return False
+
+
+@app.task()
+def delete_container(container_info):
+    # check if container is already exists
+    account_db_conn = AccountSession()
+    container_exist_list = account_db_conn.query(ContainerInfo). \
+        filter_by(account_name=container_info['account_name'],
+                  container_name=container_info['container_name']).all()
+    if len(container_exist_list) > 0:
+        try:
+            # updated deleted container
+            check_container = container_exist_list[0]
+            check_container.object_count = container_info['object_count']
+            check_container.size = container_info['size']
+            check_container.date_created = datetime.datetime.strptime(
+                container_info['date_created'], '%Y-%m-%d %H:%M:%S.%f')
+            check_container.time_stamp = datetime.datetime.strptime(
+                container_info['date_created'], '%Y-%m-%d %H:%M:%S.%f')
+            check_container.is_deleted = True
+            account_db_conn.add(check_container)
+            account_db_conn.commit()
+            account_db_conn.close()
+            return True
+        except Exception as e:
+            print (e)
+            account_db_conn.close()
+            return False
+    else:
         return False
 
 

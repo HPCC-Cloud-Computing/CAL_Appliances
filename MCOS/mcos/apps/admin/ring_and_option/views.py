@@ -114,35 +114,37 @@ def update_account_ring(request):
     pass
 
 
-def get_compatible_clusters(option_name, capacity_limit,
-                            read10mb_limit, write10mb_limit,
-                            read128k_limit, write128k_limit):
+def get_compatible_clusters(option_name,
+                            read10mb_up, read10mb_low,
+                            write10mb_up, write10mb_low,
+                            read128k_up, read128k_low,
+                            write128k_up, write128k_low):
     compatible_clusters = []
     system_clusters = SystemCluster.objects.all()
     for cluster in system_clusters:
         cluster_spec = json.loads(cluster.service_info.specifications)
         cluster.weight = int(cluster_spec['capacity'])
-        if option_name == 'optimize_big':
-            if float(cluster_spec['capacity']) >= capacity_limit and \
-                            float(cluster_spec['10mb-read']) >= read10mb_limit and \
-                            float(cluster_spec['10mb-write']) >= write10mb_limit:
-                compatible_clusters.append(cluster)
-        elif option_name == 'economy_big':
-            if float(cluster_spec['capacity']) >= capacity_limit and \
-                            float(cluster_spec['10mb-read']) < read10mb_limit and \
-                            float(cluster_spec['10mb-write']) < write10mb_limit:
-                compatible_clusters.append(cluster)
-        elif option_name == 'optimize_small':
-            if float(cluster_spec['capacity']) <= capacity_limit and \
-                            float(cluster_spec['128k-read']) >= read128k_limit and \
-                            float(cluster_spec['128k-write']) >= write128k_limit:
-                compatible_clusters.append(cluster)
-        elif option_name == 'economy_small':
-            if float(cluster_spec['capacity']) <= capacity_limit and \
-                            float(cluster_spec['128k-read']) < read128k_limit and \
-                            float(cluster_spec['128k-write']) < write128k_limit:
+        if option_name == 'optimize':
+
+            if float(cluster_spec['10mb-read']) >= read10mb_up and \
+                            float(cluster_spec['10mb-write']) >= write10mb_low and \
+                            float(cluster_spec['128k-read']) >= read128k_up and \
+                            float(cluster_spec['128k-write']) >= write128k_up:
                 compatible_clusters.append(cluster)
 
+        elif option_name == 'standard':
+            if read10mb_low <= float(cluster_spec['10mb-read']) <= read10mb_up and \
+                                    write10mb_low <= float(cluster_spec['10mb-write']) <= read10mb_up and \
+                                    read128k_low <= float(cluster_spec['128k-read']) <= read128k_up and \
+                                    write128k_low <= float(cluster_spec['128k-write']) <= write128k_up:
+                compatible_clusters.append(cluster)
+
+        elif option_name == 'economy':
+            if float(cluster_spec['10mb-read']) <= read10mb_low and \
+                            float(cluster_spec['10mb-write']) <= write10mb_low and \
+                            float(cluster_spec['128k-read']) <= read128k_low and \
+                            float(cluster_spec['128k-write']) <= write128k_low:
+                compatible_clusters.append(cluster)
     return compatible_clusters
 
 
@@ -202,15 +204,23 @@ def add_defined_option_ring(request):
         option_full_name = request.POST['optionFullName']
         option_description = request.POST['optionDescription']
         duplicate_factor = int(request.POST['optionDuplicateFactor'])
-        capacity_limit = float(request.POST['optionCapacityLimit'])
-        read10mb_limit = float(request.POST['optionRead10mb'])
-        write10mb_limit = float(request.POST['optionWrite10mb'])
-        read128k_limit = float(request.POST['optionRead128k'])
-        write128k_limit = float(request.POST['optionWrite128k'])
+
+        read10mb_up = float(request.POST['read10mb_up'])
+        read10mb_low = float(request.POST['read10mb_low'])
+        write10mb_up = float(request.POST['write10mb_up'])
+        write10mb_low = float(request.POST['write10mb_low'])
+
+        read128k_up = float(request.POST['read128k_up'])
+        read128k_low = float(request.POST['read128k_low'])
+        write128k_up = float(request.POST['write128k_up'])
+        write128k_low = float(request.POST['write128k_low'])
+
         compatible_clusters = get_compatible_clusters(
-            option_name, capacity_limit,
-            read10mb_limit, write10mb_limit,
-            read128k_limit, write128k_limit
+            option_name,
+            read10mb_up, read10mb_low,
+            write10mb_up, write10mb_low,
+            read128k_up, read128k_low,
+            write128k_up, write128k_low
         )
         compatible_names = []
         for cluster in compatible_clusters:

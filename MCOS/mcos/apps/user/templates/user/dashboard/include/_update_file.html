@@ -1,0 +1,61 @@
+{% load adminlte_helpers i18n %}
+{% load staticfiles %}
+
+<div class="modal fade" id="update-file-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id="file-update-loading" style="display: none">
+                <div class="loading-info text-primary text-bold">Loading...</div>
+            </div>
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
+                <div class="h3 modal-title" translate="">
+                    Upload new data for File: <span id="update-absolute-file"></span>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <form enctype="multipart/form-data">
+                            <fieldset>
+                                <div class="form-group">
+                                    <label class="control-label required" for="input-object-file" translate="">
+                                        <span class="ng-scope">New Data</span>
+                                    </label>
+                                    <div>
+                                        <input id="update-object-data" name="file" type="file">
+                                        <input id="update-container-name" name="container-name" type="text" hidden>
+                                        <input id="update-file-name" name="file-name" type="text" hidden>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                    <div class="col-sm-6">
+                        <p translate="">
+                            <span class="ng-scope">
+                                Select a file and upload it to update file data.
+                            </span>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-default pull-left"
+                        data-dismiss="modal">Cancel
+                </button>
+                <button type="button" class="btn btn-primary"
+                        id="update-data-object-submit-btn">
+                    Update
+                </button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+

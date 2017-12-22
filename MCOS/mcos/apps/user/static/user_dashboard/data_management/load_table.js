@@ -67,14 +67,14 @@ $(document).ready(function () {
                         // console.log(row);
                         // console.log(val);
                         let downloadUrl = $('#files-table').data('file-download-api');
-                        downloadUrl+='?account_name='+row.account_name;
-                        downloadUrl+='&container_name='+row.container_name;
-                        downloadUrl+='&file_name='+row.object_name;
+                        downloadUrl += '?account_name=' + row.account_name;
+                        downloadUrl += '&container_name=' + row.container_name;
+                        downloadUrl += '&file_name=' + row.object_name;
                         let fileActions = $("#file-actions-source").html();
                         let fileActionsBox = $(fileActions);
                         // console.log(fileActionsBox.find('a.btn-download-file')[0]);
                         // console.log(downloadUrl);
-                        $(fileActionsBox.find('a.btn-download-file')[0]).attr('href',downloadUrl);
+                        $(fileActionsBox.find('a.btn-download-file')[0]).attr('href', downloadUrl);
                         fileActionsBox.attr('data-object-name', row.file_name);
                         // console.log(fileActionsBox.prop('outerHTML'));
                         // return "<button>Edit</button>";
@@ -229,6 +229,23 @@ $(document).ready(function () {
             });
     });
 
+
+    // update file data
+    // show object info
+    $('#files-table').on('click', 'tbody tr .btn-update-file', function () {
+        let trSelectedElement = $(this).closest('tr');
+        let selectedFileName = $(trSelectedElement).data('file-name').toString();
+        let selectedContainerName = containersTable.$('tr.selected').data('container-name').toString();
+        $("#update-file-modal").find("#update-absolute-file")
+            .html(selectedContainerName + '.' + selectedFileName);
+        $("#update-file-modal").find("#update-container-name")
+            .val(selectedContainerName);
+        $("#update-file-modal").find("#update-file-name")
+            .val(selectedFileName);
+        $('#update-file-modal').modal();
+        // $("#file-info-loading .loading-info").html('Loading File Info...');
+        // $("#file-info-loading").show();
+    });
 
     function loadContainersTable() {
         let tblElement = $('#containers-table');
@@ -390,6 +407,23 @@ $(document).ready(function () {
         }
     });
 
+
+    // delete container
+    $('#containers-table').on('click', 'tbody tr .delete-container-btn', function () {
+        let trContainerRow = $(this).closest('tr');
+        let containerName = $(trContainerRow).data('container-name');
+        let objectCount = parseInt(trContainerRow.find("#object-count").html());
+        if (objectCount > 0) {
+            alert_message(
+                'Failed to delete container ' + containerName +
+                '. Reason: container is not empty!',
+                'alert-danger');
+        } else {
+            $("#delete-container-modal").find('#deleted-container-name').html(containerName);
+            $("#delete-container-modal").modal();
+        }
+    });
+
     $('#containers-table').on('click', 'tbody tr .collapse-container-btn', function () {
         // console.log('deleted!');
         let trSelectedElement = $(this).closest('tr');
@@ -528,7 +562,7 @@ $(document).ready(function () {
                 keyboard: false
             });
 
-            $("select#input-object-file-option").val("economy");
+            $("select#input-object-file-option").val("optimize");
             $("#create-data-object-submit-btn").prop("disabled", true);
 
         }
@@ -626,5 +660,109 @@ $(document).ready(function () {
     });
 
 
+    $("#delete-container-submit-btn").on('click', function () {
+        let containerName = $('#delete-container-modal').find('#deleted-container-name').html();
+        let deleteContainerApi = $('#containers-table').data("delete-container-api");
+        $("#delete-container-loading .loading-info").html('Deleting container...');
+        $("#delete-container-loading").show();
+        $.ajax({
+            method: "POST",
+            data: {'container_name': containerName},
+            url: deleteContainerApi
+        })
+            .done(function (data) {
+                if (data.result === 'success') {
+                    $('#delete-container-modal').modal('hide');
+                    setTimeout(function () {
+                        alert_message(containerName + ' is deleted.', 'alert-success');
+                        loadContainersTable();
+                    }, 100);
+                } else {
+                    setTimeout(function () {
+                        $('#delete-container-modal').modal('hide');
+                        alert_message(
+                            'Failed to delete container ' + containerName +
+                            '. Reason: ' + data.message,
+                            'alert-danger');
+                    }, 100);
+                }
+            })
+            .fail(function (jqXHR, textStatus, error) {
+                // Handle error here
+                setTimeout(function () {
+                    handleFailedAjaxRequest(jqXHR, textStatus, error,
+                        'Failed to create container ' + containerName);
+                }, 100);
+            })
+            .always(function (data) {
+                $("#delete-container-loading").hide();
+                $('#delete-container-modal').modal('hide');
+            });
+    });
+
+    $('#update-file-modal').on('hidden.bs.modal', function () {
+        let updateFileForm = $("#update-file-modal")
+        $(updateFileForm).find('#update-object-data').val("");
+    })
+
+    // handle update file submit button
+    $("#update-data-object-submit-btn").on('click', function () {
+        let updateFileForm = $("#update-file-modal")
+        let fileName = $(updateFileForm).find("#update-file-name").val();
+        let containerName = $(updateFileForm).find("#update-container-name").val();
+        let updateData = $(updateFileForm).find('#update-object-data')[0].files[0];
+        console.log(fileName);
+        console.log(containerName);
+        console.log(updateData);
+        if (updateData != null) {
+            var newObjectFileData = new FormData();
+            newObjectFileData.append('file_data', updateData);
+            newObjectFileData.append('container_name', containerName);
+            newObjectFileData.append('file_name', fileName);
+            $("#file-update-loading .loading-info").html('Update File Data...');
+            $("#file-update-loading").show();
+            $.ajax({
+                url: $("#files-table").data('update-file-api'),
+                type: 'POST',
+                data: newObjectFileData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                xhr: function () {
+                    var myXhr = $.ajaxSettings.xhr();
+                    if (myXhr.upload) {
+                        myXhr.upload.addEventListener('progress', function (e) {
+                        }, false);
+                    }
+                    return myXhr;
+                },
+            })
+                .done(function (data) {
+                    if (data.result === 'success') {
+                        setTimeout(function () {
+                            alert_message('File ' + fileName + ' is updated data.', 'alert-success');
+                            let selectedContainerRow = containersTable.$('tr.selected');
+                            loadContainerDetails(selectedContainerRow);
+                        }, 100);
+                    } else {
+                        setTimeout(function () {
+                            alert_message(
+                                'Failed to update data for file ' + fileName +
+                                '. Reason: ' + data.message,
+                                'alert-danger');
+                        }, 100);
+                    }
+                })
+                .fail(function (jqXHR, textStatus, error) {
+                    handleFailedAjaxRequest(jqXHR, textStatus, error, 'Failed to update data for file ' + fileName);
+                })
+                .always(function (data) {
+                    $("#file-update-loading").hide();
+                    $('#update-file-modal').modal('hide');
+                });
+        }
+    });
+
+    // end document ready
 });
 
