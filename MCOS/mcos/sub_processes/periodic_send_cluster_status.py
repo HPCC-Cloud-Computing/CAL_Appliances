@@ -13,7 +13,7 @@ from os.path import abspath, dirname
 
 path.insert(0, os.getcwd())
 # from mcos.settings.shared import PERIODIC_SEND_STATUS_TIME
-PERIODIC_SEND_STATUS_TIME = 300
+PERIODIC_SEND_STATUS_TIME = 360
 from mcos.settings.mcos_conf import MCOS_CLUSTER_NAME
 from mcos.settings.base import TIME_ZONE
 from mcos_celery_server import tasks
@@ -42,14 +42,13 @@ while not_exit:
             name=MCOS_CLUSTER_NAME).first()
         if check_internal_cluster(current_cluster) is True:
             current_time = timezone.now()
-            print(current_time)
-            print(time.mktime(current_time.timetuple()))
+            # print(current_time)
+            # print(time.mktime(current_time.timetuple()))
             tasks.update_cluster_status.delay(
                 str(current_cluster.id),
                 SystemCluster.ACTIVE,
                 time.mktime(current_time.timetuple())
             )
-
             # current_cluster_id = str(current_cluster.id)
             # current_time =  time.mktime(current_time.timetuple())
             # dt = datetime.fromtimestamp(1346236702)

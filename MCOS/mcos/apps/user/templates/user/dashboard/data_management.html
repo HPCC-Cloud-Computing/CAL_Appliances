@@ -145,6 +145,7 @@
                        class=" table table-hover table-select table-bordered table-striped"
                        data-upload-file-api="{% url 'file_and_container:upload_file' %}"
                        data-update-file-api="{% url 'file_and_container:update_file' %}"
+                       data-delete-file-api="{% url 'file_and_container:delete_file' %}"
                        data-file-info-api="{% url 'file_and_container:file_info' %}"
                        data-file-download-api="{% url 'file_and_container:download_file' %}"
                 >
@@ -194,6 +195,8 @@
 
     {% include 'user/dashboard/include/_upload_file.html' %}
     {% include 'user/dashboard/include/_update_file.html' %}
+    {% include 'user/dashboard/include/_delete_file.html' %}
+
     {% include 'user/dashboard/include/_file_info_modal.html' %}
 
 

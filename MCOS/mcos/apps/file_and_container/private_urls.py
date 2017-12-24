@@ -18,6 +18,7 @@ urls = \
             private_views.create_container, name='create-container'),
         url(r'^delete-container/$',
             private_views.delete_container, name='delete-container'),
+
         url(r'^update-container-info/$',
             private_views.update_container_info, name='update_container_info'),
 
@@ -30,8 +31,8 @@ urls = \
         url(r'^upload-object-data/$',
             private_views.upload_object_data, name='update_object_data'),
 
-        url(r'^upload-object-data/$',
-            private_views.upload_object_data, name='update_object_data'),
+        url(r'^delete-object-data/$',
+            private_views.delete_object_data, name='delete_object_data'),
 
         url(r'^get-object-option/$',
             private_views.get_resolver_info, name='get_object_option'),

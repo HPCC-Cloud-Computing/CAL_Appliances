@@ -85,16 +85,6 @@ task_routes = {
          'exchange': 'mcos_exchange_topic',
          'routing_key': MCOS_CLUSTER_NAME + '.get_object_list', },
 
-    'mcos_resolver_and_ring_server.tasks.create_new_container':
-        {'queue': MCOS_CLUSTER_NAME,
-         'exchange': 'mcos_exchange_topic',
-         'routing_key': MCOS_CLUSTER_NAME + '.create_new_container', },
-
-    'mcos_resolver_and_ring_server.tasks.delete_container':
-        {'queue': MCOS_CLUSTER_NAME,
-         'exchange': 'mcos_exchange_topic',
-         'routing_key': MCOS_CLUSTER_NAME + '.delete_container', },
-
     'mcos_resolver_and_ring_server.tasks.update_container_info':
         {'queue': MCOS_CLUSTER_NAME,
          'exchange': 'mcos_exchange_topic',
@@ -114,6 +104,58 @@ task_routes = {
         {'queue': MCOS_CLUSTER_NAME,
          'exchange': 'mcos_exchange_topic',
          'routing_key': MCOS_CLUSTER_NAME + '.get_resolver_info', },
+
+    # sync tasks
+
+    # container row sync
+    'mcos_resolver_and_ring_server.tasks.sync_get_container_list':
+        {'queue': MCOS_CLUSTER_NAME,
+         'exchange': 'mcos_exchange_topic',
+         'routing_key': MCOS_CLUSTER_NAME + '.sync_get_container_list', },
+
+    'mcos_resolver_and_ring_server.tasks.sync_get_container_time_stamp':
+        {'queue': MCOS_CLUSTER_NAME,
+         'exchange': 'mcos_exchange_topic',
+         'routing_key': MCOS_CLUSTER_NAME + '.sync_get_container_time_stamp', },
+
+    'mcos_resolver_and_ring_server.tasks.sync_container_row':
+        {'queue': MCOS_CLUSTER_NAME,
+         'exchange': 'mcos_exchange_topic',
+         'routing_key': MCOS_CLUSTER_NAME + '.sync_container_row', },
+
+    # object row sync
+    'mcos_resolver_and_ring_server.tasks.sync_get_object_list':
+        {'queue': MCOS_CLUSTER_NAME,
+         'exchange': 'mcos_exchange_topic',
+         'routing_key': MCOS_CLUSTER_NAME + '.sync_get_object_list', },
+
+    'mcos_resolver_and_ring_server.tasks.sync_get_object_time_stamp':
+        {'queue': MCOS_CLUSTER_NAME,
+         'exchange': 'mcos_exchange_topic',
+         'routing_key': MCOS_CLUSTER_NAME + '.sync_get_object_time_stamp', },
+
+    'mcos_resolver_and_ring_server.tasks.sync_object_row':
+        {'queue': MCOS_CLUSTER_NAME,
+         'exchange': 'mcos_exchange_topic',
+         'routing_key': MCOS_CLUSTER_NAME + '.sync_object_row', },
+
+    # resolver row sync
+    'mcos_resolver_and_ring_server.tasks.sync_get_resolver_info_time_stamp':
+        {'queue': MCOS_CLUSTER_NAME,
+         'exchange': 'mcos_exchange_topic',
+         'routing_key': MCOS_CLUSTER_NAME + '.sync_get_resolver_info_time_stamp', },
+
+    'mcos_resolver_and_ring_server.tasks.sync_get_resolver_info_list':
+        {'queue': MCOS_CLUSTER_NAME,
+         'exchange': 'mcos_exchange_topic',
+         'routing_key': MCOS_CLUSTER_NAME + '.sync_get_resolver_info_list', },
+
+    'mcos_resolver_and_ring_server.tasks.sync_resolver_info_row':
+        {'queue': MCOS_CLUSTER_NAME,
+         'exchange': 'mcos_exchange_topic',
+         'routing_key': MCOS_CLUSTER_NAME + '.sync_resolver_info_row', },
+
+    # object data sync
 
     #
     # 'mcos_resolver_and_ring_server.tasks.api_create_container':

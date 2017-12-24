@@ -5,6 +5,7 @@ from django.conf import settings
 
 import views
 import private_urls
+import sync_urls
 
 urls = [
     url(r'^csrftoken', views.get_csrf_token, name='get_csrftoken'),
@@ -17,12 +18,13 @@ urls = [
     url(r'^file-info', views.get_file_info, name='file_info'),
     url(r'^update-file', views.update_file, name='update_file'),
     url(r'^download-file', views.download_file, name='download_file'),
-
+    url(r'^delete-file', views.delete_file, name='delete_file'),
 
     url(r'^create-object', views.upload_file, name='create_object'),
     url(r'^test-file-name/', views.test_file_name, name='test_file_name'),
     url(r'^private/', include(private_urls.urlpatterns,
                               namespace='private')),
-
+    url(r'^sync/', include(sync_urls.urlpatterns,
+                           namespace='sync')),
 ]
 urlpatterns = urls

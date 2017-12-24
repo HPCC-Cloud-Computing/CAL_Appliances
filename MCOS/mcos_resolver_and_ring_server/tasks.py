@@ -301,29 +301,30 @@ def get_object_cluster_refs(user_name, container_name, object_name, option_name)
     return active_clusters
 
 
+# update a container row in account information
+# if container row is not exist, create it
+# param account_name: string, container_name: string,
+# size_changed: float MB, last_update: time string
 @app.task()
-def create_new_container(new_container_info):
-    # check if container is already exists
+def update_container_info(account_name, container_name, last_update, object_count_changed,
+                          size_changed, is_deleted, is_created):
+    # print(object_count_changed)
     account_db_conn = AccountSession()
-    container_exist_list = account_db_conn.query(ContainerInfo). \
-        filter_by(account_name=new_container_info['account_name'],
-                  container_name=new_container_info['container_name']).all()
-    print (new_container_info['account_name'])
-    print (new_container_info['container_name'])
-    print(len(container_exist_list))
-    if len(container_exist_list) > 0:
-        check_container = container_exist_list[0]
-        if check_container.is_deleted == False:
-            return False
-        else:
+    # handle create container
+    if is_created:
+        check_container = account_db_conn.query(ContainerInfo). \
+            filter_by(account_name=account_name,
+                      container_name=container_name).first()
+        if check_container is not None:
+            # change deleted container to new container
             try:
                 # updated deleted container
-                check_container.object_count = new_container_info['object_count']
-                check_container.size = new_container_info['size']
+                check_container.object_count = 0
+                check_container.size = 0
                 check_container.date_created = datetime.datetime.strptime(
-                    new_container_info['date_created'], '%Y-%m-%d %H:%M:%S.%f')
+                    last_update, '%Y-%m-%d %H:%M:%S.%f')
                 check_container.time_stamp = datetime.datetime.strptime(
-                    new_container_info['date_created'], '%Y-%m-%d %H:%M:%S.%f')
+                    last_update, '%Y-%m-%d %H:%M:%S.%f')
                 check_container.is_deleted = False
                 account_db_conn.add(check_container)
                 account_db_conn.commit()
@@ -333,79 +334,46 @@ def create_new_container(new_container_info):
                 print (e)
                 account_db_conn.close()
                 return False
-    try:
-        # add new container to database
-        new_container = ContainerInfo(
-            account_name=new_container_info['account_name'],
-            container_name=new_container_info['container_name'],
-            object_count=new_container_info['object_count'],
-            size=new_container_info['size'],
-            date_created=datetime.datetime.strptime(
-                new_container_info['date_created'],
-                '%Y-%m-%d %H:%M:%S.%f'),
-            time_stamp=datetime.datetime.strptime(
-                new_container_info['date_created'],
-                '%Y-%m-%d %H:%M:%S.%f')
-        )
-        account_db_conn.add(new_container)
-        account_db_conn.commit()
-        account_db_conn.close()
-        return True
-    except Exception as e:
-        print (e)
-        account_db_conn.close()
-        return False
-
-
-@app.task()
-def delete_container(container_info):
-    # check if container is already exists
-    account_db_conn = AccountSession()
-    container_exist_list = account_db_conn.query(ContainerInfo). \
-        filter_by(account_name=container_info['account_name'],
-                  container_name=container_info['container_name']).all()
-    if len(container_exist_list) > 0:
-        try:
-            # updated deleted container
-            check_container = container_exist_list[0]
-            check_container.object_count = container_info['object_count']
-            check_container.size = container_info['size']
-            check_container.date_created = datetime.datetime.strptime(
-                container_info['date_created'], '%Y-%m-%d %H:%M:%S.%f')
-            check_container.time_stamp = datetime.datetime.strptime(
-                container_info['date_created'], '%Y-%m-%d %H:%M:%S.%f')
-            check_container.is_deleted = True
-            account_db_conn.add(check_container)
-            account_db_conn.commit()
-            account_db_conn.close()
-            return True
-        except Exception as e:
-            print (e)
-            account_db_conn.close()
-            return False
-    else:
-        return False
-
-
-@app.task()
-# param account_name: string, container_name: string,
-# new_object_size: float, last_update: time string
-def update_container_info(account_name, container_name, new_object_size, last_update, is_deleted):
-    account_db_conn = AccountSession()
-    update_container = account_db_conn.query(ContainerInfo). \
-        filter_by(account_name=account_name,
-                  container_name=container_name).first()
-    if update_container is None:
-        pass
-    else:
-        if is_deleted is False:
+        else:
+            # add new container to database
             try:
-                # add new container to database
-                update_container.object_count = update_container.object_count + 1
-                update_container.size = update_container.size + new_object_size
-                update_container.time_stamp = datetime.datetime.strptime(
+                new_container = ContainerInfo(
+                    account_name=account_name,
+                    container_name=container_name,
+                    object_count=0,
+                    size=0,
+                    date_created=datetime.datetime.strptime(
+                        last_update,
+                        '%Y-%m-%d %H:%M:%S.%f'),
+                    time_stamp=datetime.datetime.strptime(
+                        last_update,
+                        '%Y-%m-%d %H:%M:%S.%f'))
+                account_db_conn.add(new_container)
+                account_db_conn.commit()
+                account_db_conn.close()
+                return True
+            except Exception as e:
+                print (e)
+                account_db_conn.close()
+                return False
+
+    # handle delete container
+    elif is_deleted:
+        check_container = account_db_conn.query(ContainerInfo). \
+            filter_by(account_name=account_name,
+                      container_name=container_name).first()
+        if check_container is not None:
+            # change deleted container to new container
+            try:
+                # updated deleted container
+                check_container.object_count += object_count_changed
+                check_container.size += size_changed
+                check_container.date_created = datetime.datetime.strptime(
                     last_update, '%Y-%m-%d %H:%M:%S.%f')
-                account_db_conn.add(update_container)
+                check_container.time_stamp = datetime.datetime.strptime(
+                    last_update, '%Y-%m-%d %H:%M:%S.%f')
+                check_container.is_deleted = True
+                account_db_conn.add(check_container)
                 account_db_conn.commit()
                 account_db_conn.close()
                 return True
@@ -414,22 +382,46 @@ def update_container_info(account_name, container_name, new_object_size, last_up
                 account_db_conn.close()
                 return False
         else:
-            pass
+            return False
+    # handle update container: add new object, update object, delete object
+    else:
+        check_container = account_db_conn.query(ContainerInfo). \
+            filter_by(account_name=account_name,
+                      container_name=container_name,
+                      is_deleted=False).first()
+        if check_container is not None:
+            try:
+                # add new container to database
+                check_container.object_count = check_container.object_count + object_count_changed
+                check_container.size = check_container.size + size_changed
+                check_container.time_stamp = datetime.datetime.strptime(
+                    last_update, '%Y-%m-%d %H:%M:%S.%f')
+                account_db_conn.add(check_container)
+                account_db_conn.commit()
+                account_db_conn.close()
+                return True
+            except Exception as e:
+                print (e)
+                account_db_conn.close()
+                return False
+        else:
+            return False
 
 
 @app.task()
 # param account_name: string, container_name: string,
 # new_object_size: float, last_update: time string
-def update_object_info(account_name, container_name, object_name, last_update,
-                       object_size, is_deleted):
+def update_object_info(account_name, container_name, object_name,
+                       last_update, object_size, is_deleted):
     container_db_conn = ContainerSession()
-    update_object = container_db_conn.query(ObjectInfo). \
-        filter_by(account_name=account_name,
-                  container_name=container_name,
-                  object_name=object_name).first()
-    if update_object is None:
-        try:
-            # add new container to database
+    # handle update file and upload file request
+    if is_deleted is False:
+        check_object = container_db_conn.query(ObjectInfo). \
+            filter_by(account_name=account_name,
+                      container_name=container_name,
+                      object_name=object_name).first()
+        if check_object is None:
+            # if not exist, create and add new container to database
             new_object_info = ObjectInfo(
                 account_name=account_name,
                 container_name=container_name,
@@ -444,15 +436,35 @@ def update_object_info(account_name, container_name, object_name, last_update,
             container_db_conn.commit()
             container_db_conn.close()
             return True
-        except Exception as e:
-            print (e)
-            container_db_conn.close()
-            return False
-    else:
-        if is_deleted is False:
-            pass
         else:
-            pass
+            check_object.is_deleted = False
+            check_object.size = object_size
+            check_object.last_update = datetime.datetime.strptime(
+                last_update, '%Y-%m-%d %H:%M:%S.%f')
+            check_object.time_stamp = datetime.datetime.strptime(
+                last_update, '%Y-%m-%d %H:%M:%S.%f')
+            container_db_conn.add(check_object)
+            container_db_conn.commit()
+            container_db_conn.close()
+            return True
+    # handle delete file request
+    else:
+        check_object = container_db_conn.query(ObjectInfo). \
+            filter_by(account_name=account_name,
+                      container_name=container_name,
+                      object_name=object_name).first()
+        if check_object is None:
+            return False
+        else:
+            check_object.is_deleted = True
+            check_object.last_update = datetime.datetime.strptime(
+                last_update, '%Y-%m-%d %H:%M:%S.%f')
+            check_object.time_stamp = datetime.datetime.strptime(
+                last_update, '%Y-%m-%d %H:%M:%S.%f')
+            container_db_conn.add(check_object)
+            container_db_conn.commit()
+            container_db_conn.close()
+            return True
 
 
 @app.task()
@@ -461,34 +473,57 @@ def update_object_info(account_name, container_name, object_name, last_update,
 def update_resolver_info(account_name, container_name, object_name,
                          option_name, last_update, is_deleted):
     conn = ResolverSession()
-    update_resolver = conn.query(ResolverInfo). \
-        filter_by(account_name=account_name,
-                  container_name=container_name,
-                  object_name=object_name).first()
-    if update_resolver is None:
-        try:
-            # add new container to database
-            new_resolver_info = ResolverInfo(
-                account_name=account_name,
-                container_name=container_name,
-                object_name=object_name,
-                option_name=option_name,
-                time_stamp=datetime.datetime.strptime(
-                    last_update, '%Y-%m-%d %H:%M:%S.%f')
-            )
-            conn.add(new_resolver_info)
+    if is_deleted is False:  # create or update
+        check_resolver_info = conn.query(ResolverInfo). \
+            filter_by(account_name=account_name,
+                      container_name=container_name,
+                      object_name=object_name).first()
+        # print(check_resolver_info)
+        if check_resolver_info is None:
+            try:
+                # add new container to database
+                new_resolver_info = ResolverInfo(
+                    account_name=account_name,
+                    container_name=container_name,
+                    object_name=object_name,
+                    option_name=option_name,
+                    time_stamp=datetime.datetime.strptime(
+                        last_update, '%Y-%m-%d %H:%M:%S.%f')
+                )
+                conn.add(new_resolver_info)
+                conn.commit()
+                conn.close()
+                return True
+            except Exception as e:
+                print (e)
+                conn.close()
+                return False
+        else:
+            check_resolver_info.is_deleted = False
+            check_resolver_info.option_name = option_name
+            check_resolver_info.time_stamp = datetime.datetime.strptime(
+                last_update, '%Y-%m-%d %H:%M:%S.%f')
+            conn.add(check_resolver_info)
             conn.commit()
             conn.close()
             return True
-        except Exception as e:
-            print (e)
+    else:
+        # delete resolver info
+        check_resolver_info = conn.query(ResolverInfo). \
+            filter_by(account_name=account_name,
+                      container_name=container_name,
+                      object_name=object_name).first()
+        if check_resolver_info is None:
             conn.close()
             return False
-    else:
-        if is_deleted is False:
-            pass
         else:
-            pass
+            check_resolver_info.is_deleted = True
+            check_resolver_info.time_stamp = datetime.datetime.strptime(
+                last_update, '%Y-%m-%d %H:%M:%S.%f')
+            conn.add(check_resolver_info)
+            conn.commit()
+            conn.close()
+            return True
 
 
 @app.task()
@@ -504,3 +539,244 @@ def get_resolver_info(account_name, container_name, object_name):
         return resolver_info.option_name
     else:
         return None
+
+
+# sync tasks
+
+@app.task()
+def sync_get_container_list():
+    container_list = []
+    account_db_conn = AccountSession()
+    container_list_info = account_db_conn.query(ContainerInfo).all()
+    for container in container_list_info:
+        container_list.append({
+            'account_name': container.account_name,
+            'container_name': container.container_name,
+            'object_count': container.object_count,
+            'size': container.size,
+            'date_created': container.date_created,
+            'time_stamp': container.time_stamp,
+            'is_deleted': container.is_deleted
+        })
+    account_db_conn.close()
+    return container_list
+
+
+@app.task()
+def sync_get_container_time_stamp(account_name, container_name):
+    account_db_conn = AccountSession()
+    container_row = account_db_conn.query(ContainerInfo).filter_by(
+        account_name=account_name, container_name=container_name
+    ).first()
+    if container_row is not None:
+        return_result = {'time_stamp': container_row.time_stamp}
+    else:
+        return_result = None
+    account_db_conn.close()
+    return return_result
+
+
+@celery.task(ignore_result=True)
+def sync_container_row(container_info):
+    # fix is_deleted problem convert
+    if container_info['is_deleted'] == 'False':
+        container_info['is_deleted'] = False
+    else:
+        container_info['is_deleted'] = True
+    account_db_conn = AccountSession()
+    check_container = account_db_conn.query(ContainerInfo). \
+        filter_by(account_name=container_info['account_name'],
+                  container_name=container_info['container_name']).first()
+    if check_container is not None:
+        # recheck timestamp
+        if (check_container.time_stamp < datetime.datetime.strptime(
+                container_info['time_stamp'], '%Y-%m-%dT%H:%M:%S.%f')):
+            try:
+                check_container.date_created = datetime.datetime.strptime(
+                    container_info['date_created'], '%Y-%m-%dT%H:%M:%S.%f')
+                check_container.time_stamp = datetime.datetime.strptime(
+                    container_info['time_stamp'], '%Y-%m-%dT%H:%M:%S.%f')
+                check_container.object_count = container_info['object_count']
+                check_container.size = container_info['size']
+                check_container.is_deleted = container_info['is_deleted']
+
+                account_db_conn.add(check_container)
+                account_db_conn.commit()
+                account_db_conn.close()
+            except Exception as e:
+                print(e)
+                account_db_conn.close()
+    else:
+        new_container = ContainerInfo(
+            account_name=container_info['account_name'],
+            container_name=container_info['container_name'],
+            object_count=container_info['object_count'],
+            size=container_info['size'],
+            is_deleted=container_info['is_deleted'],
+            date_created=datetime.datetime.strptime(
+                container_info['date_created'], '%Y-%m-%dT%H:%M:%S.%f'),
+            time_stamp=datetime.datetime.strptime(
+                container_info['time_stamp'], '%Y-%m-%dT%H:%M:%S.%f')
+        )
+        account_db_conn.add(new_container)
+        account_db_conn.commit()
+        account_db_conn.close()
+
+
+@app.task()
+def sync_get_object_list():
+    object_list = []
+    db_conn = ContainerSession()
+    object_list_info = db_conn.query(ObjectInfo).all()
+    for object_info in object_list_info:
+        object_list.append({
+            'account_name': object_info.account_name,
+            'container_name': object_info.container_name,
+            'object_name': object_info.object_name,
+            'size': object_info.size,
+            'last_update': object_info.last_update,
+            'time_stamp': object_info.time_stamp,
+            'is_deleted': object_info.is_deleted
+        })
+    db_conn.close()
+    return object_list
+
+
+@app.task()
+def sync_get_object_time_stamp(account_name, container_name, object_name):
+    db_conn = ContainerSession()
+    object_row = db_conn.query(ObjectInfo).filter_by(
+        account_name=account_name,
+        container_name=container_name,
+        object_name=object_name
+    ).first()
+    if object_row is not None:
+        return_result = {'time_stamp': object_row.time_stamp}
+    else:
+        return_result = None
+    db_conn.close()
+    return return_result
+
+
+@celery.task(ignore_result=True)
+def sync_object_row(object_info):
+    # fix is_deleted problem convert
+    if object_info['is_deleted'] == 'False':
+        object_info['is_deleted'] = False
+    else:
+        object_info['is_deleted'] = True
+    db_conn = ContainerSession()
+    check_object = db_conn.query(ObjectInfo). \
+        filter_by(account_name=object_info['account_name'],
+                  container_name=object_info['container_name'],
+                  object_name=object_info['object_name']).first()
+    if check_object is not None:
+        # recheck timestamp
+        if (check_object.time_stamp < datetime.datetime.strptime(
+                check_object['time_stamp'], '%Y-%m-%dT%H:%M:%S.%f')):
+            try:
+                check_object.size = object_info['size']
+                check_object.is_deleted = object_info['is_deleted']
+                check_object.last_update = datetime.datetime.strptime(
+                    object_info['last_update'], '%Y-%m-%dT%H:%M:%S.%f')
+                check_object.time_stamp = datetime.datetime.strptime(
+                    object_info['time_stamp'], '%Y-%m-%dT%H:%M:%S.%f')
+                db_conn.add(check_object)
+                db_conn.commit()
+                db_conn.close()
+            except Exception as e:
+                print(e)
+                db_conn.close()
+
+    else:
+
+        new_obj_info = ObjectInfo(
+            account_name=object_info['account_name'],
+            container_name=object_info['container_name'],
+            object_name=object_info['object_name'],
+            size=object_info['size'],
+            is_deleted=object_info['is_deleted'],
+            last_update=datetime.datetime.strptime(
+                object_info['last_update'], '%Y-%m-%dT%H:%M:%S.%f'),
+            time_stamp=datetime.datetime.strptime(
+                object_info['time_stamp'], '%Y-%m-%dT%H:%M:%S.%f')
+        )
+        db_conn.add(new_obj_info)
+        db_conn.commit()
+        db_conn.close()
+
+
+@app.task()
+def sync_get_resolver_info_list():
+    resolver_info_list = []
+    db_conn = ResolverSession()
+    resolver_list_info = db_conn.query(ResolverInfo).all()
+    for resolver_info in resolver_list_info:
+        resolver_info_list.append({
+            'account_name': resolver_info.account_name,
+            'container_name': resolver_info.container_name,
+            'object_name': resolver_info.object_name,
+            'option_name': resolver_info.option_name,
+            'time_stamp': resolver_info.time_stamp,
+            'is_deleted': resolver_info.is_deleted
+        })
+    db_conn.close()
+    return resolver_info_list
+
+
+@app.task()
+def sync_get_resolver_info_time_stamp(account_name, container_name, object_name):
+    db_conn = ResolverSession()
+    resolver_row = db_conn.query(ResolverInfo).filter_by(
+        account_name=account_name,
+        container_name=container_name,
+        object_name=object_name
+    ).first()
+    if resolver_row is not None:
+        return_result = {'time_stamp': resolver_row.time_stamp}
+    else:
+        return_result = None
+    db_conn.close()
+    return return_result
+
+
+@celery.task(ignore_result=True)
+def sync_resolver_info_row(resolver_info):
+    # fix is_deleted problem convert
+    if resolver_info['is_deleted'] == 'False':
+        resolver_info['is_deleted'] = False
+    else:
+        resolver_info['is_deleted'] = True
+    db_conn = ResolverSession()
+    check_resolver_info = db_conn.query(ResolverInfo). \
+        filter_by(account_name=resolver_info['account_name'],
+                  container_name=resolver_info['container_name'],
+                  object_name=resolver_info['object_name']).first()
+    if check_resolver_info is not None:
+        # recheck timestamp
+        if (check_resolver_info.time_stamp < datetime.datetime.strptime(
+                resolver_info['time_stamp'], '%Y-%m-%dT%H:%M:%S.%f')):
+            try:
+                check_resolver_info.option_name = resolver_info['option_name']
+                check_resolver_info.is_deleted = resolver_info['is_deleted']
+                check_resolver_info.time_stamp = datetime.datetime.strptime(
+                    resolver_info['time_stamp'], '%Y-%m-%dT%H:%M:%S.%f')
+                db_conn.add(check_resolver_info)
+                db_conn.commit()
+                db_conn.close()
+            except Exception as e:
+                print(e)
+                db_conn.close()
+    else:
+        new_resolver_info = ResolverInfo(
+            account_name=resolver_info['account_name'],
+            container_name=resolver_info['container_name'],
+            object_name=resolver_info['object_name'],
+            option_name=resolver_info['option_name'],
+            is_deleted=resolver_info['is_deleted'],
+            time_stamp=datetime.datetime.strptime(
+                resolver_info['time_stamp'], '%Y-%m-%dT%H:%M:%S.%f')
+        )
+        db_conn.add(new_resolver_info)
+        db_conn.commit()
+        db_conn.close()

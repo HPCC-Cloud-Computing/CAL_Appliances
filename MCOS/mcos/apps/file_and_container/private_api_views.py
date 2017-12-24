@@ -84,18 +84,12 @@ def create_container(request):
         try:
             container_name = request.POST['container_name']
             account_name = request.POST['account_name']
-            container_size = float(request.POST['size'])
-            object_count = int(request.POST['object_count'])
             date_created = request.POST['date_created']
         except Exception as e:
             print(e)
             return JsonResponse({'result': 'failed', 'message': 'invalid parameter'})
-    create_container_task = tasks.create_new_container.apply_async(
-        ({'account_name': account_name,
-          'container_name': container_name,
-          'object_count': object_count,
-          'size': container_size,
-          'date_created': date_created},))
+    create_container_task = tasks.update_container_info.apply_async(
+        (account_name, container_name, date_created, 0, 0, False, True))
     create_result = create_container_task.get(timeout=10)
     if create_result is True:
         return JsonResponse({'result': 'success'})
@@ -110,18 +104,13 @@ def delete_container(request):
         try:
             container_name = request.POST['container_name']
             account_name = request.POST['account_name']
-            container_size = float(request.POST['size'])
-            object_count = int(request.POST['object_count'])
-            date_created = request.POST['date_created']
+            last_update = request.POST['last_update']
         except Exception as e:
             print(e)
             return JsonResponse({'result': 'failed', 'message': 'invalid parameter'})
-    delete_container_task = tasks.delete_container.apply_async(
-        ({'account_name': account_name,
-          'container_name': container_name,
-          'object_count': object_count,
-          'size': container_size,
-          'date_created': date_created},))
+    delete_container_task = tasks.update_container_info.apply_async((
+        account_name, container_name, last_update, 0, 0, True, False
+    ))
     delete_result = delete_container_task.get(timeout=10)
     if delete_result is True:
         return JsonResponse({'result': 'success'})
@@ -129,7 +118,7 @@ def delete_container(request):
         return JsonResponse({'result': 'failed'})
 
 
-# method handle request which data is size of new object push to a container
+# method handle request update container row in container table
 @csrf_exempt
 @api_login_required(role='admin')
 def update_container_info(request):
@@ -137,14 +126,17 @@ def update_container_info(request):
         try:
             container_name = request.POST['container_name']
             account_name = request.POST['account_name']
-            size = int(request.POST['size'])  # object site in byte
             last_update = request.POST['last_update']
+            size_changed = int(request.POST['size_changed'])  # object site in byte
+            object_count_changed = int(request.POST['object_count_changed'])
+            # print(object_count_changed)
         except Exception as e:
             print(e)
             return JsonResponse({'result': 'failed', 'message': 'invalid parameter'})
-        new_object_size = size * 1.0 / (1024 * 1024)  # convert new object size to MB
-        update_container_info_task = tasks.update_container_info.apply_async(
-            (account_name, container_name, new_object_size, last_update, False))
+        size_changed = size_changed * 1.0 / (1024 * 1024)  # convert new object size to MB
+        update_container_info_task = tasks.update_container_info.apply_async((
+            account_name, container_name, last_update,
+            object_count_changed, size_changed, False, False))
         update_result = update_container_info_task.get(timeout=10)
         if update_result is True:
             return JsonResponse({'result': 'success'})
@@ -152,7 +144,7 @@ def update_container_info(request):
             return JsonResponse({'result': 'failed'})
 
 
-# method handle request which data is size of new object push to a container
+# method handle request update object row in object table
 @csrf_exempt
 @api_login_required(role='admin')
 def update_object_info(request):
@@ -161,14 +153,19 @@ def update_object_info(request):
             container_name = request.POST['container_name']
             account_name = request.POST['account_name']
             object_name = request.POST['object_name']
-            size = int(request.POST['size'])
             last_update = request.POST['last_update']
+            size = int(request.POST['size'])
+            is_deleted = request.POST['is_deleted']
+            if is_deleted == 'False':
+                is_deleted = False
+            else:
+                is_deleted = True
         except Exception as e:
             print(e)
             return JsonResponse({'result': 'failed', 'message': 'invalid parameter'})
 
         update_object_info_task = tasks.update_object_info.apply_async(
-            (account_name, container_name, object_name, last_update, size, False))
+            (account_name, container_name, object_name, last_update, size, is_deleted))
         update_result = update_object_info_task.get(timeout=10)
         if update_result is True:
             return JsonResponse({'result': 'success'})
@@ -185,38 +182,26 @@ def update_resolver_info(request):
             container_name = request.POST['container_name']
             account_name = request.POST['account_name']
             object_name = request.POST['object_name']
-            option_name = request.POST['option_name']
             last_update = request.POST['last_update']
+            option_name = request.POST['option_name']
+            is_deleted = request.POST['is_deleted']
+            if is_deleted == 'False':
+                is_deleted = False
+            else:
+                is_deleted = True
         except Exception as e:
             print(e)
             return JsonResponse({'result': 'failed', 'message': 'invalid parameter'})
         update_resolver_info_task = tasks.update_resolver_info.apply_async(
-            (account_name, container_name, object_name, option_name, last_update, False))
+            (account_name, container_name, object_name, option_name, last_update, is_deleted))
         update_result = update_resolver_info_task.get(timeout=10)
         if update_result is True:
             return JsonResponse({'result': 'success'})
         else:
             return JsonResponse({'result': 'failed'})
-            # with open('log.txt', 'a') as f:
-            #     f.write('---handle update resolver info ---')
-            #     f.write('\n')
-            #     f.write(container_name)
-            #     f.write('\n')
-            #     f.write(account_name)
-            #     f.write('\n')
-            #     f.write(object_name)
-            #     f.write('\n')
-            #     f.write(last_update)
-            #     f.write('\n')
-            #     f.write(option_name)
-            #     f.write('\n')
-            #     f.write('///handle update resolver info///')
-            #     f.write('\n')
-            #
-            # return JsonResponse({'result': 'success'})
-            #  method handle request which data is size of new object push to a container
 
 
+# handle upload data file request and update data file request to storage server
 @csrf_exempt
 @api_login_required(role='admin')
 def upload_object_data(request):
@@ -233,9 +218,20 @@ def upload_object_data(request):
             print(e)
             return JsonResponse({'result': 'failed', 'message': 'invalid parameter'})
         try:
-            # upload object to storage server
             service_connector = \
                 create_service_connector(SERVICE_TYPE, AUTH_INFO)
+            # check if object exist
+            object_exist = True
+            obj_storage_name = account_name + '.' + container_name + '.' + object_name
+            try:
+                # test_result = client.driver.list_containers()
+                object_info = client.stat_object(STORAGE_CONTAINER_NAME, obj_storage_name)
+            except Exception as e:
+                object_exist = False
+            # if object exist, delete it and upload new object to storage server
+            if object_exist:
+                service_connector.delete_object(STORAGE_CONTAINER_NAME, obj_storage_name)
+            # upload object to storage server
             service_connector.upload_object(
                 obj=account_name + '.' + container_name + '.' + object_name,
                 container=STORAGE_CONTAINER_NAME,
@@ -246,6 +242,7 @@ def upload_object_data(request):
                           'object_name': object_name,
                           'last_update': last_update,
                           'option_name': option_name,
+                          'time_stamp': last_update,
                           'is_deleted': 'false'}
             )
             return JsonResponse({'result': 'success', 'message': ''})
@@ -253,30 +250,49 @@ def upload_object_data(request):
             print (e)
             return JsonResponse({'result': 'failed', 'message': str(e)})
 
-            # test_object_length = os.path.getsize(TEST_FILE_PATH)
-            # uploaded_object_stat = service_connector.stat_object(
-            #     TEST_CONTAINER_NAME, TEST_OBJECT_NAME)
-            # download_test_object_content = service_connector.download_object(
-            #     TEST_CONTAINER_NAME, TEST_OBJECT_NAME)
-            # if STORAGE_SERVICE_CONFIG['type'] == 'swift':
-            #     if int(test_object_length) != \
-            #             int(uploaded_object_stat['content-length']) \
-            #             or int(test_object_length) != \
-            #                     int(download_test_object_content[0][
-            #                             'content-length']):
-            #         raise CheckStorageServiceError(
-            #             'Create test object failed.')
-            # elif STORAGE_SERVICE_CONFIG['type'] == 'amazon_s3':
-            #     if int(test_object_length) != \
-            #             int(uploaded_object_stat['ContentLength']) \
-            #             or int(test_object_length) != \
-            #                     int(download_test_object_content[
-            #                             'ContentLength']):
-            #         raise CheckStorageServiceError(
-            #             'Create test object failed.')
+            # handle upload data file request and update data file request to storage server
 
 
-# method handle request which data is size of new object push to a container
+@csrf_exempt
+@api_login_required(role='admin')
+def delete_object_data(request):
+    if request.method == 'POST':
+        try:
+            container_name = request.POST['container_name']
+            account_name = request.POST['account_name']
+            object_name = request.POST['object_name']
+            last_update = request.POST['last_update']
+        except Exception as e:
+            print(e)
+            return JsonResponse({'result': 'failed', 'message': 'invalid parameter'})
+        service_connector = \
+            create_service_connector(SERVICE_TYPE, AUTH_INFO)  # check if object exist
+        obj_storage_name = account_name + '.' + container_name + '.' + object_name
+        try:
+            # test_result = client.driver.list_containers()
+            object_info = service_connector.stat_object(STORAGE_CONTAINER_NAME, obj_storage_name)
+            new_object_info = {
+                'account_name': account_name,
+                'container_name': container_name,
+                'object_name': object_name,
+                'option_name': object_info['x-object-meta-option-name'],
+                'last_update': last_update,
+                'time_stamp': last_update,
+                'is_deleted': 'true'
+            }
+            service_connector.update_object(
+                STORAGE_CONTAINER_NAME, obj_storage_name, new_object_info
+            )
+            print('deleted!')
+            return JsonResponse({'result': 'success', 'message': ''})
+        except Exception as e:
+            print(e)
+            print('File not found!')
+            # object_exist = False
+            return JsonResponse({'result': 'failed',
+                                 'message': 'File not found!'})  # method handle request which data is size of new object push to a container
+
+
 @api_login_required(role='admin')
 def get_resolver_info(request):
     if request.method == 'GET':
@@ -321,6 +337,7 @@ def get_object_info(request):
                 'object_name': uploaded_object_stat['x-object-meta-object-name'],
                 'option_name': uploaded_object_stat['x-object-meta-option-name'],
                 'last_update': uploaded_object_stat['x-object-meta-last-update'],
+                'time_stamp': uploaded_object_stat['x-object-meta-time-stamp'],
                 'file_size': uploaded_object_stat['content-length']  # in byte
 
             }
@@ -350,7 +367,7 @@ def download_object(request):
                 create_service_connector(SERVICE_TYPE, AUTH_INFO)
             uploaded_object_stat = service_connector.stat_object(
                 STORAGE_CONTAINER_NAME, account_name + '.' + container_name + '.' + object_name)
-            object_deleted = uploaded_object_stat['x-object-meta-is-deleted'],
+            object_deleted = uploaded_object_stat['x-object-meta-is-deleted']
 
             if object_deleted == 'true':
                 return JsonResponse({'message': 'Object ' + object_name + ' not found!'},
@@ -365,12 +382,7 @@ def download_object(request):
             response['Content-Disposition'] = \
                 'attachment; filename={0}'.format(object_name)
             return response
-            # response = StreamingHttpResponse(streaming_content=object_data[1])
-            # resp['Content-Disposition'] = 'attachment; filename="123.txt"'
-            # response['Content-Disposition'] = \
-            #     'attachment; filename={0}'.format(object_name)
-            # return response
-            # 'conghm.container.1.test3174.tar.gz'
+
         except Exception as e:
             print (e)
             return JsonResponse({'message': 'Object ' + object_name + ' not found!'},

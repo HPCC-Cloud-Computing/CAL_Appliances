@@ -30,6 +30,8 @@ if __name__ == "__main__":
         sub_procs_manage.start_periodic_check__clusters_status()
     ring_periodic_update_proc_id = \
         sub_procs_manage.start_ring_periodic_update_proc()
+    data_sync_proc_id = \
+        sub_procs_manage.start_data_sync_proc()
 
     import atexit
 
@@ -37,7 +39,8 @@ if __name__ == "__main__":
         mcos_celery_server_proc_id,
         send_cluster_status_proc_id,
         check_cluster_status_proc_id,
-        ring_periodic_update_proc_id
+        ring_periodic_update_proc_id,
+        data_sync_proc_id
     ])
 
     from mcos import wsgi

@@ -247,6 +247,20 @@ $(document).ready(function () {
         // $("#file-info-loading").show();
     });
 
+
+    $('#files-table').on('click', 'tbody tr .btn-delete-file', function () {
+        let trSelectedElement = $(this).closest('tr');
+        let selectedFileName = $(trSelectedElement).data('file-name').toString();
+        let selectedContainerName = containersTable.$('tr.selected').data('container-name').toString();
+        $("#delete-file-modal").find("#container-name")
+            .val(selectedContainerName);
+        $("#delete-file-modal").find("#delete-file-name")
+            .val(selectedFileName);
+        $("#delete-file-modal").find("#file-name")
+            .html(selectedFileName);
+        $('#delete-file-modal').modal();
+    });
+
     function loadContainersTable() {
         let tblElement = $('#containers-table');
         let getContainerListApi = tblElement.data("container-list-api");
@@ -310,7 +324,6 @@ $(document).ready(function () {
         $("#files-filter").prop("disabled", true);
         $("#files-table-loading .loading-info").html('Loading File Object List...');
         $("#files-table-loading").show();
-
 
         let selectedRow = $(selectedContainerRow);
         let tblElement = $('#containers-table');
@@ -545,6 +558,7 @@ $(document).ready(function () {
 
     $("#upload-file").on('click', function () {
         let selectedContainerRow = containersTable.$('tr.selected');
+        console.log(selectedContainerRow.data('container-name'));
         if (selectedContainerRow.length != 1) {
             alert_message(
                 'Select extract container which you want to put uploaded file in !',
@@ -553,9 +567,9 @@ $(document).ready(function () {
             // console.log(selectedContainerRow);
             let selectecdContainerName = $(selectedContainerRow).data('container-name');
             $('#upload-file-modal').find("span#input-container-name").attr('data-container-name', selectecdContainerName);
-            $('#upload-file-modal').find("span#input-container-name").html(selectecdContainerName);
-            $("input#input-object-file[type=file]").val('');
-            $("input#input-file-name").val('');
+            $('#upload-file-modal').find("#upload-container-name").val(selectecdContainerName);
+            $('#upload-file-modal').find("input#input-object-file[type=file]").val('');
+            $('#upload-file-modal').find("input#input-file-name").val('');
 
             $('#upload-file-modal').modal({
                 backdrop: 'static',
@@ -587,7 +601,7 @@ $(document).ready(function () {
     $("#create-data-object-submit-btn").on('click', function () {
         let optionName = $("select#input-object-file-option").val();
         let fileName = $("input#input-file-name").val();
-        let containerName = $("#upload-file-modal #input-container-name").data('container-name');
+        let containerName = $("#upload-file-modal").find("#upload-container-name").val();
         var newObjectFileData = new FormData();
         newObjectFileData.append('file_data', $('input#input-object-file[type=file]')[0].files[0]);
         newObjectFileData.append('container_name', containerName);
@@ -761,6 +775,47 @@ $(document).ready(function () {
                     $('#update-file-modal').modal('hide');
                 });
         }
+    });
+
+
+    // handle update file submit button
+    $("#delete-data-object-submit-btn").on('click', function () {
+        let deleteFileForm = $("#delete-file-modal")
+        let fileName = $(deleteFileForm).find("#delete-file-name").val();
+        let containerName = $(deleteFileForm).find("#container-name").val();
+        $("#delete-file-loading .loading-info").html('Deleting File...');
+        $("#delete-file-loading").show();
+        $.ajax({
+            url: $("#files-table").data('delete-file-api'),
+            type: 'POST',
+            data: {
+                'container_name': containerName,
+                'object_name': fileName
+            },
+        })
+            .done(function (data) {
+                if (data.result === 'success') {
+                    setTimeout(function () {
+                        alert_message('File ' + fileName + ' is deleted.', 'alert-success');
+                        let selectedContainerRow = containersTable.$('tr.selected');
+                        loadContainerDetails(selectedContainerRow);
+                    }, 100);
+                } else {
+                    setTimeout(function () {
+                        alert_message(
+                            'Failed to delete file ' + fileName +
+                            '. Reason: ' + data.message,
+                            'alert-danger');
+                    }, 100);
+                }
+            })
+            .fail(function (jqXHR, textStatus, error) {
+                handleFailedAjaxRequest(jqXHR, textStatus, error, 'Failed to delete file ' + fileName);
+            })
+            .always(function (data) {
+                $("#delete-file-loading").hide();
+                $('#delete-file-modal').modal('hide');
+            });
     });
 
     // end document ready

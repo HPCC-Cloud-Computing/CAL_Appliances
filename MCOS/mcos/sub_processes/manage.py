@@ -45,3 +45,12 @@ def start_ring_periodic_update_proc():
                              "ring_periodic_update.py"])
     # print "Continue process main process"
     return proc.pid
+
+
+def start_data_sync_proc():
+    proc = subprocess.Popen(["../mcos_venv/bin/python",
+                             "mcos/sub_processes/"
+                             "data_synchronization.py"])
+    # print "Continue process main process"
+    return proc.pid
+
