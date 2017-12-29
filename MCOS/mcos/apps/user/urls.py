@@ -11,5 +11,8 @@ urls = [
         views.index, name='index'),
     url(r'^dashboard', views.dashboard, name='dashboard'),
     url(r'^data-management', views.data_management, name='data-management'),
+    url(r'^check-role', views.check_role, name='check_role'),
+
+
 ]
 urlpatterns = urls

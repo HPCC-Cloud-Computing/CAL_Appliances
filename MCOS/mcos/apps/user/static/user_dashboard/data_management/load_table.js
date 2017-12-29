@@ -283,6 +283,7 @@ $(document).ready(function () {
                 handleFailedAjaxRequest(jqXHR, textStatus, error, 'Failed to load container list.');
             })
             .always(function (data) {
+                // console.log(data);
                 let container_list = [];
                 if (data.result === 'success') {
                     let containersInfo = data.container_list;

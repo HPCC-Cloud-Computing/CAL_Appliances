@@ -17,6 +17,27 @@ AUTH_INFO = STORAGE_SERVICE_CONFIG['auth_info']
 
 
 @api_login_required(role='admin')
+def get_container_info_list(request):
+    try:
+        account_name = request.GET['account_name']
+        get_container_list_task = tasks.get_container_info_list.apply_async((account_name,))
+        container_list = get_container_list_task.get(timeout=5)
+        if container_list is not None:
+            return JsonResponse(
+                {'result': 'success', 'container_list': container_list})
+        else:
+            return JsonResponse({
+                'result': 'failed',
+                'message': 'Failed to connect to container list db'
+            })
+    except Exception as e:
+        print(e)
+        return JsonResponse(
+            {'result': 'failed',
+             'message': 'server error'})
+
+
+@api_login_required(role='admin')
 def get_container_list(request):
     try:
         account_name = request.GET['account_name']

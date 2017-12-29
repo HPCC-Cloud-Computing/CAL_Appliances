@@ -261,7 +261,7 @@ def get_container_info(request):
 
 
 # send new container to account cluster refs in account ring
-def send_new_container(account_name, container_name,last_update):
+def send_new_container(account_name, container_name, last_update):
     response_container_created = 0
     get_active_clusters_task = \
         tasks.get_account_clusters_ref.apply_async((account_name,))
@@ -1300,3 +1300,60 @@ def delete_file(request):
             return JsonResponse({'result': 'failed', 'message': 'Some Cluster is unavailable, retry later!'})
 
             # return JsonResponse({'result': 'failed', 'message': 'Some Cluster is unavailable, retry later!'})
+
+
+def get_account_overview(request):
+    user_access_info = KeyStoneClient.get_request_user_data(request)
+    account_name = user_access_info['user']['name']
+    get_active_clusters_task = tasks.get_account_clusters_ref.apply_async((account_name,))
+    active_cluster_refs = get_active_clusters_task.get(timeout=2)
+    shuffle(active_cluster_refs)
+    container_list = None
+    msg = ''
+    if active_cluster_refs is not None:
+        container_list = None
+        for cluster in active_cluster_refs:
+            mcos_admin_token = get_admin_token()
+            session = requests.Session()
+            cluster_url = 'http://' + cluster['address_ip'] + ":" + cluster['address_port']
+            container_list_url = cluster_url + '/file-and-container/private/container-info-list/'
+            re_try = 0
+            while re_try < 3:
+                try:
+                    get_container_list_resp = session.get(
+                        container_list_url, headers={'X-Auth-Token': mcos_admin_token},
+                        params={'account_name': account_name}, timeout=5
+                    )
+                    status_code = get_container_list_resp.status_code
+                    if status_code == 200:
+                        resp_data = get_container_list_resp.json()
+                        if resp_data['result'] == 'success':
+                            print('received data from account cluster ' + cluster_url)
+                            container_list = resp_data['container_list']
+                        break
+                    elif status_code == 403:  # token expired
+                        re_try += 1
+                        set_admin_token()
+                        mcos_admin_token = get_admin_token()
+                except Exception as e:
+                    print(e)
+                    print ('Failed to connect to Server ' + cluster_url)
+                    break
+            session.close()
+            if container_list is not None:
+                break
+        if container_list is not None:
+            total_storage_used = 0.0
+            total_container = 0
+            total_file = 0
+            for container_info in container_list:
+                total_container += 1
+                total_file += container_info['object_count']
+                total_storage_used += container_info['size']
+            return JsonResponse({'result': 'success',
+                                 'total_storage_used': total_storage_used,
+                                 'total_container': total_container,
+                                 'total_file': total_file})
+    msg = 'Failed to get account clusters'
+    return JsonResponse({'result': 'failed',
+                         'message': msg})

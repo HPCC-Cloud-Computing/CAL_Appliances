@@ -9,6 +9,7 @@ import sync_urls
 
 urls = [
     url(r'^csrftoken', views.get_csrf_token, name='get_csrftoken'),
+    url(r'^account-overview', views.get_account_overview, name='account_overview'),
     url(r'^container-list', views.get_container_list, name='container_list'),
     url(r'^container-info', views.get_container_info, name='container_info'),
     url(r'^create-container', views.create_container, name='create_container'),

@@ -125,42 +125,17 @@
     <script src="{% static "admin-lte/dist/js/app.min.js" %}"></script>
     <script>
         $(document).ready(function () {
-            let deleteFileForm = $("#delete-file-modal")
-            let fileName = $(deleteFileForm).find("#delete-file-name").val();
-            let containerName = $(deleteFileForm).find("#container-name").val();
-            $("#delete-file-loading .loading-info").html('Deleting File...');
-            $("#delete-file-loading").show();
             $.ajax({
-                url: $("#files-table").data('delete-file-api'),
-                type: 'POST',
-                data: {
-                    'container_name': containerName,
-                    'object_name': fileName
-                },
+                url: $("#admin-quick-access").data('check-role-api'),
+                type: 'GET',
             })
                 .done(function (data) {
-                    if (data.result === 'success') {
-                        setTimeout(function () {
-                            alert_message('File ' + fileName + ' is deleted.', 'alert-success');
-                            let selectedContainerRow = containersTable.$('tr.selected');
-                            loadContainerDetails(selectedContainerRow);
-                        }, 100);
-                    } else {
-                        setTimeout(function () {
-                            alert_message(
-                                'Failed to delete file ' + fileName +
-                                '. Reason: ' + data.message,
-                                'alert-danger');
-                        }, 100);
+                    console.log(data);
+                    let account_role = data['role'];
+                    if(account_role==='admin'){
+                        $("#admin-quick-access").show();
                     }
                 })
-                .fail(function (jqXHR, textStatus, error) {
-                    handleFailedAjaxRequest(jqXHR, textStatus, error, 'Failed to delete file ' + fileName);
-                })
-                .always(function (data) {
-                    $("#delete-file-loading").hide();
-                    $('#delete-file-modal').modal('hide');
-                });
 
             // end document ready
         });

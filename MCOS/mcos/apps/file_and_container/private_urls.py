@@ -8,6 +8,9 @@ from . import private_api_views as private_views
 urls = \
     [
         # url(r'^get_csrf_token', views.get_csrf_token, name='get_csrf_token'),
+        url(r'^container-info-list/$',
+            private_views.get_container_info_list, name='get_container_info_list'),
+
         url(r'^container-list/$',
             private_views.get_container_list, name='get_container_list'),
         url(r'^container-details/$',

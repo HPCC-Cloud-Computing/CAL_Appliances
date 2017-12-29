@@ -70,6 +70,13 @@ task_routes = {
     #      'exchange': 'mcos_exchange_topic',
     #      'routing_key': MCOS_CLUSTER_NAME + '.api_get_container_list', },
     #
+
+
+    'mcos_resolver_and_ring_server.tasks.get_container_info_list':
+        {'queue': MCOS_CLUSTER_NAME,
+         'exchange': 'mcos_exchange_topic',
+         'routing_key': MCOS_CLUSTER_NAME + '.get_container_info_list', },
+
     'mcos_resolver_and_ring_server.tasks.get_container_list':
         {'queue': MCOS_CLUSTER_NAME,
          'exchange': 'mcos_exchange_topic',

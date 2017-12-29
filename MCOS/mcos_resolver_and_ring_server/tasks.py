@@ -150,7 +150,25 @@ def check_ring_exist(ring_name):
     return is_exist
 
 
-@app.task(time_limit=2)
+@app.task(time_limit=5)
+def get_container_info_list(account_name):
+    container_list = []
+    account_db_conn = AccountSession()
+    container_list_info = account_db_conn.query(ContainerInfo). \
+        filter_by(account_name=account_name, is_deleted=False).all()
+    for selected_container in container_list_info:
+        container_list.append({
+            'account_name': selected_container.account_name,
+            'container_name': selected_container.container_name,
+            'object_count': selected_container.object_count,
+            'size': selected_container.size,
+            'date_created': str(selected_container.date_created)
+        })
+    account_db_conn.close()
+    return container_list
+
+
+@app.task(time_limit=5)
 def get_container_list(account_name):
     container_list = []
     account_db_conn = AccountSession()

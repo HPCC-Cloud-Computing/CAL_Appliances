@@ -32,6 +32,21 @@ def index(request):
 
 
 @login_required(role='user')
+def check_role(request):
+    token = request.session.get('auth_token')
+    admin_client = KeyStoneClient.create_admin_client()
+    access_info = admin_client.tokens.validate(token)
+    is_admin = False
+    for role in access_info.role_names:
+        if role == 'admin':
+            is_admin = True
+    if is_admin:
+        return JsonResponse({'role': 'admin'})
+    else:
+        return JsonResponse({'role': 'user'})
+
+
+@login_required(role='user')
 def dashboard(request):
     return render(request, 'user/dashboard/account_overview.html', set_context(request))
 
