@@ -149,6 +149,37 @@ def sync_resolver_info_row(request):
         return JsonResponse({'result': 'success'})
 
 
+def get_object_info(service_connector, obj_storage_name):
+    uploaded_object_stat = \
+        service_connector.stat_object(STORAGE_CONTAINER_NAME, obj_storage_name)
+    object_info = {}
+    if SERVICE_TYPE == 'swift':
+        object_info = {
+            'container_name': uploaded_object_stat['x-object-meta-container.name'],
+            'account_name': uploaded_object_stat['x-object-meta-account.name'],
+            'object_name': uploaded_object_stat['x-object-meta-object.name'],
+            'option_name': uploaded_object_stat['x-object-meta-option.name'],
+            'last_update': uploaded_object_stat['x-object-meta-last.update'],
+            'time_stamp': uploaded_object_stat['x-object-meta-time.stamp'],
+            'is_deleted': uploaded_object_stat['x-object-meta-is.deleted'],
+            'file_size': uploaded_object_stat['content-length']  # in byte
+
+        }
+    elif SERVICE_TYPE == 'amazon_s3':
+        object_info = {
+            'container_name': uploaded_object_stat['Metadata']['x-amz-container.name'],
+            'account_name': uploaded_object_stat['Metadata']['x-amz-account.name'],
+            'object_name': uploaded_object_stat['Metadata']['x-amz-object.name'],
+            'option_name': uploaded_object_stat['Metadata']['x-amz-option.name'],
+            'last_update': uploaded_object_stat['Metadata']['x-amz-last.update'],
+            'time_stamp': uploaded_object_stat['Metadata']['x-amz-time.stamp'],
+            'is_deleted': uploaded_object_stat['Metadata']['x-amz-is.deleted'],
+            'file_size': uploaded_object_stat['ContentLength']
+
+        }
+    return object_info
+
+
 def get_object_data_time_stamp(request):
     try:
         account_name = request.GET['account_name']
@@ -161,9 +192,10 @@ def get_object_data_time_stamp(request):
             service_connector = \
                 create_service_connector(SERVICE_TYPE, AUTH_INFO)
             storage_object_name = account_name + '.' + container_name + '.' + object_name
-            object_metadata = service_connector.stat_object(STORAGE_CONTAINER_NAME,
-                                                            storage_object_name)
-            object_data_time_stamp = object_metadata['x-object-meta-time-stamp']
+            # object_metadata = service_connector.stat_object(STORAGE_CONTAINER_NAME,
+            #                                                 storage_object_name)
+            object_metadata = get_object_info(service_connector, storage_object_name)
+            object_data_time_stamp = object_metadata['time_stamp']
         except Exception as e:
             object_data_exist = False
 
@@ -207,12 +239,14 @@ def sync_object_data(request):
             object_exist = True
             obj_storage_name = account_name + '.' + container_name + '.' + object_name
             try:
-                object_info = client.stat_object(STORAGE_CONTAINER_NAME, obj_storage_name)
+                object_info = \
+                    service_connector.stat_object(STORAGE_CONTAINER_NAME, obj_storage_name)
             except Exception as e:
                 object_exist = False
             if object_exist:
+                object_metadata = get_object_info(service_connector, storage_object_name)
                 check_time_stamp = datetime.datetime.strptime(
-                    object_info['x-object-meta-time-stamp'], '%Y-%m-%d %H:%M:%S.%f')
+                    object_metadata['time_stamp'], '%Y-%m-%d %H:%M:%S.%f')
                 if (check_time_stamp < datetime.datetime.strptime(
                         time_stamp, '%Y-%m-%d %H:%M:%S.%f')):
                     service_connector.delete_object(STORAGE_CONTAINER_NAME, obj_storage_name)
@@ -223,13 +257,13 @@ def sync_object_data(request):
                 container=STORAGE_CONTAINER_NAME,
                 contents=object_file_data.read(),
                 content_length=file_size,
-                metadata={'account_name': account_name,
-                          'container_name': container_name,
-                          'object_name': object_name,
-                          'last_update': last_update,
-                          'option_name': option_name,
-                          'time_stamp': time_stamp,
-                          'is_deleted': is_deleted}
+                metadata={'account.name': account_name,
+                          'container.name': container_name,
+                          'object.name': object_name,
+                          'last.update': last_update,
+                          'option.name': option_name,
+                          'time.stamp': time_stamp,
+                          'is.deleted': is_deleted}
             )
             return JsonResponse({'result': 'success', 'message': ''})
         except Exception as e:

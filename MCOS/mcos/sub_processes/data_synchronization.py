@@ -18,6 +18,7 @@ from mcos.settings.shared import PERIODIC_SYNCHRONIZE
 from mcos.settings.base import TIME_ZONE
 from mcos.utils import create_service_connector
 from mcos.settings.storage_service_conf import STORAGE_SERVICE_CONFIG, STORAGE_CONTAINER_NAME
+
 SERVICE_TYPE = STORAGE_SERVICE_CONFIG['type']
 AUTH_INFO = STORAGE_SERVICE_CONFIG['auth_info']
 
@@ -257,24 +258,52 @@ def sync_object_data(object_info_metadata, storage_object_name):
             pass
 
 
+def get_object_info(service_connector, obj_storage_name):
+    uploaded_object_stat = \
+        service_connector.stat_object(STORAGE_CONTAINER_NAME, obj_storage_name)
+    object_info = {}
+    if SERVICE_TYPE == 'swift':
+        object_info = {
+            'container_name': uploaded_object_stat['x-object-meta-container.name'],
+            'account_name': uploaded_object_stat['x-object-meta-account.name'],
+            'object_name': uploaded_object_stat['x-object-meta-object.name'],
+            'option_name': uploaded_object_stat['x-object-meta-option.name'],
+            'last_update': uploaded_object_stat['x-object-meta-last.update'],
+            'time_stamp': uploaded_object_stat['x-object-meta-time.stamp'],
+            'is_deleted': uploaded_object_stat['x-object-meta-is.deleted'],
+            'file_size': uploaded_object_stat['content-length']  # in byte
+
+        }
+    elif SERVICE_TYPE == 'amazon_s3':
+        object_info = {
+            'container_name': uploaded_object_stat['Metadata']['x-amz-container.name'],
+            'account_name': uploaded_object_stat['Metadata']['x-amz-account.name'],
+            'object_name': uploaded_object_stat['Metadata']['x-amz-object.name'],
+            'option_name': uploaded_object_stat['Metadata']['x-amz-option.name'],
+            'last_update': uploaded_object_stat['Metadata']['x-amz-last.update'],
+            'time_stamp': uploaded_object_stat['Metadata']['x-amz-time.stamp'],
+            'is_deleted': uploaded_object_stat['Metadata']['x-amz-is.deleted'],
+            'file_size': uploaded_object_stat['ContentLength']
+
+        }
+    return object_info
+
+
 def object_data_sync():
     service_connector = \
         create_service_connector(SERVICE_TYPE, AUTH_INFO)
-    object_data_list = service_connector.list_container_objects(STORAGE_CONTAINER_NAME)
-    # print (object_data_list)
-    for object_info in object_data_list:
-        storage_object_name = object_info['name']
-        object_metadata = service_connector.stat_object(STORAGE_CONTAINER_NAME,
-                                             storage_object_name)
-        object_info_metadata = {
-            'account_name': object_metadata['x-object-meta-account-name'],
-            'container_name': object_metadata['x-object-meta-container-name'],
-            'object_name': object_metadata['x-object-meta-object-name'],
-            'last_update': object_metadata['x-object-meta-last-update'],
-            'option_name': object_metadata['x-object-meta-option-name'],
-            'time_stamp': object_metadata['x-object-meta-time-stamp'],
-            'is_deleted': object_metadata['x-object-meta-is-deleted'],
-        }
+    object_data_list = service_connector.list_container_objects(STORAGE_CONTAINER_NAME, '', '')
+    object_list = []
+    if SERVICE_TYPE == 'swift':
+        for object_info in object_data_list:
+            object_list.append(object_info['name'])
+    elif SERVICE_TYPE == 'amazon_s3':
+        for object_info in object_data_list['Contents']:
+            object_list.append(object_info['Key'])
+    # print (object_data_list) .list_container_objects(container_test, '', '')
+    for object_info in object_list:
+        storage_object_name = object_info
+        object_info_metadata = get_object_info(service_connector,storage_object_name)
         sync_object_data(object_info_metadata, storage_object_name)
 
 

@@ -16,6 +16,37 @@ SERVICE_TYPE = STORAGE_SERVICE_CONFIG['type']
 AUTH_INFO = STORAGE_SERVICE_CONFIG['auth_info']
 
 
+def get_object_info(service_connector, obj_storage_name):
+    uploaded_object_stat = \
+        service_connector.stat_object(STORAGE_CONTAINER_NAME, obj_storage_name)
+    object_info = {}
+    if SERVICE_TYPE == 'swift':
+        object_info = {
+            'container_name': uploaded_object_stat['x-object-meta-container.name'],
+            'account_name': uploaded_object_stat['x-object-meta-account.name'],
+            'object_name': uploaded_object_stat['x-object-meta-object.name'],
+            'option_name': uploaded_object_stat['x-object-meta-option.name'],
+            'last_update': uploaded_object_stat['x-object-meta-last.update'],
+            'time_stamp': uploaded_object_stat['x-object-meta-time.stamp'],
+            'is_deleted': uploaded_object_stat['x-object-meta-is.deleted'],
+            'file_size': uploaded_object_stat['content-length']  # in byte
+
+        }
+    elif SERVICE_TYPE == 'amazon_s3':
+        object_info = {
+            'container_name': uploaded_object_stat['Metadata']['x-amz-container.name'],
+            'account_name': uploaded_object_stat['Metadata']['x-amz-account.name'],
+            'object_name': uploaded_object_stat['Metadata']['x-amz-object.name'],
+            'option_name': uploaded_object_stat['Metadata']['x-amz-option.name'],
+            'last_update': uploaded_object_stat['Metadata']['x-amz-last.update'],
+            'time_stamp': uploaded_object_stat['Metadata']['x-amz-time.stamp'],
+            'is_deleted': uploaded_object_stat['Metadata']['x-amz-is.deleted'],
+            'file_size': uploaded_object_stat['ContentLength']
+
+        }
+    return object_info
+
+
 @api_login_required(role='admin')
 def get_container_info_list(request):
     try:
@@ -258,13 +289,13 @@ def upload_object_data(request):
                 container=STORAGE_CONTAINER_NAME,
                 contents=object_file_data.read(),
                 content_length=file_size,
-                metadata={'account_name': account_name,
-                          'container_name': container_name,
-                          'object_name': object_name,
-                          'last_update': last_update,
-                          'option_name': option_name,
-                          'time_stamp': last_update,
-                          'is_deleted': 'false'}
+                metadata={'account.name': account_name,
+                          'container.name': container_name,
+                          'object.name': object_name,
+                          'last.update': last_update,
+                          'option.name': option_name,
+                          'time.stamp': last_update,
+                          'is.deleted': 'false'}
             )
             return JsonResponse({'result': 'success', 'message': ''})
         except Exception as e:
@@ -291,15 +322,16 @@ def delete_object_data(request):
         obj_storage_name = account_name + '.' + container_name + '.' + object_name
         try:
             # test_result = client.driver.list_containers()
-            object_info = service_connector.stat_object(STORAGE_CONTAINER_NAME, obj_storage_name)
+            # object_info = service_connector.stat_object(STORAGE_CONTAINER_NAME, obj_storage_name)
+            object_info =  get_object_info(service_connector,obj_storage_name)
             new_object_info = {
-                'account_name': account_name,
-                'container_name': container_name,
-                'object_name': object_name,
-                'option_name': object_info['x-object-meta-option-name'],
-                'last_update': last_update,
-                'time_stamp': last_update,
-                'is_deleted': 'true'
+                'account.name': account_name,
+                'container.name': container_name,
+                'object.name': object_name,
+                'option.name': object_info['option_name'],
+                'last.update': last_update,
+                'time.stamp': last_update,
+                'is.deleted': 'true'
             }
             service_connector.update_object(
                 STORAGE_CONTAINER_NAME, obj_storage_name, new_object_info
@@ -347,21 +379,21 @@ def get_object_info(request):
             # upload object to storage server
             service_connector = \
                 create_service_connector(SERVICE_TYPE, AUTH_INFO)
-            # 'conghm.container.1.test3174.tar.gz'
             # uploaded_object_stat = service_connector.stat_object(
-            #     STORAGE_CONTAINER_NAME, 'conghm.container.1.test3174.tar.gz')
-            uploaded_object_stat = service_connector.stat_object(
-                STORAGE_CONTAINER_NAME, account_name + '.' + container_name + '.' + object_name)
-            object_info = {
-                'container_name': uploaded_object_stat['x-object-meta-container-name'],
-                'account_name': uploaded_object_stat['x-object-meta-account-name'],
-                'object_name': uploaded_object_stat['x-object-meta-object-name'],
-                'option_name': uploaded_object_stat['x-object-meta-option-name'],
-                'last_update': uploaded_object_stat['x-object-meta-last-update'],
-                'time_stamp': uploaded_object_stat['x-object-meta-time-stamp'],
-                'file_size': uploaded_object_stat['content-length']  # in byte
-
-            }
+            #     STORAGE_CONTAINER_NAME, account_name + '.' + container_name + '.' + object_name)
+            obj_storage_name = \
+                STORAGE_CONTAINER_NAME, account_name + '.' + container_name + '.' + object_name
+            object_info = get_object_info(service_connector,obj_storage_name)
+            # object_info = {
+            #     'container_name': uploaded_object_stat['x-object-meta-container-name'],
+            #     'account_name': uploaded_object_stat['x-object-meta-account-name'],
+            #     'object_name': uploaded_object_stat['x-object-meta-object-name'],
+            #     'option_name': uploaded_object_stat['x-object-meta-option-name'],
+            #     'last_update': uploaded_object_stat['x-object-meta-last-update'],
+            #     'time_stamp': uploaded_object_stat['x-object-meta-time-stamp'],
+            #     'file_size': uploaded_object_stat['content-length']  # in byte
+            #
+            # }
             return JsonResponse({'result': 'success', 'is_exist': True,
                                  'object_info': object_info, 'message': ''})
         except Exception as e:
@@ -386,9 +418,10 @@ def download_object(request):
         try:
             service_connector = \
                 create_service_connector(SERVICE_TYPE, AUTH_INFO)
-            uploaded_object_stat = service_connector.stat_object(
-                STORAGE_CONTAINER_NAME, account_name + '.' + container_name + '.' + object_name)
-            object_deleted = uploaded_object_stat['x-object-meta-is-deleted']
+            obj_storage_name = \
+                STORAGE_CONTAINER_NAME, account_name + '.' + container_name + '.' + object_name
+            object_info = get_object_info(service_connector,obj_storage_name)
+            object_deleted = object_info['is_deleted']
 
             if object_deleted == 'true':
                 return JsonResponse({'message': 'Object ' + object_name + ' not found!'},
