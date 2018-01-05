@@ -16,7 +16,7 @@ import mcos
 from mcos.settings import mcos_conf
 
 # from mcos.settings.shared import PERIODIC_CHECK_STATUS_TIME
-PERIODIC_CHECK_STATUS_TIME = 3600
+PERIODIC_CHECK_STATUS_TIME = 60
 
 
 def setup_django_db_context(db_setting_modules):

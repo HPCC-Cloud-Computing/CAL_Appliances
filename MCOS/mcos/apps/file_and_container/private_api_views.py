@@ -16,7 +16,8 @@ SERVICE_TYPE = STORAGE_SERVICE_CONFIG['type']
 AUTH_INFO = STORAGE_SERVICE_CONFIG['auth_info']
 
 
-def get_object_info(service_connector, obj_storage_name):
+def get_object_metadata_info(service_connector, obj_storage_name):
+    # print('get object info')
     uploaded_object_stat = \
         service_connector.stat_object(STORAGE_CONTAINER_NAME, obj_storage_name)
     object_info = {}
@@ -323,21 +324,34 @@ def delete_object_data(request):
         try:
             # test_result = client.driver.list_containers()
             # object_info = service_connector.stat_object(STORAGE_CONTAINER_NAME, obj_storage_name)
-            object_info =  get_object_info(service_connector,obj_storage_name)
-            new_object_info = {
-                'account.name': account_name,
-                'container.name': container_name,
-                'object.name': object_name,
-                'option.name': object_info['option_name'],
-                'last.update': last_update,
-                'time.stamp': last_update,
-                'is.deleted': 'true'
-            }
-            service_connector.update_object(
-                STORAGE_CONTAINER_NAME, obj_storage_name, new_object_info
-            )
-            print('deleted!')
-            return JsonResponse({'result': 'success', 'message': ''})
+            object_info = get_object_metadata_info(service_connector, obj_storage_name)
+            print(object_info)
+            if object_info['is_deleted'] == 'false':
+                service_connector.delete_object(STORAGE_CONTAINER_NAME, obj_storage_name)
+                new_object_info = {
+                    'account.name': account_name,
+                    'container.name': container_name,
+                    'object.name': object_name,
+                    'option.name': object_info['option_name'],
+                    'last.update': last_update,
+                    'time.stamp': last_update,
+                    'is.deleted': 'true'
+                }
+                service_connector.upload_object(
+                    obj=obj_storage_name,
+                    container=STORAGE_CONTAINER_NAME,
+                    contents=' ',
+                    content_length=1,
+                    metadata=new_object_info
+                )
+                # service_connector.update_object(
+                #     STORAGE_CONTAINER_NAME, obj_storage_name, new_object_info
+                # )
+                print('deleted!')
+                return JsonResponse({'result': 'success', 'message': ''})
+            else:
+                return JsonResponse({'result': 'failed',
+                                     'message': 'File not found!'})
         except Exception as e:
             print(e)
             print('File not found!')
@@ -381,9 +395,8 @@ def get_object_info(request):
                 create_service_connector(SERVICE_TYPE, AUTH_INFO)
             # uploaded_object_stat = service_connector.stat_object(
             #     STORAGE_CONTAINER_NAME, account_name + '.' + container_name + '.' + object_name)
-            obj_storage_name = \
-                STORAGE_CONTAINER_NAME, account_name + '.' + container_name + '.' + object_name
-            object_info = get_object_info(service_connector,obj_storage_name)
+            obj_storage_name = account_name + '.' + container_name + '.' + object_name
+            object_info = get_object_metadata_info(service_connector, obj_storage_name)
             # object_info = {
             #     'container_name': uploaded_object_stat['x-object-meta-container-name'],
             #     'account_name': uploaded_object_stat['x-object-meta-account-name'],
@@ -418,9 +431,10 @@ def download_object(request):
         try:
             service_connector = \
                 create_service_connector(SERVICE_TYPE, AUTH_INFO)
-            obj_storage_name = \
-                STORAGE_CONTAINER_NAME, account_name + '.' + container_name + '.' + object_name
-            object_info = get_object_info(service_connector,obj_storage_name)
+            obj_storage_name = account_name + '.' + container_name + '.' + object_name
+            object_info = get_object_metadata_info(service_connector, obj_storage_name)
+            print('object_info')
+            print(object_info)
             object_deleted = object_info['is_deleted']
 
             if object_deleted == 'true':
@@ -432,12 +446,17 @@ def download_object(request):
             # resp['Content-Disposition'] = 'attachment; filename="123.txt"'
             # with open(object_name,'wb') as test_f:
             #     test_f.write(object_data)
-            response = HttpResponse(object_data[1], status=200)
+            if SERVICE_TYPE == 'swift':
+                object_content = object_data[1]
+            elif SERVICE_TYPE == 'amazon_s3':
+                object_content = object_data['Body']._raw_stream.data
+            response = HttpResponse(object_content, status=200)
             response['Content-Disposition'] = \
                 'attachment; filename={0}'.format(object_name)
             return response
 
         except Exception as e:
+            print('catch exception!')
             print (e)
             return JsonResponse({'message': 'Object ' + object_name + ' not found!'},
                                 status=404)

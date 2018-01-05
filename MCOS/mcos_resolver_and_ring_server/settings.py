@@ -130,6 +130,10 @@ task_routes = {
          'exchange': 'mcos_exchange_topic',
          'routing_key': MCOS_CLUSTER_NAME + '.sync_container_row', },
 
+    'mcos_resolver_and_ring_server.tasks.process_container_row_report':
+        {'queue': MCOS_CLUSTER_NAME,
+         'exchange': 'mcos_exchange_topic',
+         'routing_key': MCOS_CLUSTER_NAME + '.process_container_row_report', },
     # object row sync
     'mcos_resolver_and_ring_server.tasks.sync_get_object_list':
         {'queue': MCOS_CLUSTER_NAME,

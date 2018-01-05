@@ -11,6 +11,7 @@ from mcos_resolver_and_ring_server import tasks
 from mcos.utils import create_service_connector
 from mcos.settings.storage_service_conf import STORAGE_SERVICE_CONFIG, STORAGE_CONTAINER_NAME
 from django.views.decorators.csrf import csrf_exempt
+import datetime
 
 SERVICE_TYPE = STORAGE_SERVICE_CONFIG['type']
 AUTH_INFO = STORAGE_SERVICE_CONFIG['auth_info']
@@ -60,6 +61,20 @@ def sync_container_row(request):
         return JsonResponse({'result': 'success'})
 
 
+@csrf_exempt
+def report_container_row(request):
+    if request.method == "POST":
+        container_info = {
+            'account_name': request.POST['account_name'],
+            'container_name': request.POST['container_name'],
+            'object_count': request.POST['object_count'],
+            'time_stamp': request.POST['time_stamp'],
+            'size': request.POST['total_size']
+        }
+        tasks.process_container_row_report.apply_async((container_info,))
+        return JsonResponse({'result': 'success'})
+
+
 # get container row time stamp
 def get_object_info_time_stamp(request):
     try:
@@ -69,6 +84,7 @@ def get_object_info_time_stamp(request):
         get_obj_info_task = tasks.sync_get_object_time_stamp. \
             apply_async((account_name, container_name, object_name))
         obj_info_row = get_obj_info_task.get(timeout=5)
+
         if obj_info_row is not None:
             return JsonResponse(
                 {'result': 'success',
@@ -196,6 +212,8 @@ def get_object_data_time_stamp(request):
             #                                                 storage_object_name)
             object_metadata = get_object_info(service_connector, storage_object_name)
             object_data_time_stamp = object_metadata['time_stamp']
+            # print('time_stamp')
+            # print(object_data_time_stamp)
         except Exception as e:
             object_data_exist = False
 
@@ -242,9 +260,10 @@ def sync_object_data(request):
                 object_info = \
                     service_connector.stat_object(STORAGE_CONTAINER_NAME, obj_storage_name)
             except Exception as e:
+                print('object not exist!')
                 object_exist = False
             if object_exist:
-                object_metadata = get_object_info(service_connector, storage_object_name)
+                object_metadata = get_object_info(service_connector, obj_storage_name)
                 check_time_stamp = datetime.datetime.strptime(
                     object_metadata['time_stamp'], '%Y-%m-%d %H:%M:%S.%f')
                 if (check_time_stamp < datetime.datetime.strptime(
@@ -267,6 +286,8 @@ def sync_object_data(request):
             )
             return JsonResponse({'result': 'success', 'message': ''})
         except Exception as e:
+            print('catch exception')
+            print(e)
             return JsonResponse({'result': 'failed', 'message': str(e)})
 
             # handle upload data file request and update data file request to storage server

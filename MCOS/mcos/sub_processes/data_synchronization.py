@@ -38,7 +38,7 @@ from mcos.apps.admin.system.models import SystemCluster
 from mcos.apps.admin.system.models import ObjectServiceInfo
 
 
-# sync container row in container info table
+# sync container row in account info table
 
 def send_sync_container_msg(check_container, ref_cluster):
     cluster_url = 'http://' + ref_cluster['address_ip'] + ":" + ref_cluster['address_port']
@@ -93,7 +93,7 @@ def account_db_sync():
 # sync object row in container information
 def send_sync_object_info_msg(check_object, ref_cluster):
     cluster_url = 'http://' + ref_cluster['address_ip'] + ":" + ref_cluster['address_port']
-    target_url = cluster_url + '/file-and-container/sync/sync-object-row/'
+    target_url = cluster_url + '/file-and-container/sync/sync-object-info-row/'
     try:
         requests.post(target_url, data=check_object, timeout=3)
     except Exception as e:
@@ -107,14 +107,15 @@ def sync_object_row(check_object):
     ref_clusters = tasks.get_container_clusters_ref.apply_async(
         (check_object['account_name'], check_object['container_name']))
     ref_clusters = ref_clusters.get()
+    # print(ref_clusters)
     for ref_cluster in ref_clusters:
         cluster_url = 'http://' + ref_cluster['address_ip'] + ":" + ref_cluster['address_port']
-        target_url = cluster_url + '/file-and-container/sync/get-object-time-stamp/'
+        target_url = cluster_url + '/file-and-container/sync/get-object-info-time-stamp/'
         try:
             get_req = requests.get(
                 target_url, params={'account_name': check_object['account_name'],
                                     'container_name': check_object['container_name'],
-                                    'object_name': check_object['object_namer']
+                                    'object_name': check_object['object_name']
                                     }, timeout=5)
             status_code = get_req.status_code
             if status_code == 200:
@@ -128,14 +129,16 @@ def sync_object_row(check_object):
                     else:
                         send_sync_object_info_msg(check_object, ref_cluster)
         except Exception as e:
+            raise e
             pass
 
 
 def container_db_sync():
-    pass
+    # print('sync container db')
     object_list_task = tasks.sync_get_object_list.apply_async()
     object_list = object_list_task.get()
     for object_info in object_list:
+        # print(object_info)
         sync_object_row(object_info)
         # break
 
@@ -152,6 +155,7 @@ def send_sync_resolver_info_msg(check_resolver_info, ref_cluster):
 
 
 def sync_resolver_info_row(check_resolver_info):
+    # print(check_resolver_info)
     check_time_stamp = datetime.datetime.strptime(
         check_resolver_info['time_stamp'], '%Y-%m-%dT%H:%M:%S.%f')
     # get last_update from other clusters
@@ -167,7 +171,7 @@ def sync_resolver_info_row(check_resolver_info):
             get_req = requests.get(
                 target_url, params={'account_name': check_resolver_info['account_name'],
                                     'container_name': check_resolver_info['container_name'],
-                                    'object_name': check_resolver_info['object_namer']
+                                    'object_name': check_resolver_info['object_name']
                                     }, timeout=5)
             status_code = get_req.status_code
             if status_code == 200:
@@ -194,23 +198,26 @@ def resolver_db_sync():
 
 # sync object data
 def send_sync_object_data_msg(object_info_metadata, storage_object_name, ref_cluster):
-    print ('send request')
-    print (object_info_metadata)
-    print (storage_object_name)
-    print (ref_cluster)
+    # print ('send request')
+    # print (object_info_metadata)
+    # print (storage_object_name)
+    # print (ref_cluster)
     service_connector = \
         create_service_connector(SERVICE_TYPE, AUTH_INFO)
     object_data = service_connector.download_object(
         STORAGE_CONTAINER_NAME, storage_object_name)
-    object_data = object_data[1]
+    if SERVICE_TYPE == 'swift':
+        object_content = object_data[1]
+    elif SERVICE_TYPE == 'amazon_s3':
+        object_content = object_data['Body']._raw_stream.data
     # print(object_data)
     cluster_url = 'http://' + ref_cluster['address_ip'] + ":" + ref_cluster['address_port']
-    print(cluster_url)
+    # print(cluster_url)
     target_url = cluster_url + '/file-and-container/sync/sync-object-data/'
     try:
         requests.post(target_url,
                       data=object_info_metadata,
-                      files={'file': object_data},
+                      files={'file': object_content},
                       timeout=10)
     except Exception as e:
         pass
@@ -298,24 +305,97 @@ def object_data_sync():
         for object_info in object_data_list:
             object_list.append(object_info['name'])
     elif SERVICE_TYPE == 'amazon_s3':
-        for object_info in object_data_list['Contents']:
-            object_list.append(object_info['Key'])
+        if 'Contents' in object_data_list:
+            for object_info in object_data_list['Contents']:
+                object_list.append(object_info['Key'])
     # print (object_data_list) .list_container_objects(container_test, '', '')
     for object_info in object_list:
         storage_object_name = object_info
-        object_info_metadata = get_object_info(service_connector,storage_object_name)
+        object_info_metadata = get_object_info(service_connector, storage_object_name)
         sync_object_data(object_info_metadata, storage_object_name)
+
+
+def send_report_account_info(container_row):
+    send_account = container_row['account_name']
+
+
+def report_account_info_sync():
+    check_time_stamp = str(datetime.datetime.utcnow())
+    # print('sync container db')
+    object_list_task = tasks.sync_get_object_list.apply_async()
+    object_list = object_list_task.get()
+    container_row_list = []
+    for object_info in object_list:
+        container_exist = False
+        for container_info in container_row_list:
+            if object_info['container_name'] == container_info['container_name'] and \
+                            object_info['account_name'] == container_info['account_name']:
+                container_exist = True
+                if object_info['is_deleted'] == False:
+                    container_info['object_count'] += 1
+                    container_info['total_size'] += (1.0 * object_info['size']) / (1024 * 1024)
+        if container_exist is False:
+            if object_info['is_deleted'] == False:
+
+                container_row_list.append({
+                    'account_name': object_info['account_name'],
+                    'container_name': object_info['container_name'],
+                    'object_count': 1,
+                    'total_size': (1.0 * object_info['size']) / (1024 * 1024),
+                    'time_stamp': check_time_stamp
+                })
+            else:
+                container_row_list.append({
+                    'account_name': object_info['account_name'],
+                    'container_name': object_info['container_name'],
+                    'object_count': 0,
+                    'total_size': 0.0,
+                    'time_stamp': check_time_stamp
+                })
+
+    print(container_row_list)
+
+    for container_row in container_row_list:
+        # get last_update from other clusters
+        ref_clusters = tasks.get_account_clusters_ref.apply_async((container_row['account_name'],))
+        ref_clusters = ref_clusters.get()
+        for ref_cluster in ref_clusters:
+            cluster_url = 'http://' + ref_cluster['address_ip'] + ":" + ref_cluster['address_port']
+            # print('check replica in cluster ' + cluster_url)
+            target_url = cluster_url + '/file-and-container/sync/report-container-row/'
+            try:
+                requests.post(target_url, data=container_row, timeout=3)
+            except Exception as e:
+                pass
+                # sync_object_row(object_info)
+                # break
 
 
 while True:
     try:
         account_db_sync()
-        container_db_sync()
-        resolver_db_sync()
-        object_data_sync()
-        time.sleep(PERIODIC_SYNCHRONIZE)
-
     except Exception as e:
         print(e)
-        time.sleep(PERIODIC_SYNCHRONIZE)
-        # sys.exit(1)
+
+    try:
+        container_db_sync()
+    except Exception as e:
+        print(e)
+
+    try:
+        resolver_db_sync()
+    except Exception as e:
+        print(e)
+
+    try:
+        object_data_sync()
+    except Exception as e:
+        print(e)
+
+    try:
+        report_account_info_sync()
+    except Exception as e:
+        print(e)
+
+    time.sleep(PERIODIC_SYNCHRONIZE)
+    # sys.exit(1)

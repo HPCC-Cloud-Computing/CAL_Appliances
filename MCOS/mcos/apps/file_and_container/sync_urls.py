@@ -12,6 +12,9 @@ urls = \
             sync_views.get_container_time_stamp, name='get_container_time_stamp'),
         url(r'^sync-container-row/$',
             sync_views.sync_container_row, name='sync_container_row'),
+        url(r'^report-container-row/$',
+            sync_views.report_container_row, name='report_container_row'),
+
 
         url(r'^get-object-info-time-stamp/$',
             sync_views.get_object_info_time_stamp, name='get_object_info_time_stamp'),

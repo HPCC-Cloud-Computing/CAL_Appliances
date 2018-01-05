@@ -22,7 +22,7 @@ def start_periodic_send_cluster_status():
 def start_handle_cluster_msg_server():
     # print "Start handle cluster message celery server"
     celery_cmdline = '../mcos_venv/bin/celery worker -A ' \
-                     'mcos_celery_server -l INFO'.split(" ")
+                     'mcos_celery_server -l ERROR'.split(" ")
 
     proc = subprocess.Popen(celery_cmdline)
     # print "Continue process main process"

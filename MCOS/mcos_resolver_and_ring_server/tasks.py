@@ -641,6 +641,31 @@ def sync_container_row(container_info):
         account_db_conn.close()
 
 
+@celery.task(ignore_result=True)
+def process_container_row_report(container_info):
+    # print(container_info)
+    account_db_conn = AccountSession()
+    check_container = account_db_conn.query(ContainerInfo). \
+        filter_by(account_name=container_info['account_name'],
+                  container_name=container_info['container_name']).first()
+    if check_container is not None:
+        if check_container.is_deleted is False:
+            # recheck timestamp
+            if check_container.object_count != int(container_info['object_count']) or \
+                            check_container.size != float(container_info['size']):
+                try:
+                    check_container.time_stamp = datetime.datetime.strptime(
+                        container_info['time_stamp'], '%Y-%m-%d %H:%M:%S.%f')
+                    check_container.object_count = container_info['object_count']
+                    check_container.size = container_info['size']
+                    account_db_conn.add(check_container)
+                    account_db_conn.commit()
+                    account_db_conn.close()
+                except Exception as e:
+                    print(e)
+                    account_db_conn.close()
+
+
 @app.task()
 def sync_get_object_list():
     object_list = []
@@ -691,7 +716,7 @@ def sync_object_row(object_info):
     if check_object is not None:
         # recheck timestamp
         if (check_object.time_stamp < datetime.datetime.strptime(
-                check_object['time_stamp'], '%Y-%m-%dT%H:%M:%S.%f')):
+                object_info['time_stamp'], '%Y-%m-%dT%H:%M:%S.%f')):
             try:
                 check_object.size = object_info['size']
                 check_object.is_deleted = object_info['is_deleted']

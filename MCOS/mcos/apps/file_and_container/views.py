@@ -1291,6 +1291,10 @@ def delete_file(request):
             len_obj_info = len(send_object_info_requests)
             len_res_info = len(send_resolver_info_requests)
             len_obj_data = len(send_object_data_requests)
+        print('success_object_data ' +str(success_object_data))
+        print('success_object_info ' +str(success_object_info))
+        print('success_container_info ' +str(success_container_info))
+        print('success_resolver_info ' +str(success_resolver_info))
 
         if success_object_data >= 1 and success_object_info >= 1 and \
                         success_container_info >= 1 and success_resolver_info >= 1:
